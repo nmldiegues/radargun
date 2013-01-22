@@ -83,26 +83,6 @@ public class TpccBenchmarkStage extends AbstractDistStage {
 
    private transient TpccStressor tpccStressor;
 
-   @Override
-   public void initOnMaster(MasterState masterState, int slaveIndex) {
-      super.initOnMaster(masterState, slaveIndex);
-      Boolean started = (Boolean) masterState.get(SCRIPT_LAUNCH);
-      if (started == null || !started) {
-         masterState.put(SCRIPT_LAUNCH, startScript());
-      }
-   }
-
-   private Boolean startScript() {
-      try {
-         Runtime.getRuntime().exec(SCRIPT_PATH);
-         log.info("Script " + SCRIPT_PATH + " started successfully");
-         return Boolean.TRUE;
-      } catch (Exception e) {
-         log.warn("Error starting script " + SCRIPT_PATH + ". " + e.getMessage());
-         return Boolean.FALSE;
-      }
-   }
-
    public DistStageAck executeOnSlave() {
       DefaultDistStageAck result = new DefaultDistStageAck(slaveIndex, slaveState.getLocalAddress());
       this.cacheWrapper = slaveState.getCacheWrapper();

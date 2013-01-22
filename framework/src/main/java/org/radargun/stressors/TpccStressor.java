@@ -478,7 +478,6 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
 
    private List<Stressor> executeOperations() throws Exception {
       calculateLocalWarehouses();
-
       startPoint = new CountDownLatch(1);
       for (int threadIndex = 0; threadIndex < numOfThreads; threadIndex++) {
          Stressor stressor = createStressor(threadIndex);
