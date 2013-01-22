@@ -167,7 +167,7 @@ public class ClusterValidationStage extends AbstractDistStage {
       int replicaCount = 0;
       for (int i = 0; i < clusterSize; i++) {
          int currentSlaveIndex = getSlaveIndex();
-         if (i == currentSlaveIndex && !isPassiveReplication) { //the master in passive replication can only see himself data
+         if (i == currentSlaveIndex && !isPassiveReplication && clusterSize > 1) { //the master in passive replication can only see himself data
             continue;
          }
          Object data = tryGet(i);

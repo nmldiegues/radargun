@@ -327,7 +327,7 @@ public class PutGetStressor extends AbstractCacheWrapperStressor {
 
    private boolean startTransaction(int i) {
       if ((i % transactionSize) == 0) {
-         cacheWrapper.startTransaction();
+         cacheWrapper.startTransaction(false);
          return true;
       }
       return false;

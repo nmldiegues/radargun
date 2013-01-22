@@ -173,6 +173,19 @@
 
    <repositories>
       <!-- basic JBoss repository -->
+		<repository>
+			<id>cloudtm</id>
+			<name>Cloud-TM's Maven Repository</name>
+			<url>http://cloudtm.ist.utl.pt:8083/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
+		</repository>
       <repository>
          <id>jboss-public-repository-group</id>
          <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
@@ -188,6 +201,19 @@
          <id>snapshots.repository.codehaus.org</id>
          <url>http://snapshots.repository.codehaus.org</url>
       </pluginRepository>
+		<pluginRepository>
+			<id>cloudtm</id>
+			<name>Cloud-TM's Maven Repository</name>
+			<url>http://cloudtm.ist.utl.pt:8083/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
+		</pluginRepository>
       <pluginRepository>
          <id>jboss-public-repository-group</id>
          <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
@@ -207,6 +233,6 @@
 
    <properties>
       <!-- By default don't run unit tests for the fwk! -->
-      <maven.test.skip>false</maven.test.skip>
+      <maven.test.skip>true</maven.test.skip>
    </properties>
 </project>

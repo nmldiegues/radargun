@@ -576,7 +576,7 @@ public class ThreadParallelTpccPopulation extends TpccPopulation{
          if (sleepFor > 0) {
             sleepFor(sleepFor);
          }
-         wrapper.startTransaction();
+         wrapper.startTransaction(false);
       }
    }
 

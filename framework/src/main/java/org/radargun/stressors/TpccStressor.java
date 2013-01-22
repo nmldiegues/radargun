@@ -615,7 +615,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
 
             long startService = System.nanoTime();
 
-            cacheWrapper.startTransaction();
+            cacheWrapper.startTransaction(isReadOnly);
 
             try {
                transaction.executeTransaction(cacheWrapper);

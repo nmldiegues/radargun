@@ -80,7 +80,7 @@ public interface CacheWrapper
     * @throws RuntimeException if a particular cache implementation does not support transactions it should throw a
     * RuntimeException to signal that.
     */
-   void startTransaction();
+   void startTransaction(boolean isReadOnly);
 
    /**
     * Called in conjunction with {@link #startTransaction()} in order to complete a transaction by either committing or rolling it back.

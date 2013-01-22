@@ -18,7 +18,7 @@
     </global>
     <default>
         <locking
-                isolationLevel="REPEATABLE_READ"
+                isolationLevel="SERIALIZABLE"
                 concurrencyLevel="32"
                 writeSkewCheck="false"
                 useLockStriping="false"
@@ -40,22 +40,32 @@
                 enabled="true"/>
         <deadlockDetection
                 enabled="false"/>
-        <clustering mode="r">
+        <clustering mode="d">
             <sync
                     replTimeout="15000" />
-            <stateTransfer
-                    fetchInMemoryState="false"
-                    chunkSize="100"
-                    timeout="240000"/>
+            <hash
+                    numVirtualNodes="1"
+                    numOwners="1"
+                    rehashEnabled="false"
+                    rehashRpcTimeout="600000"
+                    rehashWait="60000" />
+            <l1
+                    enabled="false"
+                    onRehash="false"
+                    lifespan="600000"
+                    invalidationThreshold="0" />
         </clustering>
         <customInterceptors>
             <interceptor
                     after="org.infinispan.interceptors.InvocationContextInterceptor"
-                    class="org.infinispan.distribution.wrappers.ReplCustomStatsInterceptor"/>
+                    class="org.infinispan.distribution.wrappers.DistCustomStatsInterceptor"/>
             <interceptor
                     before="org.infinispan.interceptors.NotificationInterceptor"
-                    class="org.infinispan.stats.topK.StreamLibInterceptor"/>
+                    class="org.infinispan.stats.topK.DistributedStreamLibInterceptor"/>
         </customInterceptors>
+        <versioning
+                enabled="true"
+                versioningScheme="GMU" />
     </default>
     <namedCache
             name="x" />

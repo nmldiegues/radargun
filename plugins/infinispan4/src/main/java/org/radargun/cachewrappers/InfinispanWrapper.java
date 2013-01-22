@@ -152,10 +152,15 @@ public class InfinispanWrapper implements CacheWrapper {
       return get(bucket, key);
    }
 
-   public void startTransaction() {
+   @Override
+   public void startTransaction(boolean isReadOnly) {
       assertTm();
       try {
          tm.begin();
+         if (!isReadOnly) {
+             cache.markAsWriteTransaction();
+         }
+         
          Transaction transaction = tm.getTransaction();
          if (enlistExtraXAResource) {
             transaction.enlistResource(new DummyXAResource());
