@@ -111,9 +111,11 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    long totalTime = 0L;
 	    for (int t = 0; t < workers.length; t++) {
 		aborts += vacationStressors[t].getRestarts();
-		totalTime += vacationStressors[t].getTotalTime();
+		if (vacationStressors[t].getTotalTime() > totalTime) {
+		    totalTime = vacationStressors[t].getTotalTime();
+		}
 	    }
-	    results.put("TOTAL_TIME", (totalTime + 0.0) / (workers.length + 0.0) + "");
+	    results.put("TOTAL_TIME", totalTime + 0.0 + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    log.info(sizeInfo);
 	    result.setPayload(results);
