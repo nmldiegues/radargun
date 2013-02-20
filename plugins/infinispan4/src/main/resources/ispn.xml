@@ -35,6 +35,7 @@
                 eagerLockSingleNode="false"
                 use1PcForAutoCommitTransactions="false"
                 autoCommit="true"
+		ssiValidation="true"
                 />
         <jmxStatistics
                 enabled="true"/>
@@ -56,12 +57,12 @@
                     invalidationThreshold="0" />
         </clustering>
         <customInterceptors>
-            <interceptor
+            <!-- <interceptor
                     after="org.infinispan.interceptors.InvocationContextInterceptor"
                     class="org.infinispan.distribution.wrappers.DistCustomStatsInterceptor"/>
             <interceptor
                     before="org.infinispan.interceptors.NotificationInterceptor"
-                    class="org.infinispan.stats.topK.DistributedStreamLibInterceptor"/>
+                    class="org.infinispan.stats.topK.DistributedStreamLibInterceptor"/> -->
         </customInterceptors>
         <versioning
                 enabled="true"

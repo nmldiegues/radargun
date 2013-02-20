@@ -150,6 +150,7 @@ echo "                lockingMode=\"${LOCKING_MODE}\"" >> ${DST_DIR}
 echo "                eagerLockSingleNode=\"false\"" >> ${DST_DIR}
 echo "                use1PcForAutoCommitTransactions=\"false\"" >> ${DST_DIR}
 echo "                autoCommit=\"true\"" >> ${DST_DIR}
+echo "                ssiValidation=\"false\"" >> ${DST_DIR}
 echo "                transactionProtocol=\"${TX_PROTOCOL}\">" >> ${DST_DIR}
 echo "            <totalOrderThreading" >> ${DST_DIR}
 echo "                    corePoolSize=\"${TO_CORE_POOL_SIZE}\"" >> ${DST_DIR}

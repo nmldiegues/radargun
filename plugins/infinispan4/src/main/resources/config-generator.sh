@@ -180,6 +180,7 @@ echo "                lockingMode=\"${LOCKING_MODE}\"" >> ${DEST_FILE}
 echo "                eagerLockSingleNode=\"false\"" >> ${DEST_FILE}
 echo "                use1PcForAutoCommitTransactions=\"false\"" >> ${DEST_FILE}
 echo "                autoCommit=\"true\"" >> ${DEST_FILE}
+echo "		      ssiValidation=\"true\"" >> ${DEST_FILE}
 
 #Total order protocol
 if [ "${TX_PROTOCOL}" == "TOTAL_ORDER" ]; then

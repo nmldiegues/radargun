@@ -12,7 +12,7 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
     
     private int items;
     private int range;
-    private String name;
+    private String set;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -34,7 +34,7 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
 	MicrobenchmarkPopulationStressor stressor = new MicrobenchmarkPopulationStressor();
 	stressor.setItems(items);
 	stressor.setRange(range);
-	stressor.setName(name);
+	stressor.setSet(set);
 	stressor.stress(wrapper);
     }
 
@@ -54,11 +54,11 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
         this.range = range;
     }
 
-    public String getName() {
-        return name;
+    public String getSet() {
+        return set;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSet(String set) {
+        this.set = set;
     }
 }

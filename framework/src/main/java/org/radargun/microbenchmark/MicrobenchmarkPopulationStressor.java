@@ -13,7 +13,7 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
     
     private int items;
     private int range;
-    private String name;
+    private String set;
     
     public void setItems(int items) {
 	this.items = items;
@@ -23,8 +23,8 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
 	this.range = range;
     }
     
-    public void setName(String name) {
-	this.name = name;
+    public void setSet(String set) {
+	this.set = set;
     }
     
     @Override
@@ -34,7 +34,7 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
 	}
 	try {
 	    log.info("Performing Population Operations");
-	    new MicrobenchmarkPopulation(wrapper, items, range, name).performPopulation();
+	    new MicrobenchmarkPopulation(wrapper, items, range, set).performPopulation();
 	} catch (Exception e) {
 	    log.warn("Received exception during cache population" + e.getMessage());
 	}

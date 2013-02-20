@@ -16,22 +16,22 @@ public class MicrobenchmarkPopulation {
     private final CacheWrapper wrapper;
     private final int items;
     private final int range;
-    private final String name;
+    private final String set;
 
-    public MicrobenchmarkPopulation(CacheWrapper wrapper, int items, int range, String name) {
+    public MicrobenchmarkPopulation(CacheWrapper wrapper, int items, int range, String set) {
 	this.wrapper = wrapper;
 	this.items = items;
 	this.range = range;
-	this.name = name;
+	this.set = set;
     }
 
     public void performPopulation(){
 
 	Random random = new Random();
 	IntSet set = null;
-	if (name.equals("ll")) {
+	if (set.equals("ll")) {
 	    set = new IntSetLinkedList(wrapper);
-	} else if (name.equals("sl")) {
+	} else if (set.equals("sl")) {
 	    set = new IntSetSkipList(wrapper);
 	}
 	for (int i = 0; i < items; i++)
