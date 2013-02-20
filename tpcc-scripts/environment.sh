@@ -180,7 +180,7 @@ fi
 
 echo "start test with ${i} number of nodes"
 cd ${RADARGUN_DIR}
-./bin/benchmark.sh -m localhost -i ${i} ${nodes}
+./bin/benchmark.sh -m ${MASTER} -i ${i} ${nodes}
 echo "started at" $(date);
 echo "wait ${estimated_duration} minutes";
 sleep ${estimated_duration}m;
