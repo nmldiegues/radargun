@@ -13,7 +13,7 @@ ITEMS=128
 RANGE=1024
 DURATION=10000
 WRITE_RATIO=10
-NAME="ll"
+SET="ll"
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -46,7 +46,7 @@ echo "  -w <value>        	 write ratio"
 echo "                           default: ${WRITE_RATIO}"
 echo ""
 echo "  -s <value>        	 the set type"
-echo "                           default: ${NAME}"
+echo "                           default: ${SET}"
 echo ""
 echo "  -h                       show this message and exit"
 exit 0
@@ -61,7 +61,7 @@ case $1 in
   -r) RANGE=$2; shift 2;;
   -d) DURATION=$2; shift 2;;
   -w) WRITE_RATIO=$2; shift 2;;
-  -s) NAME=$2; shift 2;;
+  -s) SET=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -97,7 +97,7 @@ echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FIL
 echo "      <MicrobenchmarkPopulation" >> ${DEST_FILE}
 echo "            items=\"${ITEMS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
-echo "            name=\"${NAME}\" />" >> ${DEST_FILE}
+echo "            set=\"${SET}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}

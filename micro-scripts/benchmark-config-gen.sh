@@ -6,13 +6,17 @@ if [ -n "${BENCH_XML_FILEPATH}" ]; then
 else
   DEST_FILE=./benchmark.xml
 fi
+
 CLIENTS=1
-WRITE_RATIO=10
-DURATION=10000
 LOCAL_THREADS=1
-ITEMS=64
-RANGE=4096
-SET=ll
+ITEMS=128
+RANGE=1024
+DURATION=10000
+WRITE_RATIO=10
+SET="ll"
+CACHE_CONFIG_FILE="ispn.xml"
+PARTIAL_REPLICATION="false"
+PASSIVE_REPLICATION="false"
 
 if [ -n "${ISPN_CONFIG_FILENAME}" ]; then
   CONFIGURATION_FILE=${ISPN_CONFIG_FILENAME}
@@ -29,21 +33,20 @@ echo ""
 echo "  -l <value>               number of threads per node"
 echo "                           default: ${LOCAL_THREADS}"
 echo ""
-echo "  -d <value>               duration of the benchmark (ms)"
-echo "                           default: ${DURATION}"
-echo ""
-echo "  -w <value>               the ratio of write transactions"
-echo "                           default: ${WRITE_RATIO}"
-echo ""
-echo "  -i <value>               the number of items in the collection"
+echo "  -i <value>               number of items in the set"
 echo "                           default: ${ITEMS}"
 echo ""
-echo "  -r <value>        	 the range of possible values for the items"
+echo "  -r <value>               range of possible items"
 echo "                           default: ${RANGE}"
 echo ""
-echo "  -s <value>               the set to be used"
-echo "                           default: ${SET}"
+echo "  -d <value>               duration of the test (in ms)"
+echo "                           default: ${DURATION}"
 echo ""
+echo "  -w <value>        	 write ratio"
+echo "                           default: ${WRITE_RATIO}"
+echo ""
+echo "  -s <value>        	 the set type"
+echo "                           default: ${SET}"
 echo ""
 echo "  -h                       show this message and exit"
 exit 0
@@ -54,11 +57,13 @@ case $1 in
   -h) help_and_exit;;
   -c) CLIENTS=$2; shift 2;;
   -l) LOCAL_THREADS=$2; shift 2;;
-  -w) WRITE_RATIO=$2; shift 2;;
-  -d) DURATION=$2; shift 2;;
   -i) ITEMS=$2; shift 2;;
   -r) RANGE=$2; shift 2;;
+  -d) DURATION=$2; shift 2;;
+  -w) WRITE_RATIO=$2; shift 2;;
   -s) SET=$2; shift 2;;
+  -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
+  -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
   *) break;;
 esac
@@ -90,19 +95,18 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <MicrobenchmarkPopulation" >> ${DEST_FILE}
-echo "            relations=\"${RELATIONS}\" />" >> ${DEST_FILE}
+echo "            items=\"${ITEMS}\"" >> ${DEST_FILE}
+echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
+echo "            set=\"${SET}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 
 echo "      <Microbenchmark" >> ${DEST_FILE}
-echo "            clients=\"${CLIENTS}\"" >> ${DEST_FILE}
 echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
-echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}
-echo "            writeRatio=\"${WRITE_RATIO}\"" >> ${DEST_FILE}
-echo "            items=\"${ITEMS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
-echo "            set=\"${SET}\"/>" >> ${DEST_FILE}
+echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}
+echo "            writeRatio=\"${WRITE_RATIO}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_AFTER_BENCH\" />" >> ${DEST_FILE}

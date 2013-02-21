@@ -28,19 +28,19 @@ public class MicrobenchmarkPopulation {
     public void performPopulation(){
 
 	Random random = new Random();
-	IntSet set = null;
+	IntSet mySet = null;
 	if (set.equals("ll")) {
-	    set = new IntSetLinkedList(wrapper);
+	    mySet = new IntSetLinkedList(wrapper);
 	} else if (set.equals("sl")) {
-	    set = new IntSetSkipList(wrapper);
+	    mySet = new IntSetSkipList(wrapper);
 	}
 	for (int i = 0; i < items; i++)
-	    set.add(wrapper, random.nextInt(range));
+	    mySet.add(wrapper, random.nextInt(range));
 
 	boolean successful = false;
 	while (!successful) {
 	    try {
-		wrapper.put(null, "SET", set);
+		wrapper.put(null, "SET", mySet);
 		successful = true;
 	    } catch (Throwable e) {
 		log.warn(e);

@@ -58,7 +58,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 	    step(TEST_PHASE);
 	    steps++;
 	}
-
+	
 	Map<String, String> results = new LinkedHashMap<String, String>();
 
 	return results;
@@ -73,7 +73,6 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 		    m_write = false;
 	    } else {
 		processTransaction(cacheWrapper, new RemoveTransaction(set, m_last));
-		if (phase == TEST_PHASE)
 		m_write = true;
 	    }
 	} else {
@@ -86,6 +85,9 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 	boolean result = false;
 
 	while (true) {
+	    if (m_phase == SHUTDOWN_PHASE) {
+		return false;
+	    }
 	    result = false;
 	    cacheWrapper.startTransaction(transaction.isReadOnly());
 	    try {

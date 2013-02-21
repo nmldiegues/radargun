@@ -9,4 +9,5 @@ public interface IntSet {
     public boolean remove(CacheWrapper cache, int value);
 
     public boolean contains(CacheWrapper cache, int value);
+    
 }

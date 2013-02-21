@@ -120,7 +120,9 @@ public class IntSetSkipList implements IntSet, Serializable {
 	Node[] update = new Node[m_maxLevel + 1];
 	Node node = m_head;
 
-	for (int i = getLevel(cache); i >= 0; i--) {
+	int level = getLevel(cache);
+	
+	for (int i = level; i >= 0; i--) {
 	    Node next = node.getForward(cache, i);
 	    while (next.getValue() < value) {
 		node = next;
@@ -133,13 +135,15 @@ public class IntSetSkipList implements IntSet, Serializable {
 	if (node.getValue() != value) {
 	    result = false;
 	} else {
-	    int auxLimit = getLevel(cache);
-	    for (int i = 0; i <= auxLimit; i++) {
-		if (update[i].getForward(cache, i) == node)
+	    
+	    for (int i = 0; i <= level; i++) {
+		if (update[i].getForward(cache, i).getValue() == node.getValue())
 		    update[i].setForward(cache, i, node.getForward(cache, i));
 	    }
-	    while (getLevel(cache) > 0 && m_head.getForward(cache, getLevel(cache)).getForward(cache, 0) == null)
-		setLevel(cache, getLevel(cache) - 1);
+	    while (level > 0 && m_head.getForward(cache, level).getForward(cache, 0) == null) {
+		level--;
+		setLevel(cache, level);
+	    }
 	    result = true;
 	}
 
@@ -166,5 +170,5 @@ public class IntSetSkipList implements IntSet, Serializable {
 	return result;
 
     }
-
+    
 }
