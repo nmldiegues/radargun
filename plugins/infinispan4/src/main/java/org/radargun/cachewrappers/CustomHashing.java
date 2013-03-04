@@ -12,16 +12,18 @@ public class CustomHashing extends DefaultConsistentHash {
 
     private volatile Address[] addresses;
 
+    public int getAddressesSize() {
+        return addresses.length;
+    }
+    
     @Override
     public void setCaches(Set<Address> newCaches) {
         super.setCaches(newCaches);
-        synchronized (this) {
-            addresses = new Address[newCaches.size()];
-            int i = 0;
-            for (Address addr : newCaches) {
-                addresses[i] = addr;
-                i++;
-            }
+        addresses = new Address[newCaches.size()];
+        int i = 0;
+        for (Address addr : newCaches) {
+            addresses[i] = addr;
+            i++;
         }
     }
 
@@ -65,18 +67,7 @@ public class CustomHashing extends DefaultConsistentHash {
         }
     }
 
-    public int getMyId(int expected, Address addr) {
-        while (true) {
-            synchronized (this) {
-                if (this.addresses.length != expected) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {}
-                } else {
-                    break;
-                }
-            }
-        }
+    public int getMyId(Address addr) {
         for (int i = 0; i < addresses.length; i++) {
             if (addresses[i].equals(addr)) {
                 System.out.println("Node: " + i + " " + Arrays.toString(addresses));

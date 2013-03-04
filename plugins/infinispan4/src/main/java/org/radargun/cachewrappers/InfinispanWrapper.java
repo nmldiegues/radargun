@@ -99,7 +99,13 @@ public class InfinispanWrapper implements CacheWrapper {
        ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
        if (ch instanceof CustomHashing) {
            CustomHashing hash = (CustomHashing) ch;
-           MagicKey.NODE_INDEX = hash.getMyId(expected, cacheManager.getTransport().getAddress());
+           while (hash.getAddressesSize() != expected) {
+               try {
+                   Thread.sleep(1000);
+               } catch (InterruptedException e) {}
+               hash = (CustomHashing) cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+           }
+           MagicKey.NODE_INDEX = hash.getMyId(cacheManager.getTransport().getAddress());
        }
     }
    
