@@ -47,11 +47,11 @@ public class IntSetLinkedList implements IntSet, Serializable {
     public IntSetLinkedList() { }
 
     public IntSetLinkedList(int node, CacheWrapper wrapper) {
+        this.node = node;
         Node min = new Node(wrapper, Integer.MIN_VALUE);
         Node max = new Node(wrapper, Integer.MAX_VALUE);
         min.setNext(wrapper, max);
         m_first = min;
-        this.node = node;
     }
 
     public boolean add(CacheWrapper wrapper, int value) {

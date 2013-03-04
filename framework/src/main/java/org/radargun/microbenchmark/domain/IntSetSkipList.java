@@ -72,9 +72,9 @@ public class IntSetSkipList implements IntSet, Serializable {
     private int node;
     
     public IntSetSkipList(int node, CacheWrapper cache) {
+        this.node = node;
         setLevel(cache, 0);
 
-        this.node = node;
         m_head = new Node(m_maxLevel, Integer.MIN_VALUE);
         Node tail = new Node(m_maxLevel, Integer.MAX_VALUE);
         for (int i = 0; i <= m_maxLevel; i++)

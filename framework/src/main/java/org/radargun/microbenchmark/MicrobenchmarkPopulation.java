@@ -8,7 +8,9 @@ import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
 import org.radargun.microbenchmark.domain.IntSet;
 import org.radargun.microbenchmark.domain.IntSetLinkedList;
+import org.radargun.microbenchmark.domain.IntSetRBTree;
 import org.radargun.microbenchmark.domain.IntSetSkipList;
+import org.radargun.microbenchmark.domain.IntSetTreeMap;
 
 public class MicrobenchmarkPopulation {
 
@@ -37,7 +39,12 @@ public class MicrobenchmarkPopulation {
                 mySet = new IntSetLinkedList(n, wrapper);
             } else if (set.equals("sl")) {
                 mySet = new IntSetSkipList(n, wrapper);
-            }
+            } else if (set.equals("rb")) {
+                mySet = new IntSetRBTree(n, wrapper);
+            } else if (set.equals("tm")) {
+                mySet = new IntSetTreeMap(n, wrapper);
+            } 
+            
             for (int i = 0; i < items; i++)
                 mySet.add(wrapper, random.nextInt(range));
 
