@@ -100,6 +100,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
             try {
                 result = transaction.executeTransaction(cacheWrapper);
             } catch (Throwable e) {
+        	e.printStackTrace();
                 successful = false;
             }
 

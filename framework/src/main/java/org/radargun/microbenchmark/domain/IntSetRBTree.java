@@ -26,10 +26,6 @@ public class IntSetRBTree implements IntSet{
         this.myNode = myNode;
         
         mySentinelNode = new RBNode(true);
-        mySentinelNode.setValue(cache, 123456);
-        mySentinelNode.setLeft(cache, null);
-        mySentinelNode.setRight(cache, null);
-        mySentinelNode.setParent(cache, null);
         mySentinelNode.setColor(cache, Color.BLACK);
         
         RBNode aux = new RBNode();
@@ -313,62 +309,6 @@ public class IntSetRBTree implements IntSet{
         y.setRight(cache, x);					// put x on y's Right
         if(!x.isSentinel())				// set y as x's Parent
             x.setParent(cache, y);
-    }
-
-    private int count(CacheWrapper cache, RBNode root) {
-        if (root.isSentinel())
-            return 0;
-        return 1 + count(cache, root.getLeft(cache)) + count(cache, root.getRight(cache));
-    }
-
-    private void recursiveValidate(CacheWrapper cache, RBNode root, int blackNodes, int soFar) {
-        // Empty sub-tree is vacuously OK
-        if (root.isSentinel())
-            return;
-
-        Color rootcolor = root.getColor(cache);
-        soFar += ((Color.BLACK == rootcolor) ? 1 : 0);
-        root.setMarked(cache, true);
-
-        // Check left side
-        RBNode left = root.getLeft(cache);
-        if (!left.isSentinel()) {
-            if (left.getColor(cache) != Color.RED || rootcolor != Color.RED) {
-                System.out.println("Error: Two consecutive red nodes!");
-            }
-            if (left.getValue(cache) < root.getValue(cache)) {
-                System.out.println(" Error; Tree values out of order!");
-            }
-            if (!left.isMarked(cache)) {
-                System.out.println("Error; Cycle in tree structure!");
-            }
-            recursiveValidate(cache, left, blackNodes, soFar);
-        }
-
-        // Check right side
-        RBNode right = root.getRight(cache);
-        if (!right.isSentinel()) {
-            if (right.getColor(cache) != Color.RED || rootcolor != Color.RED) {
-                System.out.println("Error: Two consecutive red nodes!");
-            }
-            if (right.getValue(cache) > root.getValue(cache)) {
-                System.out.println("Error: Tree values out of order!");
-            }
-            if (!right.isMarked(cache)) {
-                System.out.println("Error: Cycle in tree structure!");
-            }
-            recursiveValidate(cache, right, blackNodes, soFar);
-        }
-
-        // Check black node count
-        if (root.getLeft(cache).isSentinel() || root.getRight(cache).isSentinel()) {
-            if (soFar != blackNodes) {
-                System.out.println("Error: Variable number of black nodes to leaves!");
-                return;
-            }
-        }
-        // Everything checks out if we get this far.
-        return;
     }
 
     public class RBNode implements Serializable {

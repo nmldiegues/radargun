@@ -23,9 +23,9 @@ public class TreeMapJvstm<K extends Comparable <? super K>, V> {
         Micro.put(wrapper, key, root);
     }
     
-    public TreeMapJvstm(int myNode, CacheWrapper cache) {
+    public TreeMapJvstm(int myNode, CacheWrapper cache, K ignoreKey, V ignoreValue) {
         this.myNode = myNode;
-        this.myNilNode = new Node(cache, null, null, Color.BLACK, true);
+        this.myNilNode = new Node(cache, ignoreKey, ignoreValue, Color.BLACK, true);
         setRoot(cache, this.myNilNode);
     }
 
@@ -419,8 +419,11 @@ public class TreeMapJvstm<K extends Comparable <? super K>, V> {
         }
         
         public Node(CacheWrapper wrapper, K key, V value, Color color, boolean isNil) {
-            this(wrapper, key, value, color);
             this.isNil = isNil;
+            this.uuid = UUID.randomUUID().toString();
+            setKey(wrapper, key);
+            setValue(wrapper, value);
+            setColor(wrapper, color);
         }
         
         public boolean isNil() {

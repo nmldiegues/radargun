@@ -5,7 +5,7 @@ import org.radargun.CacheWrapper;
 public class IntSetTreeMap extends TreeMapJvstm<Integer,Object> implements IntSet {
     
     public IntSetTreeMap(int myNode, CacheWrapper cache) {
-        super(myNode, cache);
+        super(myNode, cache, -1, new Object());
     }
 
     private static final Object PRESENT = new Object();

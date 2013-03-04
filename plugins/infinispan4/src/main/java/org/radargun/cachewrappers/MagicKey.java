@@ -37,7 +37,7 @@ public class MagicKey implements LocatedKey, Serializable {
     }
     
     public int hashCode() {
-        throw new RuntimeException("Where am I?");
+        return key.hashCode();
     }
     
     @Override

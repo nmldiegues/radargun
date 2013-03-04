@@ -97,12 +97,14 @@ echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FIL
 echo "      <MicrobenchmarkPopulation" >> ${DEST_FILE}
 echo "            items=\"${ITEMS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
+echo "		  clients=\"${CLIENTS}\"" >> ${DEST_FILE}
 echo "            set=\"${SET}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 
 echo "      <Microbenchmark" >> ${DEST_FILE}
+echo "		  clients=\"${CLIENTS}\"" >> ${DEST_FILE}
 echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
 echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}

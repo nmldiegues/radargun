@@ -41,6 +41,7 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
             log.info("Performing Population Operations");
             new MicrobenchmarkPopulation(wrapper, items, range, set, clients).performPopulation();
         } catch (Exception e) {
+            e.printStackTrace();
             log.warn("Received exception during cache population" + e.getMessage());
         }
         return null;

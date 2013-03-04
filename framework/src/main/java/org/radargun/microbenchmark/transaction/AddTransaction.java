@@ -17,7 +17,8 @@ public class AddTransaction implements MicrobenchmarkTransaction {
     @Override
     public boolean executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
         LocatedKey key = cacheWrapper.createKey("SET" + node, node);
-        return ((IntSet)cacheWrapper.get(null, key)).add(cacheWrapper, this.value);
+        IntSet set = (IntSet)cacheWrapper.get(null, key);
+        return set.add(cacheWrapper, this.value);
     }
 
     @Override

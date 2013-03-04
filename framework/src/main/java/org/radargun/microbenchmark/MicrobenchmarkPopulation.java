@@ -55,6 +55,7 @@ public class MicrobenchmarkPopulation {
                     wrapper.put(null, key, mySet);
                     successful = true;
                 } catch (Throwable e) {
+                    e.printStackTrace();
                     log.warn(e);
                 }
             }
