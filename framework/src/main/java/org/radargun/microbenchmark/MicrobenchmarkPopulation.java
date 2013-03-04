@@ -59,9 +59,15 @@ public class MicrobenchmarkPopulation {
 		wrapper.endTransaction(true);
 		successful = true;
 	    } catch (Throwable e) {
-		wrapper.endTransaction(false);
+		System.out.println("Exception during population, going to rollback after this");
 		e.printStackTrace();
 		log.warn(e);
+		try {
+		    wrapper.endTransaction(false);
+		} catch (Throwable e2) {
+		    System.out.println("Exception during rollback!");
+		    e2.printStackTrace();
+		}
 	    }
 	}
 
