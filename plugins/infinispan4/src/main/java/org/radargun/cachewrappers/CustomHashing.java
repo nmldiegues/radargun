@@ -10,16 +10,18 @@ import org.infinispan.remoting.transport.Address;
 
 public class CustomHashing extends DefaultConsistentHash {
 
-    private Address[] addresses;
+    private volatile Address[] addresses;
 
     @Override
     public void setCaches(Set<Address> newCaches) {
         super.setCaches(newCaches);
-        addresses = new Address[newCaches.size()];
-        int i = 0;
-        for (Address addr : newCaches) {
-            addresses[i] = addr;
-            i++;
+        synchronized (this) {
+            addresses = new Address[newCaches.size()];
+            int i = 0;
+            for (Address addr : newCaches) {
+                addresses[i] = addr;
+                i++;
+            }
         }
     }
 
@@ -63,7 +65,18 @@ public class CustomHashing extends DefaultConsistentHash {
         }
     }
 
-    public int getMyId(Address addr) {
+    public int getMyId(int expected, Address addr) {
+        while (true) {
+            synchronized (this) {
+                if (this.addresses.length != expected) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {}
+                } else {
+                    break;
+                }
+            }
+        }
         for (int i = 0; i < addresses.length; i++) {
             if (addresses[i].equals(addr)) {
                 System.out.println("Node: " + i + " " + Arrays.toString(addresses));

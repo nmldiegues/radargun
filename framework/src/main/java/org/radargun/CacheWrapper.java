@@ -124,7 +124,7 @@ public interface CacheWrapper
     */
    void resetAdditionalStats();
 
-   void clusterFormed();
+   void clusterFormed(int expected);
    
    int getMyNode();
    

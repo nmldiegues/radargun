@@ -95,11 +95,11 @@ public class InfinispanWrapper implements CacheWrapper {
    }
    
    @Override
-    public void clusterFormed() {
+    public void clusterFormed(int expected) {
        ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
        if (ch instanceof CustomHashing) {
            CustomHashing hash = (CustomHashing) ch;
-           MagicKey.NODE_INDEX = hash.getMyId(cacheManager.getTransport().getAddress());
+           MagicKey.NODE_INDEX = hash.getMyId(expected, cacheManager.getTransport().getAddress());
        }
     }
    
