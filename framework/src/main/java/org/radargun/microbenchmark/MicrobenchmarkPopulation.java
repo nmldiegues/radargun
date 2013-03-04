@@ -23,44 +23,49 @@ public class MicrobenchmarkPopulation {
     private final int clients;
 
     public MicrobenchmarkPopulation(CacheWrapper wrapper, int items, int range, String set, int clients) {
-        this.wrapper = wrapper;
-        this.items = items;
-        this.range = range;
-        this.set = set;
-        this.clients = clients;
+	this.wrapper = wrapper;
+	this.items = items;
+	this.range = range;
+	this.set = set;
+	this.clients = clients;
     }
 
     public void performPopulation(){
-        
+
 	Random random = new Random();
 	int n = wrapper.getMyNode();
-	IntSet mySet = null;
-	if (set.equals("ll")) {
-	    mySet = new IntSetLinkedList(n, wrapper);
-	} else if (set.equals("sl")) {
-	    mySet = new IntSetSkipList(n, wrapper);
-	} else if (set.equals("rb")) {
-	    mySet = new IntSetRBTree(n, wrapper);
-	} else if (set.equals("tm")) {
-	    mySet = new IntSetTreeMap(n, wrapper);
-	} 
-
-	for (int i = 0; i < items; i++)
-	    mySet.add(wrapper, random.nextInt(range));
-
 	boolean successful = false;
 	while (!successful) {
 	    try {
+		wrapper.startTransaction(false);
+
+		IntSet mySet = null;
+		if (set.equals("ll")) {
+		    mySet = new IntSetLinkedList(n, wrapper);
+		} else if (set.equals("sl")) {
+		    mySet = new IntSetSkipList(n, wrapper);
+		} else if (set.equals("rb")) {
+		    mySet = new IntSetRBTree(n, wrapper);
+		} else if (set.equals("tm")) {
+		    mySet = new IntSetTreeMap(n, wrapper);
+		} 
+
+		for (int i = 0; i < items; i++)
+		    mySet.add(wrapper, random.nextInt(range));
+
 		LocatedKey key = wrapper.createKey("SET" + n, n);
 		wrapper.put(null, key, mySet);
+		
+		wrapper.endTransaction(true);
 		successful = true;
 	    } catch (Throwable e) {
+		wrapper.endTransaction(false);
 		e.printStackTrace();
 		log.warn(e);
 	    }
 	}
 
-        System.gc();
+	System.gc();
     }
 
 }
