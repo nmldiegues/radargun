@@ -25,6 +25,7 @@ public class MicrobenchmarkStage extends AbstractDistStage {
     int range;
     int duration;
     int writeRatio;
+    int clients;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -38,13 +39,12 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	log.info("Starting MicrobenchmarkBenchmarkStage: " + this.toString());
 	
 	microbenchmarkStressors = new MicrobenchmarkStressor[localThreads];
-	IntSet set = Micro.get(cacheWrapper, "SET");
 	
 	for (int t = 0; t < microbenchmarkStressors.length; t++) {
 	    microbenchmarkStressors[t] = new MicrobenchmarkStressor();
 	    microbenchmarkStressors[t].setCacheWrapper(cacheWrapper);
 	    microbenchmarkStressors[t].setRange(range);
-	    microbenchmarkStressors[t].setSet(set);
+	    microbenchmarkStressors[t].setClients(clients);
 	    microbenchmarkStressors[t].setWriteRatio(writeRatio);
 	}
 	
@@ -133,6 +133,10 @@ public class MicrobenchmarkStage extends AbstractDistStage {
     public int getRange() {
         return range;
     }
+    
+    public int getClients() {
+        return clients;
+    }
 
     public int getDuration() {
         return duration;
@@ -152,6 +156,10 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 
     public void setRange(int range) {
         this.range = range;
+    }
+    
+    public void setClients(int clients) {
+        this.clients = clients;
     }
 
     public void setDuration(int duration) {

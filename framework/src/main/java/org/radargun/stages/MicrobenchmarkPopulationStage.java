@@ -9,33 +9,35 @@ import org.radargun.microbenchmark.MicrobenchmarkPopulationStressor;
 public class MicrobenchmarkPopulationStage extends AbstractDistStage {
 
     private static Log log = LogFactory.getLog(MicrobenchmarkPopulationStage.class);
-    
+
     private int items;
     private int range;
     private String set;
-    
+    private int clients;
+
     @Override
     public DistStageAck executeOnSlave() {
-	DefaultDistStageAck ack = newDefaultStageAck();
-	CacheWrapper wrapper = slaveState.getCacheWrapper();
-	if (wrapper == null) {
-	    log.info("Not executing any test as the wrapper is not set up on this slave ");
-	    return ack;
-	}
-	long startTime = System.currentTimeMillis();
-	populate(wrapper);
-	long duration = System.currentTimeMillis() - startTime;
-	log.info("The population took: " + (duration / 1000) + " seconds.");
-	ack.setPayload(duration);
-	return ack;
+        DefaultDistStageAck ack = newDefaultStageAck();
+        CacheWrapper wrapper = slaveState.getCacheWrapper();
+        if (wrapper == null) {
+            log.info("Not executing any test as the wrapper is not set up on this slave ");
+            return ack;
+        }
+        long startTime = System.currentTimeMillis();
+        populate(wrapper);
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("The population took: " + (duration / 1000) + " seconds.");
+        ack.setPayload(duration);
+        return ack;
     }
 
     private void populate(CacheWrapper wrapper) {
-	MicrobenchmarkPopulationStressor stressor = new MicrobenchmarkPopulationStressor();
-	stressor.setItems(items);
-	stressor.setRange(range);
-	stressor.setSet(set);
-	stressor.stress(wrapper);
+        MicrobenchmarkPopulationStressor stressor = new MicrobenchmarkPopulationStressor();
+        stressor.setItems(items);
+        stressor.setRange(range);
+        stressor.setSet(set);
+        stressor.setClients(clients);
+        stressor.stress(wrapper);
     }
 
     public int getItems() {
@@ -60,5 +62,13 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
 
     public void setSet(String set) {
         this.set = set;
+    }
+    
+    public int getClients() {
+        return clients;
+    }
+    
+    public void setClients(int clients) {
+        this.clients = clients;
     }
 }

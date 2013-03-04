@@ -67,6 +67,7 @@ public class StartClusterStage extends AbstractDistStage {
                   break;
                }
             }
+            wrapper.clusterFormed();
          }
       } catch (Exception e) {
          log.error("Issues while instantiating/starting cache wrapper", e);

@@ -123,4 +123,10 @@ public interface CacheWrapper
     * it resets the additional stats
     */
    void resetAdditionalStats();
+
+   void clusterFormed();
+   
+   int getMyNode();
+   
+   LocatedKey createKey(String key, int node);
 }

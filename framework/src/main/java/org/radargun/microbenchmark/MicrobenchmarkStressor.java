@@ -21,106 +21,113 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 
     public static final int TEST_PHASE = 2;
     public static final int SHUTDOWN_PHASE = 3;
-    
+
     private CacheWrapper cacheWrapper;
     private long restarts = 0;
     private long steps = 0;
-    
-    private IntSet set;
+
     private int range;
+    private int clients;
     private int writeRatio;
-    
+
     private boolean m_write = true;
     private int m_last;
     private Random m_random = new Random();
-    
+
     volatile protected int m_phase = TEST_PHASE;
-    
+
 
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
-	this.cacheWrapper = cacheWrapper;
+        this.cacheWrapper = cacheWrapper;
     }
 
     @Override
     public void run() {
-	stress(cacheWrapper);
+        stress(cacheWrapper);
     }
 
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
-	if (wrapper == null) {
-	    throw new IllegalStateException("Null wrapper not allowed");
-	}
+        if (wrapper == null) {
+            throw new IllegalStateException("Null wrapper not allowed");
+        }
 
-	this.cacheWrapper = wrapper;
+        this.cacheWrapper = wrapper;
 
-	while (m_phase == TEST_PHASE) {
-	    step(TEST_PHASE);
-	    steps++;
-	}
-	
-	Map<String, String> results = new LinkedHashMap<String, String>();
+        while (m_phase == TEST_PHASE) {
+            step(TEST_PHASE);
+            steps++;
+        }
 
-	return results;
+        Map<String, String> results = new LinkedHashMap<String, String>();
+
+        return results;
     }
 
     protected void step(int phase) {
-	int i = m_random.nextInt(100);
-	if (i < writeRatio) {
-	    if (m_write) {
-		m_last = m_random.nextInt(range);
-		if (processTransaction(cacheWrapper, new AddTransaction(set, m_last)))
-		    m_write = false;
-	    } else {
-		processTransaction(cacheWrapper, new RemoveTransaction(set, m_last));
-		m_write = true;
-	    }
-	} else {
-	    processTransaction(cacheWrapper, new ContainsTransaction(set, m_last));
-	}
+        int k = m_random.nextInt(100);
+        int node = -1;
+        if (k < (((1 + 0.0) / (clients + 0.0)) * 100.0)) {
+            node = k % clients;
+        } else {
+            node = cacheWrapper.getMyNode();
+        }
+        int i = m_random.nextInt(100);
+        if (i < writeRatio) {
+            if (m_write) {
+                m_last = m_random.nextInt(range);
+                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last)))
+                    m_write = false;
+            } else {
+                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last));
+                m_write = true;
+            }
+        } else {
+            processTransaction(cacheWrapper, new ContainsTransaction(node, m_last));
+        }
     }
-    
+
     private boolean processTransaction(CacheWrapper wrapper, MicrobenchmarkTransaction transaction) {
-	boolean successful = true;
-	boolean result = false;
+        boolean successful = true;
+        boolean result = false;
 
-	while (true) {
-	    if (m_phase == SHUTDOWN_PHASE) {
-		return false;
-	    }
-	    result = false;
-	    cacheWrapper.startTransaction(transaction.isReadOnly());
-	    try {
-		result = transaction.executeTransaction(cacheWrapper);
-	    } catch (Throwable e) {
-		successful = false;
-	    }
+        while (true) {
+            if (m_phase == SHUTDOWN_PHASE) {
+                return false;
+            }
+            result = false;
+            cacheWrapper.startTransaction(transaction.isReadOnly());
+            try {
+                result = transaction.executeTransaction(cacheWrapper);
+            } catch (Throwable e) {
+                successful = false;
+            }
 
-	    try {
-		cacheWrapper.endTransaction(successful);
+            try {
+                cacheWrapper.endTransaction(successful);
 
-		if (!successful) {
-		    setRestarts(getRestarts() + 1);
-		}
-	    } catch (Throwable rb) {
-		setRestarts(getRestarts() + 1);
-		successful = false;
-	    }
-	    
-	    if (! successful) {
-		successful = true;
-	    } else { 
-		break;
-	    }
-	}
-	
-	return result;
+                if (!successful) {
+                    setRestarts(getRestarts() + 1);
+                }
+            } catch (Throwable rb) {
+                setRestarts(getRestarts() + 1);
+                successful = false;
+            }
+
+            if (! successful) {
+                successful = true;
+            } else { 
+                break;
+            }
+        }
+
+        return result;
     }
 
     @Override
     public void destroy() throws Exception {
-	cacheWrapper.empty();
-	cacheWrapper = null;
+        cacheWrapper.empty();
+        cacheWrapper = null;
     }
 
     public long getRestarts() {
@@ -139,20 +146,20 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         this.steps = steps;
     }
 
-    public IntSet getSet() {
-        return set;
-    }
-
-    public void setSet(IntSet set) {
-        this.set = set;
-    }
-
     public int getRange() {
         return range;
     }
 
     public void setRange(int range) {
         this.range = range;
+    }
+
+    public int getClients() {
+        return this.clients;
+    }
+    
+    public void setClients(int clients) {
+        this.clients = clients;
     }
 
     public int getWriteRatio() {

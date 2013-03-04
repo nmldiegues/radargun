@@ -16,6 +16,7 @@ import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.cachewrappers.parser.StatisticComponent;
 import org.radargun.cachewrappers.parser.StatsParser;
 import org.radargun.utils.TypedProperties;
@@ -92,7 +93,26 @@ public class InfinispanWrapper implements CacheWrapper {
       blockForRehashing();
       injectEvenConsistentHash(confAttributes);
    }
-
+   
+   @Override
+    public void clusterFormed() {
+       ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+       if (ch instanceof CustomHashing) {
+           CustomHashing hash = (CustomHashing) ch;
+           MagicKey.NODE_INDEX = hash.getMyId(cacheManager.getTransport().getAddress());
+       }
+    }
+   
+   @Override
+    public int getMyNode() {
+        return MagicKey.NODE_INDEX;
+    }
+   
+   @Override
+    public LocatedKey createKey(String key, int node) {
+        return new MagicKey(key, node);
+    }
+   
    public void tearDown() throws Exception {
       List<Address> addressList = cacheManager.getMembers();
       if (started) {

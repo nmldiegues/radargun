@@ -1,99 +1,107 @@
 package org.radargun.microbenchmark.domain;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 
 
 public class IntSetLinkedList implements IntSet, Serializable {
 
     public class Node implements Serializable {
-	/* final */ private int m_value;
+        /* final */ private int m_value;
+        private String uuid;
 
-	public Node(CacheWrapper cache, int value, Node next) {
-	    m_value = value;
-	    setNext(cache, next);
-	}
+        public Node(CacheWrapper wrapper, int value, Node next) {
+            m_value = value;
+            this.uuid = UUID.randomUUID().toString();
+            setNext(wrapper, next);
+        }
 
-	public Node(CacheWrapper cache, int value) {
-	    this(cache, value, null);
-	}
+        public Node(CacheWrapper wrapper, int value) {
+            this(wrapper, value, null);
+        }
 
-	public int getValue() {
-	    return m_value;
-	}
+        public int getValue() {
+            return m_value;
+        }
 
-	public void setNext(CacheWrapper cache, Node next) {
-	    if (next != null) {
-		Micro.put(cache, m_value + ":next", next);
-	    }
-	}
+        public void setNext(CacheWrapper wrapper, Node next) {
+            if (next != null) {
+                LocatedKey key = wrapper.createKey(m_value + ":" + uuid + ":next", node);
+                Micro.put(wrapper, key, next);
+            }
+        }
 
-	public Node getNext(CacheWrapper cache) {
-	    return (Node) Micro.get(cache, m_value + ":next");
-	}
+        public Node getNext(CacheWrapper wrapper) {
+            LocatedKey key = wrapper.createKey(m_value + ":" + uuid + ":next", node);
+            return (Node) Micro.get(wrapper, key);
+        }
     }
 
     /* final */ private Node m_first;
 
+    int node;
+    
     public IntSetLinkedList() { }
 
-    public IntSetLinkedList(CacheWrapper cache) {
-	Node min = new Node(cache, Integer.MIN_VALUE);
-	Node max = new Node(cache, Integer.MAX_VALUE);
-	min.setNext(cache, max);
-	m_first = min;
+    public IntSetLinkedList(int node, CacheWrapper wrapper) {
+        Node min = new Node(wrapper, Integer.MIN_VALUE);
+        Node max = new Node(wrapper, Integer.MAX_VALUE);
+        min.setNext(wrapper, max);
+        m_first = min;
+        this.node = node;
     }
 
-    public boolean add(CacheWrapper cache, int value) {
-	boolean result;
+    public boolean add(CacheWrapper wrapper, int value) {
+        boolean result;
 
-	Node previous = m_first;
-	Node next = previous.getNext(cache);
-	int v;
-	while ((v = next.getValue()) < value) {
-	    previous = next;
-	    next = previous.getNext(cache);
-	}
-	result = v != value;
-	if (result) {
-	    previous.setNext(cache, new Node(cache, value, next));
-	}
+        Node previous = m_first;
+        Node next = previous.getNext(wrapper);
+        int v;
+        while ((v = next.getValue()) < value) {
+            previous = next;
+            next = previous.getNext(wrapper);
+        }
+        result = v != value;
+        if (result) {
+            previous.setNext(wrapper, new Node(wrapper, value, next));
+        }
 
-	return result;
+        return result;
     }
 
-    public boolean remove(CacheWrapper cache, int value) {
-	boolean result;
+    public boolean remove(CacheWrapper wrapper, final int value) {
+        boolean result;
 
-	Node previous = m_first;
-	Node next = previous.getNext(cache);
-	int v;
-	while ((v = next.getValue()) < value) {
-	    previous = next;
-	    next = previous.getNext(cache);
-	}
-	result = v == value;
-	if (result) {
-	    previous.setNext(cache, next.getNext(cache));
-	}
+        Node previous = m_first;
+        Node next = previous.getNext(wrapper);
+        int v;
+        while ((v = next.getValue()) < value) {
+            previous = next;
+            next = previous.getNext(wrapper);
+        }
+        result = v == value;
+        if (result) {
+            previous.setNext(wrapper, next.getNext(wrapper));
+        }
 
-	return result;
+        return result;
     }
 
-    public boolean contains(CacheWrapper cache, int value) {
-	boolean result;
+    public boolean contains(CacheWrapper wrapper, final int value) {
+        boolean result;
 
-	Node previous = m_first;
-	Node next = previous.getNext(cache);
-	int v;
-	while ((v = next.getValue()) < value) {
-	    previous = next;
-	    next = previous.getNext(cache);
-	}
-	result = (v == value);
+        Node previous = m_first;
+        Node next = previous.getNext(wrapper);
+        int v;
+        while ((v = next.getValue()) < value) {
+            previous = next;
+            next = previous.getNext(wrapper);
+        }
+        result = (v == value);
 
-	return result;
+        return result;
     }
-    
 }

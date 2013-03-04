@@ -675,7 +675,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
                if (log.isDebugEnabled()) {
                   log.debug("Error while committing", rb);
                } else {
-                  log.warn("Error while committing: " + rb.getMessage());
+//                  log.warn("Error while committing: " + rb.getMessage());
                }
             }
 
