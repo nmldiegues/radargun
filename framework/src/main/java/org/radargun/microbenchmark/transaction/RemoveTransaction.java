@@ -17,7 +17,8 @@ public class RemoveTransaction implements MicrobenchmarkTransaction {
     @Override
     public boolean executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
         LocatedKey key = cacheWrapper.createKey("SET" + node, node);
-        return ((IntSet)cacheWrapper.get(null, key)).remove(cacheWrapper, this.value);
+        IntSet intset = ((IntSet)cacheWrapper.get(null, key));
+        return intset.remove(cacheWrapper, this.value);
     }
 
     @Override
