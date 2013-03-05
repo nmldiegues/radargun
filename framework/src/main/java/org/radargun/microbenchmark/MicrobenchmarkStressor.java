@@ -71,7 +71,9 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     protected void step(int phase) {
         int k = m_random.nextInt(100);
         int node = -1;
+	boolean remote = false;
         if (k < 20) {
+	    remote = true;
             node = k % clients;
         } else {
             node = cacheWrapper.getMyNode();
@@ -81,10 +83,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         if (i < writeRatio) {
             if (m_write) {
                 m_last = m_random.nextInt(range);
-                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local)))
+                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local, remote)))
                     m_write = false;
             } else {
-                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last));
+                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last, local, remote));
                 m_write = true;
             }
         } else {

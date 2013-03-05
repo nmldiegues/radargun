@@ -10,11 +10,11 @@ public class IntSetTreeMap extends TreeMapJvstm<Integer,Object> implements IntSe
 
     private static final Object PRESENT = new Object();
 
-    public boolean add(CacheWrapper wrapper, final int value, boolean local) {
+    public boolean add(CacheWrapper wrapper, final int value, boolean local, boolean remote) {
         return super.put(wrapper, value, PRESENT) == null;
     }
 
-    public boolean remove(CacheWrapper wrapper, final int value) {
+    public boolean remove(CacheWrapper wrapper, final int value, boolean local, boolean remote) {
         return super.remove(wrapper, value) != null;
     }
 

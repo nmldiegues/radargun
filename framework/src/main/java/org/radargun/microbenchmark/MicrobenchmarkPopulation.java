@@ -51,7 +51,7 @@ public class MicrobenchmarkPopulation {
 		} 
 
 		for (int i = 0; i < items; i++)
-		    mySet.add(wrapper, random.nextInt(range), false);
+		    mySet.add(wrapper, random.nextInt(range), true, false);
 
 		for (int i = 0; i < 100; i++) {
 		    LocatedKey key = wrapper.createKey("local" + n + "-" + i, n);

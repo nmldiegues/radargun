@@ -69,7 +69,7 @@ echo "         ip_ttl=\"\${jgroups.udp.ip_ttl:8}\"" >> ${DEST_FILE}
 if [ "${IP_MCAST}" == "true" ]; then
     echo "         mcast_recv_buf_size=\"25M\"" >> ${DEST_FILE}
     echo "         mcast_send_buf_size=\"640K\"" >> ${DEST_FILE}
-    echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:232.10.10.10}\"" >> ${DEST_FILE}
+    echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:224.0.0.1}\"" >> ${DEST_FILE}
     echo "         mcast_port=\"\${jgroups.udp.mcast_port:45588}\"" >> ${DEST_FILE}
 fi
 fi
@@ -104,7 +104,7 @@ if [ "${IP_MCAST}" == "true" ]; then
    if [ "${TCP}" == "true" ]; then
 #TPC discover
 echo "   <MPING" >> ${DEST_FILE}
-echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:228.6.7.8}\"" >> ${DEST_FILE}
+echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:224.0.0.1}\"" >> ${DEST_FILE}
 echo "         mcast_port=\"\${jgroups.udp.mcast_port:46655}\"" >> ${DEST_FILE}
 echo "         ip_ttl=\"\${jgroups.udp.ip_ttl:8}\"" >> ${DEST_FILE}
 else

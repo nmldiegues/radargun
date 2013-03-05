@@ -55,7 +55,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
         m_first = min;
     }
 
-    public boolean add(CacheWrapper wrapper, int value, boolean local) {
+    public boolean add(CacheWrapper wrapper, int value, boolean local, boolean remote) {
         boolean result;
 
         Node previous = m_first;
@@ -66,7 +66,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
             next = previous.getNext(wrapper);
         }
         result = v != value;
-        if (result && !local) {
+        if (result && !remote && local) {
             previous.setNext(wrapper, new Node(wrapper, value, next));
         } else {
             LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
@@ -76,7 +76,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
         return result;
     }
 
-    public boolean remove(CacheWrapper wrapper, final int value) {
+    public boolean remove(CacheWrapper wrapper, final int value, boolean local, boolean remote) {
         boolean result;
 
         Node previous = m_first;
@@ -87,8 +87,11 @@ public class IntSetLinkedList implements IntSet, Serializable {
             next = previous.getNext(wrapper);
         }
         result = v == value;
-        if (result) {
+        if (result && !remote && local) {
             previous.setNext(wrapper, next.getNext(wrapper));
+        } else {
+            LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            Micro.put(wrapper, key, 1);
         }
 
         return result;

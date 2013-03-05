@@ -89,7 +89,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         return l;
     }
 
-    public boolean add(CacheWrapper cache, int value, boolean local) {
+    public boolean add(CacheWrapper cache, int value, boolean local, boolean remote) {
         boolean result;
 
         Node[] update = new Node[m_maxLevel + 1];
@@ -106,7 +106,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(cache, 0);
 
-        if (node.getValue() != value && !local) {
+        if (node.getValue() != value && !remote && local) {
             int newLevel = randomLevel();
             if (newLevel > level) {
                 for (int i = level + 1; i <= level; i++)
@@ -129,7 +129,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         return result;
     }
 
-    public boolean remove(CacheWrapper wrapper, int value) {
+    public boolean remove(CacheWrapper wrapper, int value, boolean local, boolean remote) {
         boolean result;
 
         Node[] update = new Node[m_maxLevel + 1];
@@ -147,9 +147,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(wrapper, 0);
 
-        if (node.getValue() != value) {
-            result = false;
-        } else {
+        if (node.getValue() == value && !remote && local) {
             for (int i = 0; i <= level; i++) {
                 if (update[i].getForward(wrapper, i).getValue() == node.getValue())
                     update[i].setForward(wrapper, i, node.getForward(wrapper, i));
@@ -160,6 +158,10 @@ public class IntSetSkipList implements IntSet, Serializable {
                 setLevel(wrapper, level);
             }           
             result = true;
+        } else {
+            LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            Micro.put(wrapper, key, 1);
+            return false;
         }
 
         return result;
