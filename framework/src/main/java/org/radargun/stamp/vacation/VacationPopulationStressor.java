@@ -27,6 +27,7 @@ public class VacationPopulationStressor extends AbstractCacheWrapperStressor {
 	    new VacationPopulation(wrapper, RELATIONS).performPopulation();
 	} catch (Exception e) {
 	    log.warn("Received exception during cache population" + e.getMessage());
+	    e.printStackTrace();
 	}
 	return null;
     }

@@ -19,6 +19,9 @@ public class VacationPopulation {
     }
 
     public void performPopulation(){
+	int n = wrapper.getMyNode();
+	Vacation.NODE_TARGET.set(n);
+	VacationStressor.MY_NODE = n;
 
 	int i;
 	int t;
@@ -33,7 +36,6 @@ public class VacationPopulation {
 	    ids[i] = i + 1;
 	}
 
-	int n = wrapper.getMyNode();
 	
 	boolean successful = false;
 	while (!successful) {

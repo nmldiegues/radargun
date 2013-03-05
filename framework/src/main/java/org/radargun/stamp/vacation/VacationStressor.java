@@ -37,8 +37,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
 	THREADID.set(this.threadid);
-	CLIENTS = clients;
-	MY_NODE = wrapper.getMyNode();
 	
 	this.cacheWrapper = wrapper;
 
