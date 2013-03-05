@@ -30,12 +30,17 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 
     private int clients;
     private int localThreads;
+    private int readOnly;
     private int number;
     private int queries;
     private int relations;
     private int transactions;
     private int user;
 
+    public void setReadOnly(int ro) {
+	this.readOnly = ro;
+    }
+    
     @Override
     public DistStageAck executeOnSlave() {
 	DefaultDistStageAck result = new DefaultDistStageAck(slaveIndex, slaveState.getLocalAddress());
@@ -75,7 +80,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		int action = selectAction(r, percentUser);
 
 		if (action == Definitions.ACTION_MAKE_RESERVATION) {
-		    operations[i] = new MakeReservationOperation(randomPtr, numQueryPerTransaction, queryRange);
+		    operations[i] = new MakeReservationOperation(randomPtr, numQueryPerTransaction, queryRange, readOnly);
 		} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
 		    operations[i] = new DeleteCustomerOperation(randomPtr, queryRange);
 		} else if (action == Definitions.ACTION_UPDATE_TABLES) {

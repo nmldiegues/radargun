@@ -13,6 +13,7 @@ QUERIES=60
 RELATIONS=1024
 TRANSACTIONS=2000
 USER=98
+READONLY=50
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -47,6 +48,9 @@ echo ""
 echo "  -u <value>               the percentage of reservations"
 echo "                           default: ${USER}"
 echo ""
+echo "  -ro <value>               the percentage of read-only"
+echo "                           default: ${READONLY}"
+echo ""
 echo ""
 echo "  -h                       show this message and exit"
 exit 0
@@ -62,6 +66,7 @@ case $1 in
   -r) RELATIONS=$2; shift 2;;
   -t) TRANSACTIONS=$2; shift 2;;
   -u) USER=$2; shift 2;;
+  -ro) READONLY=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -107,6 +112,7 @@ echo "            number=\"${NUMBER}\"" >> ${DEST_FILE}
 echo "            queries=\"${QUERIES}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\"" >> ${DEST_FILE}
 echo "            transactions=\"${TRANSACTIONS}\"" >> ${DEST_FILE}
+echo "            readOnly=\"${READONLY}\"" >> ${DEST_FILE}
 echo "            user=\"${USER}\"/>" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
