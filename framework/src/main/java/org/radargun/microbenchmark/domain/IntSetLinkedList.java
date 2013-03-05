@@ -69,7 +69,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
         if (result && !remote && local) {
             previous.setNext(wrapper, new Node(wrapper, value, next));
         } else {
-            LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            LocatedKey key = wrapper.createKey("local" + wrapper.getMyNode() + "-" + MicrobenchmarkStressor.THREADID.get(), wrapper.getMyNode());
             Micro.put(wrapper, key, 1);
         }
 
@@ -90,7 +90,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
         if (result && !remote && local) {
             previous.setNext(wrapper, next.getNext(wrapper));
         } else {
-            LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            LocatedKey key = wrapper.createKey("local" + wrapper.getMyNode() + "-" + MicrobenchmarkStressor.THREADID.get(), wrapper.getMyNode());
             Micro.put(wrapper, key, 1);
         }
 
