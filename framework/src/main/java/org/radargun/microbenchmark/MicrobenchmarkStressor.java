@@ -36,6 +36,11 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     
     volatile protected int m_phase = TEST_PHASE;
 
+    private int threadid;
+
+    public MicrobenchmarkStressor(int threadid) {
+        this.threadid = threadid;
+    }
 
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
         this.cacheWrapper = cacheWrapper;
@@ -43,13 +48,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 
     @Override
     public void run() {
+        THREADID.set(this.threadid);
         stress(cacheWrapper);
     }
 
-    public void setThreadId(int threadid) {
-        MicrobenchmarkStressor.THREADID.set(threadid);
-    }
-    
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
         if (wrapper == null) {
