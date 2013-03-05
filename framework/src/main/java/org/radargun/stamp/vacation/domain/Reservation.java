@@ -72,13 +72,16 @@ package org.radargun.stamp.vacation.domain;
  */
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.OpacityException;
 import org.radargun.stamp.vacation.Vacation;
 
 public class Reservation implements Comparable<Reservation>, Serializable {
     /* final */ int id;
+    int node;
     /* final */ String PREFIX; 
     static final String NUM_USED = "numUsed";
     static final String NUM_FREE = "numFree";
@@ -88,45 +91,58 @@ public class Reservation implements Comparable<Reservation>, Serializable {
     public Reservation() { }
     
     public Reservation(CacheWrapper cache, String type, int id, int numTotal, int price) {
+	this.node = Vacation.NODE_TARGET.get();
 	this.id = id;
-	this.PREFIX = "Reservation:" + type + ":" + id + ":";
-	Vacation.put(cache, PREFIX + NUM_USED, 0);
-	Vacation.put(cache, PREFIX + NUM_FREE, numTotal);
-	Vacation.put(cache, PREFIX + NUM_TOTAL, numTotal);
-	Vacation.put(cache, PREFIX + PRICE, price);
+	this.PREFIX = UUID.randomUUID().toString() + ":" + "Reservation:" + type + ":" + id + ":";
+	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
+	Vacation.put(cache, key, 0);
+	key = cache.createKey( PREFIX + NUM_FREE + node, node);
+	Vacation.put(cache, key, numTotal);
+	key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
+	Vacation.put(cache, key, numTotal);
+	key = cache.createKey( PREFIX + PRICE + node, node);
+	Vacation.put(cache, key, price);
 	checkReservation(cache);
     }
     
     public Integer getNumUsed(CacheWrapper cache) {
-	return (Integer) Vacation.get(cache, PREFIX + NUM_USED);
+	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
+	return (Integer) Vacation.get(cache, key);
     }
     
     public Integer getNumFree(CacheWrapper cache) {
-	return (Integer) Vacation.get(cache, PREFIX + NUM_FREE);
+	LocatedKey key = cache.createKey( PREFIX + NUM_FREE + node, node);
+	return (Integer) Vacation.get(cache, key);
     }
     
     public Integer getNumTotal(CacheWrapper cache) {
-	return (Integer) Vacation.get(cache, PREFIX + NUM_TOTAL);
+	LocatedKey key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
+	return (Integer) Vacation.get(cache, key);
     }
     
     public Integer getPrice(CacheWrapper cache) {
-	return (Integer) Vacation.get(cache, PREFIX + PRICE);
+	LocatedKey key = cache.createKey( PREFIX + PRICE + node, node);
+	return (Integer) Vacation.get(cache, key);
     }
     
     public void putNumUsed(CacheWrapper cache, Integer value) {
-	Vacation.put(cache, PREFIX + NUM_USED, value);
+	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
+	Vacation.put(cache, key, value);
     }
     
     public void putNumFree(CacheWrapper cache, Integer value) {
-	Vacation.put(cache, PREFIX + NUM_FREE, value);
+	LocatedKey key = cache.createKey( PREFIX + NUM_FREE + node, node);
+	Vacation.put(cache, key, value);
     }
     
     public void putNumTotal(CacheWrapper cache, Integer value) {
-	Vacation.put(cache, PREFIX + NUM_TOTAL, value);
+	LocatedKey key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
+	Vacation.put(cache, key, value);
     }
     
     public void putPrice(CacheWrapper cache, Integer value) {
-	Vacation.put(cache, PREFIX + PRICE, value);
+	LocatedKey key = cache.createKey( PREFIX + PRICE + node, node);
+	Vacation.put(cache, key, value);
     }
 
     public void checkReservation(CacheWrapper cache) {

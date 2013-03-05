@@ -5,28 +5,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Cons;
 import org.radargun.stamp.vacation.Vacation;
 
 public class List_t<E> implements Serializable{
 
     protected /* final */ String cacheKey;
+    protected int node;
 
     public List_t() { }
     
-    public List_t(CacheWrapper cache, String cacheKey) {
-	this.cacheKey = cacheKey;
-	Vacation.put(cache, cacheKey, (Cons<E>) Cons.empty());
+    public List_t(CacheWrapper cache, String strKey) {
+	this.node = Vacation.NODE_TARGET.get();
+	this.cacheKey = UUID.randomUUID().toString() + ":" + strKey;
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	Vacation.put(cache, key, (Cons<E>) Cons.empty());
     }
     
     private void putElements(CacheWrapper cache, Cons<E> elems) {
-	Vacation.put(cache, cacheKey, elems);
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	Vacation.put(cache, key, elems);
     }
     
     private Cons<E> getElements(CacheWrapper cache) {
-	return ((Cons<E>) Vacation.get(cache, cacheKey));
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	return ((Cons<E>) Vacation.get(cache, key));
     }
 
     public void add(CacheWrapper cache, E element) {

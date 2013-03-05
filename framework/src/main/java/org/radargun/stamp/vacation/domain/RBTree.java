@@ -1,14 +1,17 @@
 package org.radargun.stamp.vacation.domain;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Vacation;
 
 
 public class RBTree<K extends Comparable<K>, V> implements Serializable {
 
     /* final */ protected String cacheKey;
+    int node;
 
     public RBTree() {
 	
@@ -16,17 +19,21 @@ public class RBTree<K extends Comparable<K>, V> implements Serializable {
     
     @SuppressWarnings("unchecked")
     public RBTree(CacheWrapper cache, String cacheKey) {
-	this.cacheKey = cacheKey;
-	Vacation.put(cache, cacheKey, new RedBlackTree<Entry<K, V>>(true));
+	this.cacheKey = cacheKey + UUID.randomUUID().toString();
+	this.node = Vacation.NODE_TARGET.get();
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	Vacation.put(cache, key, new RedBlackTree<Entry<K, V>>(true));
     }
     
     private RedBlackTree<Entry<K, V>> getIndex(CacheWrapper cache) {
-	RedBlackTree<Entry<K, V>> v = (RedBlackTree<Entry<K, V>>)Vacation.get(cache, cacheKey);
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	RedBlackTree<Entry<K, V>> v = (RedBlackTree<Entry<K, V>>)Vacation.get(cache, key);
 	return v;
     }
     
     private void putIndex(CacheWrapper cache, RedBlackTree<Entry<K, V>> index) {
-	Vacation.put(cache, cacheKey, index);
+	LocatedKey key = cache.createKey(this.cacheKey + node, node);
+	Vacation.put(cache, key, index);
     }
 
     public void put(CacheWrapper cache, K key, V value) {

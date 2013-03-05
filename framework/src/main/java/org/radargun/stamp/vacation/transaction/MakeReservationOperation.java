@@ -1,22 +1,24 @@
 package org.radargun.stamp.vacation.transaction;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
+import org.radargun.stamp.vacation.Vacation;
 import org.radargun.stamp.vacation.domain.Manager;
 
-public class MakeReservationOperation implements VacationTransaction {
+public class MakeReservationOperation extends VacationTransaction {
 
-    final private Manager manager;
     final private int[] types;
     final private int[] ids;
     final private int[] maxPrices;
     final private int[] maxIds;
     final private int customerId;
     final private int numQuery;
+    final private boolean readOnly;
 
-    public MakeReservationOperation(Manager manager, Random random, int numQueryPerTx, int queryRange) {
-	this.manager = manager;
+    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange) {
+	super(random.random_generate());
 	this.types = new int[numQueryPerTx];
 	this.ids = new int[numQueryPerTx];
 
@@ -41,11 +43,15 @@ public class MakeReservationOperation implements VacationTransaction {
 	    types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
 	    ids[n] = baseIds[n % 20];
 	}
+	
+	this.readOnly = (random.random_generate() % 100) <= queryRange;
     }
 
     @Override
     public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
-
+	Vacation.NODE_TARGET.set(super.node);
+	LocatedKey key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
+	Manager manager = (Manager) cacheWrapper.get(null, key);
 	boolean isFound = false;
 	int n;
 	for (n = 0; n < numQuery; n++) {
@@ -74,23 +80,28 @@ public class MakeReservationOperation implements VacationTransaction {
 	    }
 	}
 
-	if (isFound) {
-	    manager.manager_addCustomer(cacheWrapper, customerId);
-	}
-	if (maxIds[Definitions.RESERVATION_CAR] > 0) {
-	    manager.manager_reserveCar(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_CAR]);
-	}
-	if (maxIds[Definitions.RESERVATION_FLIGHT] > 0) {
-	    manager.manager_reserveFlight(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_FLIGHT]);
-	}
-	if (maxIds[Definitions.RESERVATION_ROOM] > 0) {
-	    manager.manager_reserveRoom(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_ROOM]);
+	if (!readOnly) {
+	    if (!remote) {
+		if (isFound) {
+		    manager.manager_addCustomer(cacheWrapper, customerId);
+		}
+		if (maxIds[Definitions.RESERVATION_CAR] > 0) {
+		    manager.manager_reserveCar(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_CAR]);
+		}
+		if (maxIds[Definitions.RESERVATION_FLIGHT] > 0) {
+		    manager.manager_reserveFlight(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_FLIGHT]);
+		}
+		if (maxIds[Definitions.RESERVATION_ROOM] > 0) {
+		    manager.manager_reserveRoom(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_ROOM]);
+		}
+	    }
+	    manager.manager_doCustomer(cacheWrapper);
 	}
     }
 
     @Override
     public boolean isReadOnly() {
-	return false;
+	return this.readOnly;
     }
 
 }

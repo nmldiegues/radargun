@@ -16,9 +16,15 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 
     private CacheWrapper cacheWrapper;
     private VacationTransaction[] transactions;
+    private int clients;
+    private int threadid;
     private long restarts = 0;
     private long totalTime = 0;
 
+    public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
+    public static int CLIENTS;
+    public static int MY_NODE;
+    
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
 	this.cacheWrapper = cacheWrapper;
     }
@@ -30,12 +36,11 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
-	if (wrapper == null) {
-	    throw new IllegalStateException("Null wrapper not allowed");
-	}
-
+	THREADID.set(this.threadid);
+	CLIENTS = clients;
+	MY_NODE = wrapper.getMyNode();
+	
 	this.cacheWrapper = wrapper;
-
 
 	long start = System.currentTimeMillis();
 	for (int i = 0; i < transactions.length; i++) {
@@ -57,11 +62,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 		transaction.executeTransaction(cacheWrapper);
 	    } catch (Throwable e) {
 		successful = false;
-		//		if (log.isDebugEnabled()) {
-		//		    log.debug("Exception while executing transaction.", e);
-		//		} else {
-		//		    log.warn("Exception while executing transaction: " + e.getMessage());
-		//		}
 	    }
 
 	    try {
@@ -73,11 +73,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	    } catch (Throwable rb) {
 		setRestarts(getRestarts() + 1);
 		successful = false;
-		//		if (log.isDebugEnabled()) {
-		//		    log.debug("Error while committing", rb);
-		//		} else {
-		//		    log.warn("Error while committing: " + rb.getMessage());
-		//		}
 	    }
 	    
 	    if (! successful) {
@@ -101,7 +96,15 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     public void setTransactions(VacationTransaction[] transactions) {
 	this.transactions = transactions;
     }
+    
+    public void setClients(int clients) {
+	this.clients = clients;
+    }
 
+    public void setThreadid(int threadid) {
+	this.threadid = threadid;
+    }
+    
     public long getRestarts() {
 	return restarts;
     }

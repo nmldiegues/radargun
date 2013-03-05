@@ -48,7 +48,6 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	log.info("Starting VacationBenchmarkStage: " + this.toString());
 
 
-	Manager managerPtr = Vacation.get(cacheWrapper, "MANAGER");
 	vacationStressors = new VacationStressor[localThreads];
 
 	for (int t = 0; t < vacationStressors.length; t++) {
@@ -75,11 +74,11 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		int action = selectAction(r, percentUser);
 
 		if (action == Definitions.ACTION_MAKE_RESERVATION) {
-		    operations[i] = new MakeReservationOperation(managerPtr, randomPtr, numQueryPerTransaction, queryRange);
+		    operations[i] = new MakeReservationOperation(randomPtr, numQueryPerTransaction, queryRange);
 		} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-		    operations[i] = new DeleteCustomerOperation(managerPtr, randomPtr, queryRange);
+		    operations[i] = new DeleteCustomerOperation(randomPtr, queryRange);
 		} else if (action == Definitions.ACTION_UPDATE_TABLES) {
-		    operations[i] = new UpdateTablesOperation(managerPtr, randomPtr, numQueryPerTransaction, queryRange);
+		    operations[i] = new UpdateTablesOperation(randomPtr, numQueryPerTransaction, queryRange);
 		} else {
 		    assert (false);
 		}
@@ -88,6 +87,8 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    vacationStressors[t] = new VacationStressor();
 	    vacationStressors[t].setTransactions(operations);
 	    vacationStressors[t].setCacheWrapper(cacheWrapper);
+	    vacationStressors[t].setClients(getActiveSlaveCount());
+	    vacationStressors[t].setThreadid(t);
 	}
 
 	try {

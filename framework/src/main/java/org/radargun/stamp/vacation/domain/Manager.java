@@ -78,10 +78,14 @@ package org.radargun.stamp.vacation.domain;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.OpacityException;
+import org.radargun.stamp.vacation.Vacation;
+import org.radargun.stamp.vacation.VacationStressor;
 
 public class Manager implements Serializable {
     /* final */ RBTree<Integer, Reservation> carTable;
@@ -553,5 +557,10 @@ public class Manager implements Serializable {
      */
     boolean manager_cancelFlight(CacheWrapper cache, int customerId, int flightId) {
 	return cancel(cache, flightTable, customerTable, customerId, flightId, Definitions.RESERVATION_FLIGHT);
+    }
+    
+    public void manager_doCustomer(CacheWrapper wrapper) {
+	LocatedKey key = wrapper.createKey("local" + VacationStressor.MY_NODE + "-" + VacationStressor.THREADID.get(), VacationStressor.MY_NODE);
+	Vacation.put(wrapper, key, 1);
     }
 }

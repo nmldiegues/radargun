@@ -1,21 +1,22 @@
 package org.radargun.stamp.vacation.transaction;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
+import org.radargun.stamp.vacation.Vacation;
 import org.radargun.stamp.vacation.domain.Manager;
 
-public class UpdateTablesOperation implements VacationTransaction {
+public class UpdateTablesOperation extends VacationTransaction {
 
-    final private Manager managerPtr;
     final private int[] types;
     final private int[] ids;
     final private int[] ops;
     final private int[] prices;
     final private int numUpdate;
 
-    public UpdateTablesOperation(Manager managerPtr, Random randomPtr, int numQueryPerTransaction, int queryRange) {
-	this.managerPtr = managerPtr;
+    public UpdateTablesOperation(Random randomPtr, int numQueryPerTransaction, int queryRange) {
+	super(randomPtr.random_generate());
 	this.types = new int[numQueryPerTransaction];
 	this.ids = new int[numQueryPerTransaction];
 	this.ops = new int[numQueryPerTransaction];
@@ -40,6 +41,9 @@ public class UpdateTablesOperation implements VacationTransaction {
 
     @Override
     public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
+	Vacation.NODE_TARGET.set(super.node);
+	LocatedKey key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
+	Manager managerPtr = (Manager) cacheWrapper.get(null, key);
 	int n;
 	for (n = 0; n < numUpdate; n++) {
 	    int t = types[n];
@@ -67,6 +71,7 @@ public class UpdateTablesOperation implements VacationTransaction {
 		    assert (false);
 		}
 	    }
+	    managerPtr.manager_doCustomer(cacheWrapper);
 	}
     }
 
