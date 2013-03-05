@@ -7,12 +7,10 @@ import java.util.Random;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
-import org.radargun.microbenchmark.domain.IntSet;
 import org.radargun.microbenchmark.transaction.AddTransaction;
 import org.radargun.microbenchmark.transaction.ContainsTransaction;
 import org.radargun.microbenchmark.transaction.MicrobenchmarkTransaction;
 import org.radargun.microbenchmark.transaction.RemoveTransaction;
-import org.radargun.stamp.vacation.transaction.VacationTransaction;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 
 public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor implements Runnable {
@@ -34,6 +32,8 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     private int m_last;
     private Random m_random = new Random();
 
+    public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
+    
     volatile protected int m_phase = TEST_PHASE;
 
 
@@ -46,6 +46,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         stress(cacheWrapper);
     }
 
+    public void setThreadId(int threadid) {
+        MicrobenchmarkStressor.THREADID.set(threadid);
+    }
+    
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
         if (wrapper == null) {
@@ -73,10 +77,11 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
             node = cacheWrapper.getMyNode();
         }
         int i = m_random.nextInt(100);
+        boolean local = ((i * k) % 100) < 50;
         if (i < writeRatio) {
             if (m_write) {
                 m_last = m_random.nextInt(range);
-                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last)))
+                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local)))
                     m_write = false;
             } else {
                 processTransaction(cacheWrapper, new RemoveTransaction(node, m_last));

@@ -42,6 +42,7 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	
 	for (int t = 0; t < microbenchmarkStressors.length; t++) {
 	    microbenchmarkStressors[t] = new MicrobenchmarkStressor();
+	    microbenchmarkStressors[t].setThreadId(t);
 	    microbenchmarkStressors[t].setCacheWrapper(cacheWrapper);
 	    microbenchmarkStressors[t].setRange(range);
 	    microbenchmarkStressors[t].setClients(clients);

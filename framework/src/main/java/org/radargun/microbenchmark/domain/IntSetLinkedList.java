@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
+import org.radargun.microbenchmark.MicrobenchmarkStressor;
 
 
 public class IntSetLinkedList implements IntSet, Serializable {
@@ -54,7 +55,7 @@ public class IntSetLinkedList implements IntSet, Serializable {
         m_first = min;
     }
 
-    public boolean add(CacheWrapper wrapper, int value) {
+    public boolean add(CacheWrapper wrapper, int value, boolean local) {
         boolean result;
 
         Node previous = m_first;
@@ -65,8 +66,11 @@ public class IntSetLinkedList implements IntSet, Serializable {
             next = previous.getNext(wrapper);
         }
         result = v != value;
-        if (result) {
+        if (result && !local) {
             previous.setNext(wrapper, new Node(wrapper, value, next));
+        } else {
+            LocatedKey key = wrapper.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            Micro.put(wrapper, key, 1);
         }
 
         return result;

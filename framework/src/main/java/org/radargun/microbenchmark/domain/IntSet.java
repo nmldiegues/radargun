@@ -4,7 +4,7 @@ import org.radargun.CacheWrapper;
 
 public interface IntSet {
 
-    public boolean add(CacheWrapper cache, int value);
+    public boolean add(CacheWrapper cache, int value, boolean local);
     
     public boolean remove(CacheWrapper cache, int value);
 

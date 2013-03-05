@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
+import org.radargun.microbenchmark.MicrobenchmarkStressor;
 
 public class IntSetSkipList implements IntSet, Serializable {
 
@@ -88,7 +89,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         return l;
     }
 
-    public boolean add(CacheWrapper cache, int value) {
+    public boolean add(CacheWrapper cache, int value, boolean local) {
         boolean result;
 
         Node[] update = new Node[m_maxLevel + 1];
@@ -105,9 +106,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(cache, 0);
 
-        if (node.getValue() == value) {
-            result = false;
-        } else {
+        if (node.getValue() != value && !local) {
             int newLevel = randomLevel();
             if (newLevel > level) {
                 for (int i = level + 1; i <= level; i++)
@@ -120,6 +119,10 @@ public class IntSetSkipList implements IntSet, Serializable {
                 update[i].setForward(cache, i, node);
             }
             result = true;
+        } else {
+            LocatedKey key = cache.createKey("local" + this.node + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
+            Micro.put(cache, key, 1);
+            return false;
         }
 
 

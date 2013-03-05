@@ -36,7 +36,7 @@ public class IntSetRBTree implements IntSet{
         Micro.put(cache, key, aux);
     }
 
-    public boolean add(CacheWrapper cache, final int key) {
+    public boolean add(CacheWrapper cache, final int key, boolean local) {
         RBNode node	= new RBNode();
         RBNode temp	= getRoot(cache);
 
