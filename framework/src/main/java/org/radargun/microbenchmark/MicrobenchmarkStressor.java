@@ -71,7 +71,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     protected void step(int phase) {
         int k = m_random.nextInt(100);
         int node = -1;
-        if (k < (((1 + 0.0) / (clients + 0.0)) * 100.0)) {
+        if (k < 20) {
             node = k % clients;
         } else {
             node = cacheWrapper.getMyNode();
