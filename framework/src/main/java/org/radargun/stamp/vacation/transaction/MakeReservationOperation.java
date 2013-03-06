@@ -32,11 +32,11 @@ public class MakeReservationOperation extends VacationTransaction {
 	this.maxIds[2] = -1;
 	int n;
 	this.numQuery = numQueryPerTx;
-	this.customerId = random.posrandom_generate() % queryRange + 1;
+	this.customerId = random.posrandom_generate() % 100 + 1;
 	
 	int[] baseIds = new int[20];
 	for (int i = 0; i < 20; i++) {
-	    baseIds[i] = (random.random_generate() % queryRange) + 1;
+	    baseIds[i] = (random.random_generate() % 100) + 1;
 	}
 	
 	for (n = 0; n < numQuery; n++) {

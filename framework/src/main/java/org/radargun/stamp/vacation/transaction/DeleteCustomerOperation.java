@@ -12,7 +12,7 @@ public class DeleteCustomerOperation extends VacationTransaction {
 
     public DeleteCustomerOperation(Random randomPtr, int queryRange) {
 	super(randomPtr.random_generate(), queryRange);
-	this.customerId = randomPtr.posrandom_generate() % queryRange + 1;
+	this.customerId = randomPtr.posrandom_generate() % 100 + 1;
     }
 
     @Override

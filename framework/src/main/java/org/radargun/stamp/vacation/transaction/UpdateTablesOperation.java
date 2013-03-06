@@ -24,7 +24,7 @@ public class UpdateTablesOperation extends VacationTransaction {
 
 	int[] baseIds = new int[20];
 	for (int i = 0; i < 20; i++) {
-	    baseIds[i] = (randomPtr.random_generate() % queryRange) + 1;
+	    baseIds[i] = (randomPtr.random_generate() % 100) + 1;
 	}
 	
 	this.numUpdate = numQueryPerTransaction;
