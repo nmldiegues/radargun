@@ -5,7 +5,6 @@ import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
 import org.radargun.stamp.vacation.Vacation;
-import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class MakeReservationOperation extends VacationTransaction {
@@ -17,6 +16,7 @@ public class MakeReservationOperation extends VacationTransaction {
     final private int customerId;
     final private int numQuery;
     final private boolean readOnly;
+    final private boolean local;
 
     public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int readOnly) {
 	super(random.random_generate(), queryRange);
@@ -46,6 +46,7 @@ public class MakeReservationOperation extends VacationTransaction {
 	}
 	
 	this.readOnly = (random.random_generate() % 100) <= readOnly;
+	this.local = (random.random_generate() % 100) <= readOnly;
     }
 
     @Override
@@ -82,7 +83,7 @@ public class MakeReservationOperation extends VacationTransaction {
 	}
 
 	if (!readOnly) {
-	    if (!remote) {
+	    if (!remote && local) {
 		if (isFound) {
 		    manager.manager_addCustomer(cacheWrapper, customerId);
 		}
