@@ -128,7 +128,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    Map<String, Object> benchResult = (Map<String, Object>) wAck.getPayload();
 	    if (benchResult != null) {
 		results.put(ack.getSlaveIndex(), benchResult);
-		Object reqPerSes = benchResult.get("TOTAL_TIME");
+		Object reqPerSes = benchResult.get("THROUGHPUT");
 		if (reqPerSes == null) {
 		    throw new IllegalStateException("This should be there!");
 		}
