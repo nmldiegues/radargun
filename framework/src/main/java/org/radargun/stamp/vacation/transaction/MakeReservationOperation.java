@@ -18,7 +18,7 @@ public class MakeReservationOperation extends VacationTransaction {
     final private boolean readOnly;
 
     public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int readOnly) {
-	super(random.random_generate());
+	super(random.random_generate(), queryRange);
 	this.types = new int[numQueryPerTx];
 	this.ids = new int[numQueryPerTx];
 

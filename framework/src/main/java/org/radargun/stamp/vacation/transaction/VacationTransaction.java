@@ -8,8 +8,8 @@ public abstract class VacationTransaction {
     protected boolean remote;
     protected int node;
 
-    public VacationTransaction(int random) {
-	this.remote = (random % 100) < 20;
+    public VacationTransaction(int random, int remotePerc) {
+	this.remote = (random % 100) < remotePerc;
 	if (this.remote) {
 	    this.node = random % VacationStressor.CLIENTS;
 	} else {

@@ -16,7 +16,7 @@ public class UpdateTablesOperation extends VacationTransaction {
     final private int numUpdate;
 
     public UpdateTablesOperation(Random randomPtr, int numQueryPerTransaction, int queryRange) {
-	super(randomPtr.random_generate());
+	super(randomPtr.random_generate(), queryRange);
 	this.types = new int[numQueryPerTransaction];
 	this.ids = new int[numQueryPerTransaction];
 	this.ops = new int[numQueryPerTransaction];
