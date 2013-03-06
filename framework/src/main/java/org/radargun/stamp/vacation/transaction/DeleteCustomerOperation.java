@@ -9,10 +9,12 @@ import org.radargun.stamp.vacation.domain.Manager;
 public class DeleteCustomerOperation extends VacationTransaction {
 
     final private int customerId;
+    final private boolean readOnly;
 
-    public DeleteCustomerOperation(Random randomPtr, int queryRange) {
+    public DeleteCustomerOperation(Random randomPtr, int queryRange, int readOnlyPerc) {
 	super(randomPtr.random_generate(), queryRange);
 	this.customerId = randomPtr.posrandom_generate() % 100 + 1;
+	this.readOnly = (randomPtr.random_generate() % 100) <= readOnlyPerc;
     }
 
     @Override

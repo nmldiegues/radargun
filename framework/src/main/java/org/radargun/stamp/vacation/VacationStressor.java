@@ -75,7 +75,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	if (action == Definitions.ACTION_MAKE_RESERVATION) {
 	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, readOnlyPerc);
 	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-	    result = new DeleteCustomerOperation(randomPtr, queryRange);
+	    result = new DeleteCustomerOperation(randomPtr, queryRange, readOnlyPerc);
 	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
 	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange);
 	} else {
