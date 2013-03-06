@@ -63,6 +63,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    vacationStressors[t] = new VacationStressor();
 	    vacationStressors[t].setQueryPerTx(numQueryPerTransaction);
 	    vacationStressors[t].setPercentUser(percentUser);
+	    vacationStressors[t].setQueryRange(queries);
 	    vacationStressors[t].setReadOnlyPerc(this.readOnly);
 	    vacationStressors[t].setCacheWrapper(cacheWrapper);
 	    vacationStressors[t].setClients(getActiveSlaveCount());

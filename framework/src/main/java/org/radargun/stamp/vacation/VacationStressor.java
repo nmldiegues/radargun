@@ -30,7 +30,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     private Random randomPtr;
     private int percentUser;
     private int queryPerTx;
-    private int queryRange = 100;
+    private int queryRange;
     private int readOnlyPerc;
 
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
@@ -48,6 +48,10 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     
     public void setQueryPerTx(int queryPerTx) {
 	this.queryPerTx = queryPerTx;
+    }
+    
+    public void setQueryRange(int queryRange) {
+	this.queryRange = queryRange;
     }
     
     public void setReadOnlyPerc(int readOnlyPerc) {
