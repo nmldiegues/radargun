@@ -34,7 +34,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     private int number;
     private int queries;
     private int relations;
-    private int transactions;
+    private int transactions;	// actually it's time now
     private int user;
 
     public void setReadOnly(int ro) {
@@ -57,41 +57,13 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	vacationStressors = new VacationStressor[localThreads];
 
 	for (int t = 0; t < vacationStressors.length; t++) {
-	    Random randomPtr = new Random();
-	    randomPtr.random_alloc();
-
-	    int numThreads = localThreads;
-	    int numTransaction = transactions;
-	    int numTransactionPerClient;
 	    int numQueryPerTransaction = number;
-	    int numRelation = relations;
-	    int percentQuery = queries;
-	    int queryRange;
 	    int percentUser = user;
 
-	    numTransactionPerClient = (int) ((double) numTransaction / ((double) numThreads + clients) + 0.5);
-	    queryRange = (int) (percentQuery / 100.0 * numRelation + 0.5);
-
-
-	    VacationTransaction[] operations = new VacationTransaction[numTransactionPerClient];
-
-	    for (int i = 0; i < numTransactionPerClient; i++) {
-		int r = randomPtr.posrandom_generate() % 100;
-		int action = selectAction(r, percentUser);
-
-		if (action == Definitions.ACTION_MAKE_RESERVATION) {
-		    operations[i] = new MakeReservationOperation(randomPtr, numQueryPerTransaction, queryRange, readOnly);
-		} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-		    operations[i] = new DeleteCustomerOperation(randomPtr, queryRange);
-		} else if (action == Definitions.ACTION_UPDATE_TABLES) {
-		    operations[i] = new UpdateTablesOperation(randomPtr, numQueryPerTransaction, queryRange);
-		} else {
-		    assert (false);
-		}
-	    }
-
 	    vacationStressors[t] = new VacationStressor();
-	    vacationStressors[t].setTransactions(operations);
+	    vacationStressors[t].setQueryPerTx(numQueryPerTransaction);
+	    vacationStressors[t].setPercentUser(percentUser);
+	    vacationStressors[t].setReadOnlyPerc(this.readOnly);
 	    vacationStressors[t].setCacheWrapper(cacheWrapper);
 	    vacationStressors[t].setClients(getActiveSlaveCount());
 	    vacationStressors[t].setThreadid(t);
@@ -105,6 +77,12 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    for (int t = 0; t < workers.length; t++) {
 		workers[t].start();
 	    }
+	    try {
+		Thread.sleep(transactions);
+	    } catch (InterruptedException e) { }
+	    for (int t = 0; t < workers.length; t++) {
+		vacationStressors[t].setPhase(VacationStressor.SHUTDOWN_PHASE);
+	    }
 	    for (int t = 0; t < workers.length; t++) {
 		workers[t].join();
 	    }
@@ -115,14 +93,12 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		    ", cacheSize: " + cacheWrapper.getCacheSize();
 	    results.put(SIZE_INFO, sizeInfo);
 	    long aborts = 0L;
-	    long totalTime = 0L;
+	    long throughput = 0L;
 	    for (int t = 0; t < workers.length; t++) {
 		aborts += vacationStressors[t].getRestarts();
-		if (vacationStressors[t].getTotalTime() > totalTime) {
-		    totalTime = vacationStressors[t].getTotalTime();
-		}
+		throughput += vacationStressors[t].getThroughput();
 	    }
-	    results.put("TOTAL_TIME", totalTime + 0.0 + "");
+	    results.put("THROUGHPUT", throughput + 0.0 + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    log.info(sizeInfo);
 	    result.setPayload(results);
@@ -132,16 +108,6 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    result.setError(true);
 	    result.setRemoteException(e);
 	    return result;
-	}
-    }
-
-    public int selectAction(int r, int percentUser) {
-	if (r < percentUser) {
-	    return Definitions.ACTION_MAKE_RESERVATION;
-	} else if ((r & 1) == 1) {
-	    return Definitions.ACTION_DELETE_CUSTOMER;
-	} else {
-	    return Definitions.ACTION_UPDATE_TABLES;
 	}
     }
 

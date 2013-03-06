@@ -7,6 +7,9 @@ import java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
+import org.radargun.stamp.vacation.transaction.DeleteCustomerOperation;
+import org.radargun.stamp.vacation.transaction.MakeReservationOperation;
+import org.radargun.stamp.vacation.transaction.UpdateTablesOperation;
 import org.radargun.stamp.vacation.transaction.VacationTransaction;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 
@@ -14,16 +17,42 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 
     private static Log log = LogFactory.getLog(VacationStressor.class);
 
+    public static final int TEST_PHASE = 2;
+    public static final int SHUTDOWN_PHASE = 3;
+    
+    volatile protected int m_phase = TEST_PHASE;
+    
     private CacheWrapper cacheWrapper;
-    private VacationTransaction[] transactions;
     private int clients;
     private int threadid;
     private long restarts = 0;
-    private long totalTime = 0;
+    private long throughput = 0;
+    private Random randomPtr;
+    private int percentUser;
+    private int queryPerTx;
+    private int queryRange = 100;
+    private int readOnlyPerc;
 
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
     public static int CLIENTS;
     public static int MY_NODE;
+    
+    public VacationStressor() {
+	randomPtr = new Random();
+	randomPtr.random_alloc();
+    }
+    
+    public void setPercentUser(int percentUser) {
+	this.percentUser = percentUser;
+    }
+    
+    public void setQueryPerTx(int queryPerTx) {
+	this.queryPerTx = queryPerTx;
+    }
+    
+    public void setReadOnlyPerc(int readOnlyPerc) {
+	this.readOnlyPerc = readOnlyPerc;
+    }
     
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
 	this.cacheWrapper = cacheWrapper;
@@ -34,17 +63,44 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	stress(cacheWrapper);
     }
 
+    private VacationTransaction generateNextTransaction() {
+	int r = randomPtr.posrandom_generate() % 100;
+	int action = selectAction(r, percentUser);
+	VacationTransaction result = null;
+	
+	if (action == Definitions.ACTION_MAKE_RESERVATION) {
+	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, readOnlyPerc);
+	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
+	    result = new DeleteCustomerOperation(randomPtr, queryRange);
+	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
+	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange);
+	} else {
+	    assert (false);
+	}
+	
+	return result;
+    }
+
+    public int selectAction(int r, int percentUser) {
+	if (r < percentUser) {
+	    return Definitions.ACTION_MAKE_RESERVATION;
+	} else if ((r & 1) == 1) {
+	    return Definitions.ACTION_DELETE_CUSTOMER;
+	} else {
+	    return Definitions.ACTION_UPDATE_TABLES;
+	}
+    }
+    
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
 	THREADID.set(this.threadid);
 	
 	this.cacheWrapper = wrapper;
 
-	long start = System.currentTimeMillis();
-	for (int i = 0; i < transactions.length; i++) {
-	    processTransaction(wrapper, transactions[i]);
+	while (m_phase == TEST_PHASE) {
+	    processTransaction(wrapper, generateNextTransaction());
+	    this.throughput++;
 	}
-	this.totalTime = System.currentTimeMillis() - start;
 
 	Map<String, String> results = new LinkedHashMap<String, String>();
 
@@ -87,14 +143,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	cacheWrapper = null;
     }
 
-    public VacationTransaction[] getTransactions() {
-	return transactions;
-    }
-
-    public void setTransactions(VacationTransaction[] transactions) {
-	this.transactions = transactions;
-    }
-    
     public void setClients(int clients) {
 	this.clients = clients;
     }
@@ -107,12 +155,16 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	return restarts;
     }
 
-    public long getTotalTime() {
-	return this.totalTime;
+    public long getThroughput() {
+	return this.throughput;
     }
 
     public void setRestarts(long restarts) {
 	this.restarts = restarts;
+    }
+
+    public void setPhase(int shutdownPhase) {
+	this.m_phase = shutdownPhase;
     }
 
 }
