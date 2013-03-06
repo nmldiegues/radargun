@@ -115,6 +115,9 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	boolean successful = true;
 
 	while (true) {
+	    if (m_phase != TEST_PHASE) {
+		this.throughput--;
+	    }
 	    cacheWrapper.startTransaction(transaction.isReadOnly());
 	    try {
 		transaction.executeTransaction(cacheWrapper);

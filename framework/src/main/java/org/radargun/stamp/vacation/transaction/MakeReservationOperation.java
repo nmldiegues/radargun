@@ -5,6 +5,7 @@ import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
 import org.radargun.stamp.vacation.Vacation;
+import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class MakeReservationOperation extends VacationTransaction {

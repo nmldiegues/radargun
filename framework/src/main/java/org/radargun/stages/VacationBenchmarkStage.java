@@ -99,7 +99,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		aborts += vacationStressors[t].getRestarts();
 		throughput += vacationStressors[t].getThroughput();
 	    }
-	    results.put("THROUGHPUT", throughput + 0.0 + "");
+	    results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / transactions) + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    log.info(sizeInfo);
 	    result.setPayload(results);
