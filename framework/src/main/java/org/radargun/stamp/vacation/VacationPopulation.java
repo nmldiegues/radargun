@@ -26,10 +26,6 @@ public class VacationPopulation {
 	int i;
 	int t;
 
-	Random randomPtr = new Random();
-	randomPtr.random_alloc();
-	Manager managerPtr = new Manager(wrapper, true);
-
 	int numRelation = relations;
 	int ids[] = new int[numRelation];
 	for (i = 0; i < numRelation; i++) {
@@ -41,6 +37,10 @@ public class VacationPopulation {
 	while (!successful) {
 	    try {
 		wrapper.startTransaction(false);
+		
+		Random randomPtr = new Random();
+		randomPtr.random_alloc();
+		Manager managerPtr = new Manager(n);
 		
 		for (t = 0; t < 4; t++) {
 

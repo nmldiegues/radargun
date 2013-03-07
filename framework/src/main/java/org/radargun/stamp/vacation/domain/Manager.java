@@ -77,52 +77,68 @@ package org.radargun.stamp.vacation.domain;
  */
 
 import java.io.Serializable;
+import java.io.ObjectInputStream.GetField;
 import java.util.Iterator;
 import java.util.UUID;
 
 import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
+import org.radargun.stamp.vacation.Cons;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.OpacityException;
 import org.radargun.stamp.vacation.Vacation;
 import org.radargun.stamp.vacation.VacationStressor;
 
 public class Manager implements Serializable {
-    /* final */ RBTree<Integer, Reservation> carTable;
-    /* final */ RBTree<Integer, Reservation> roomTable;
-    /* final */ RBTree<Integer, Reservation> flightTable;
-    /* final */ RBTree<Integer, Customer> customerTable;
+    public static final String CARS = "carTable";
+    public static final String ROOMS = "carTable";
+    public static final String FLIGHTS = "carTable";
+    public static final String CUSTOMERS = "carTable";
 
+    private int node;
+    
     public Manager() { }
     
-    public Manager(CacheWrapper cache, boolean dummy) {
-	carTable = new RBTree<Integer, Reservation>(cache, "carTable");
-	roomTable = new RBTree<Integer, Reservation>(cache, "roomTable");
-	flightTable = new RBTree<Integer, Reservation>(cache, "flightTable");
-	customerTable = new RBTree<Integer, Customer>(cache, "customerTable");
+    public Manager(int node) {
+	this.node = node;
     }
 
-    boolean addReservation(CacheWrapper cache, RBTree<Integer, Reservation> table, String type, int id, int num, int price) {
-	Reservation reservation;
+    void putCustomer(CacheWrapper cache, int id, Customer val) {
+	LocatedKey key = cache.createKey(CUSTOMERS + ":" + id + ":" + node, node);
+	Vacation.put(cache, key, val);
+    }
+    
+    Customer getCustomer(CacheWrapper cache, int id) {
+	LocatedKey key = cache.createKey(CUSTOMERS + ":" + id + ":" + node, node);
+	return (Customer) Vacation.get(cache, key);
+    }
+    
+    void putReservation(CacheWrapper cache, String table, int id, Reservation val) {
+	LocatedKey key = cache.createKey(table + ":" + id + ":" + node, node);
+	Vacation.put(cache, key, val);
+    }
+    
+    Reservation getReservation(CacheWrapper cache, String table, int id) {
+	LocatedKey key = cache.createKey(table + ":" + id + ":" + node, node);
+	return (Reservation) Vacation.get(cache, key);
+    }
+    
+    boolean addReservation(CacheWrapper cache, String table, String type, int id, int num, int price) {
+	Reservation reservation = getReservation(cache, table, id);
 
-	reservation = table.get(cache, id);
 	if (reservation == null) {
 	    /* Create new reservation */
 	    if (num < 1 || price < 0) {
 		return false;
 	    }
 	    reservation = new Reservation(cache, type, id, num, price);
-	    table.put(cache, id, reservation);
+	    putReservation(cache, table, id, reservation);
 	} else {
 	    /* Update existing reservation */
 	    if (!reservation.reservation_addToTotal(cache, num)) {
 		return false;
 	    }
 	    if (reservation.getNumTotal(cache) == 0) {
-		boolean status = table.remove(cache, id);
-		if (!status) {
-		    throw new OpacityException();
-		}
 	    } else {
 		reservation.reservation_updatePrice(cache, price);
 	    }
@@ -140,7 +156,7 @@ public class Manager implements Serializable {
      * =========
      */
     public boolean manager_addCar(CacheWrapper cache, int carId, int numCars, int price) {
-	return addReservation(cache, carTable, "car", carId, numCars, price);
+	return addReservation(cache, CARS, "car", carId, numCars, price);
     }
 
     /*
@@ -154,7 +170,7 @@ public class Manager implements Serializable {
      */
     public boolean manager_deleteCar(CacheWrapper cache, int carId, int numCar) {
 	/* -1 keeps old price */
-	return addReservation(cache, carTable, "car", carId, -numCar, -1);
+	return addReservation(cache, CARS, "car", carId, -numCar, -1);
     }
 
     /*
@@ -166,7 +182,7 @@ public class Manager implements Serializable {
      * =========
      */
     public boolean manager_addRoom(CacheWrapper cache, int roomId, int numRoom, int price) {
-	return addReservation(cache, roomTable, "room", roomId, numRoom, price);
+	return addReservation(cache, ROOMS, "room", roomId, numRoom, price);
     }
 
     /*
@@ -180,7 +196,7 @@ public class Manager implements Serializable {
      */
     public boolean manager_deleteRoom(CacheWrapper cache, int roomId, int numRoom) {
 	/* -1 keeps old price */
-	return addReservation(cache, roomTable, "room", roomId, -numRoom, -1);
+	return addReservation(cache, ROOMS, "room", roomId, -numRoom, -1);
     }
 
     /*
@@ -192,7 +208,7 @@ public class Manager implements Serializable {
      * ===================
      */
     public boolean manager_addFlight(CacheWrapper cache, int flightId, int numSeat, int price) {
-	return addReservation(cache, flightTable, "flight", flightId, numSeat, price);
+	return addReservation(cache, FLIGHTS, "flight", flightId, numSeat, price);
     }
 
     /*
@@ -203,7 +219,7 @@ public class Manager implements Serializable {
      * =========================================================================
      */
     public boolean manager_deleteFlight(CacheWrapper cache, int flightId) {
-	Reservation reservation = flightTable.get(cache, flightId);
+	Reservation reservation = getReservation(cache, FLIGHTS, flightId);
 	if (reservation == null) {
 	    return false;
 	}
@@ -212,7 +228,7 @@ public class Manager implements Serializable {
 	    return false; /* somebody has a reservation */
 	}
 
-	return addReservation(cache, flightTable, "flight", flightId, -reservation.getNumTotal(cache), -1);
+	return addReservation(cache, FLIGHTS, "flight", flightId, -reservation.getNumTotal(cache), -1);
     }
 
     /*
@@ -223,21 +239,29 @@ public class Manager implements Serializable {
      * =======================================
      */
     public boolean manager_addCustomer(CacheWrapper cache, int customerId) {
-	Customer customer;
+	Customer customer = getCustomer(cache, customerId);
 
-	if (customerTable.get(cache, customerId) != null) {
+	if (customer != null) {
 	    return false;
 	}
 
 	customer = new Customer(cache, customerId);
-	Customer oldCustomer = customerTable.putIfAbsent(cache, customerId, customer);
-	if (oldCustomer != null) {
-	    throw new OpacityException();
-	}
+	putCustomer(cache, customerId, customer);
 
 	return true;
     }
 
+    private String translateToTree(int type) {
+	if (type == Definitions.RESERVATION_CAR) {
+	    return CARS;
+	} else if (type == Definitions.RESERVATION_FLIGHT) {
+	    return FLIGHTS;
+	} else if (type == Definitions.RESERVATION_ROOM) {
+	    return ROOMS;
+	}
+	throw new RuntimeException("Did not find matching type for: " + type);
+    }
+    
     /*
      * ==========================================================================
      * === manager_deleteCustomer -- Delete this customer and associated
@@ -247,19 +271,13 @@ public class Manager implements Serializable {
      * ===============================
      */
     public boolean manager_deleteCustomer(CacheWrapper cache, int customerId) {
-	Customer customer;
-	RBTree<Integer, Reservation> reservationTables[] = new RBTree[Definitions.NUM_RESERVATION_TYPE];
+	Customer customer = getCustomer(cache, customerId);
 	List_t<Reservation_Info> reservationInfoList;
 	boolean status;
 
-	customer = customerTable.get(cache, customerId);
 	if (customer == null) {
 	    return false;
 	}
-
-	reservationTables[Definitions.RESERVATION_CAR] = carTable;
-	reservationTables[Definitions.RESERVATION_ROOM] = roomTable;
-	reservationTables[Definitions.RESERVATION_FLIGHT] = flightTable;
 
 	/* Cancel this customer's reservations */
 	reservationInfoList = customer.reservationInfoList;
@@ -267,7 +285,7 @@ public class Manager implements Serializable {
 	Iterator<Reservation_Info> iter = reservationInfoList.iterator(cache);
 	while (iter.hasNext()) {
 	    Reservation_Info reservationInfo = iter.next();
-	    Reservation reservation = reservationTables[reservationInfo.type].get(cache, reservationInfo.id);
+	    Reservation reservation = getReservation(cache, translateToTree(reservationInfo.type), reservationInfo.id);
 	    if (reservation == null) {
 		throw new OpacityException();
 	    }
@@ -275,11 +293,6 @@ public class Manager implements Serializable {
 	    if (!status) {
 		throw new OpacityException();
 	    }
-	}
-
-	status = customerTable.remove(cache, customerId);
-	if (!status) {
-	    throw new OpacityException();
 	}
 
 	return true;
@@ -298,9 +311,9 @@ public class Manager implements Serializable {
      * ========
      * =====================================================================
      */
-    int queryNumFree(CacheWrapper cache, RBTree<Integer, Reservation> table, int id) {
+    int queryNumFree(CacheWrapper cache, String table, int id) {
 	int numFree = -1;
-	Reservation reservation = table.get(cache, id);
+	Reservation reservation = getReservation(cache, table, id);
 	if (reservation != null) {
 	    numFree = reservation.getNumFree(cache);
 	}
@@ -314,9 +327,9 @@ public class Manager implements Serializable {
      * ============
      * =================================================================
      */
-    int queryPrice(CacheWrapper cache, RBTree<Integer, Reservation> table, int id) {
+    int queryPrice(CacheWrapper cache, String table, int id) {
 	int price = -1;
-	Reservation reservation = table.get(cache, id);
+	Reservation reservation = getReservation(cache, table, id);
 	if (reservation != null) {
 	    price = reservation.getPrice(cache);
 	}
@@ -332,7 +345,7 @@ public class Manager implements Serializable {
      * =======================================
      */
     public int manager_queryCar(CacheWrapper cache, int carId) {
-	return queryNumFree(cache, carTable, carId);
+	return queryNumFree(cache, CARS, carId);
     }
 
     /*
@@ -343,7 +356,7 @@ public class Manager implements Serializable {
      * =========================
      */
     public int manager_queryCarPrice(CacheWrapper cache, int carId) {
-	return queryPrice(cache, carTable, carId);
+	return queryPrice(cache, CARS, carId);
     }
 
     /*
@@ -354,7 +367,7 @@ public class Manager implements Serializable {
      * =========================================
      */
     public int manager_queryRoom(CacheWrapper cache, int roomId) {
-	return queryNumFree(cache, roomTable, roomId);
+	return queryNumFree(cache, ROOMS, roomId);
     }
 
     /*
@@ -365,7 +378,7 @@ public class Manager implements Serializable {
      * =============================
      */
     public int manager_queryRoomPrice(CacheWrapper cache, int roomId) {
-	return queryPrice(cache, roomTable, roomId);
+	return queryPrice(cache, ROOMS, roomId);
     }
 
     /*
@@ -376,7 +389,7 @@ public class Manager implements Serializable {
      * =============================================
      */
     public int manager_queryFlight(CacheWrapper cache, int flightId) {
-	return queryNumFree(cache, flightTable, flightId);
+	return queryNumFree(cache, FLIGHTS, flightId);
     }
 
     /*
@@ -387,7 +400,7 @@ public class Manager implements Serializable {
      * ===================================
      */
     public int manager_queryFlightPrice(CacheWrapper cache, int flightId) {
-	return queryPrice(cache, flightTable, flightId);
+	return queryPrice(cache, FLIGHTS, flightId);
     }
 
     /*
@@ -400,9 +413,7 @@ public class Manager implements Serializable {
      */
     public int manager_queryCustomerBill(CacheWrapper cache, int customerId) {
 	int bill = -1;
-	Customer customer;
-
-	customer = customerTable.get(cache, customerId);
+	Customer customer = getCustomer(cache, customerId);
 
 	if (customer != null) {
 	    bill = customer.customer_getBill(cache);
@@ -425,17 +436,14 @@ public class Manager implements Serializable {
      * ====================
      * =========================================================
      */
-    static boolean reserve(CacheWrapper cache, RBTree<Integer, Reservation> table, RBTree<Integer, Customer> customerTable, int customerId, int id, int type) {
-	Customer customer;
-	Reservation reservation;
-
-	customer = customerTable.get(cache, customerId);
+    boolean reserve(CacheWrapper cache, String table, int customerId, int id, int type) {
+	Customer customer = getCustomer(cache, customerId);
+	Reservation reservation = getReservation(cache, table, id);
 
 	if (customer == null) {
 	    return false;
 	}
 
-	reservation = table.get(cache, id);
 	if (reservation == null) {
 	    return false;
 	}
@@ -464,7 +472,7 @@ public class Manager implements Serializable {
      * ===============================================
      */
     public boolean manager_reserveCar(CacheWrapper cache, int customerId, int carId) {
-	return reserve(cache, carTable, customerTable, customerId, carId, Definitions.RESERVATION_CAR);
+	return reserve(cache, CARS, customerId, carId, Definitions.RESERVATION_CAR);
     }
 
     /*
@@ -475,7 +483,7 @@ public class Manager implements Serializable {
      * ===================================================
      */
     public boolean manager_reserveRoom(CacheWrapper cache, int customerId, int roomId) {
-	return reserve(cache, roomTable, customerTable, customerId, roomId, Definitions.RESERVATION_ROOM);
+	return reserve(cache, ROOMS, customerId, roomId, Definitions.RESERVATION_ROOM);
     }
 
     /*
@@ -486,7 +494,7 @@ public class Manager implements Serializable {
      * =========================================================
      */
     public boolean manager_reserveFlight(CacheWrapper cache, int customerId, int flightId) {
-	return reserve(cache, flightTable, customerTable, customerId, flightId, Definitions.RESERVATION_FLIGHT);
+	return reserve(cache, FLIGHTS, customerId, flightId, Definitions.RESERVATION_FLIGHT);
     }
 
     /*
@@ -496,16 +504,14 @@ public class Manager implements Serializable {
      * ==============================================
      * ===============================
      */
-    static boolean cancel(CacheWrapper cache, RBTree<Integer, Reservation> table, RBTree<Integer, Customer> customerTable, int customerId, int id, int type) {
-	Customer customer;
-	Reservation reservation;
+    boolean cancel(CacheWrapper cache, String table, int customerId, int id, int type) {
+	Customer customer = getCustomer(cache, customerId);
+	Reservation reservation = getReservation(cache, table, id);
 
-	customer = customerTable.get(cache, customerId);
 	if (customer == null) {
 	    return false;
 	}
 
-	reservation = table.get(cache, id);
 	if (reservation == null) {
 	    return false;
 	}
@@ -534,7 +540,7 @@ public class Manager implements Serializable {
      * =================================================================
      */
     boolean manager_cancelCar(CacheWrapper cache, int customerId, int carId) {
-	return cancel(cache, carTable, customerTable, customerId, carId, Definitions.RESERVATION_CAR);
+	return cancel(cache, CARS, customerId, carId, Definitions.RESERVATION_CAR);
     }
 
     /*
@@ -545,7 +551,7 @@ public class Manager implements Serializable {
      * =================================================================
      */
     boolean manager_cancelRoom(CacheWrapper cache, int customerId, int roomId) {
-	return cancel(cache, roomTable, customerTable, customerId, roomId, Definitions.RESERVATION_ROOM);
+	return cancel(cache, ROOMS, customerId, roomId, Definitions.RESERVATION_ROOM);
     }
 
     /*
@@ -556,7 +562,7 @@ public class Manager implements Serializable {
      * =====================================================================
      */
     boolean manager_cancelFlight(CacheWrapper cache, int customerId, int flightId) {
-	return cancel(cache, flightTable, customerTable, customerId, flightId, Definitions.RESERVATION_FLIGHT);
+	return cancel(cache, FLIGHTS, customerId, flightId, Definitions.RESERVATION_FLIGHT);
     }
     
     public void manager_doCustomer(CacheWrapper wrapper) {
