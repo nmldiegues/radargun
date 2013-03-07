@@ -2,9 +2,11 @@ package org.radargun.stamp.vacation.transaction;
 
 import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
+import org.radargun.stages.VacationBenchmarkStage;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
 import org.radargun.stamp.vacation.Vacation;
+import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class MakeReservationOperation extends VacationTransaction {
@@ -34,10 +36,12 @@ public class MakeReservationOperation extends VacationTransaction {
 	int n;
 	this.numQuery = numQueryPerTx;
 
-	customerId = random.posrandom_generate() % relations;
+	int base = (relations * VacationStressor.THREADID.get()) / VacationBenchmarkStage.THREADS;
+	int parcel = relations / VacationBenchmarkStage.THREADS;
+	customerId = base + (random.posrandom_generate() % parcel);
 	for (n = 0; n < numQuery; n++) {
             types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
-            ids[n] = (random.random_generate() % relations);
+            ids[n] = base + (random.random_generate() % parcel);
         }
 
 	this.readOnly = (random.random_generate() % 100) <= readOnly;

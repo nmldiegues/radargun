@@ -28,6 +28,8 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 
     private transient VacationStressor[] vacationStressors;
 
+    public static int THREADS;
+    
     private int clients;
     private int localThreads;
     private int readOnly;
@@ -164,6 +166,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     }
 
     public void setLocalThreads(int localThreads) {
+	THREADS = localThreads;
 	this.localThreads = localThreads;
     }
 
