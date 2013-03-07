@@ -68,6 +68,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    vacationStressors[t].setCacheWrapper(cacheWrapper);
 	    vacationStressors[t].setClients(getActiveSlaveCount());
 	    vacationStressors[t].setThreadid(t);
+	    vacationStressors[t].setRelations(relations);
 	}
 
 	try {

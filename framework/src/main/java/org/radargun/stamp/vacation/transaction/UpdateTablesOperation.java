@@ -15,26 +15,22 @@ public class UpdateTablesOperation extends VacationTransaction {
     final private int[] prices;
     final private int numUpdate;
 
-    public UpdateTablesOperation(Random randomPtr, int numQueryPerTransaction, int queryRange) {
+    public UpdateTablesOperation(Random randomPtr, int numQueryPerTransaction, int queryRange, int relations) {
 	super(randomPtr.random_generate(), queryRange);
 	this.types = new int[numQueryPerTransaction];
 	this.ids = new int[numQueryPerTransaction];
 	this.ops = new int[numQueryPerTransaction];
 	this.prices = new int[numQueryPerTransaction];
 
-	int[] baseIds = new int[20];
-	for (int i = 0; i < 20; i++) {
-	    baseIds[i] = (randomPtr.random_generate() % 100) + 1;
-	}
-	
-	this.numUpdate = numQueryPerTransaction;
+	numUpdate = numQueryPerTransaction;
 	int n;
+
 	for (n = 0; n < numUpdate; n++) {
 	    types[n] = randomPtr.posrandom_generate() % Definitions.NUM_RESERVATION_TYPE;
-	    ids[n] = baseIds[n % 20];
+	    ids[n] = (randomPtr.posrandom_generate() % relations);
 	    ops[n] = randomPtr.posrandom_generate() % 2;
-	    if (ops[n] == 1) {
-		prices[n] = ((randomPtr.posrandom_generate() % 5) * 10) + 50;
+	    if (ops[n]==1) {
+	        prices[n] = ((randomPtr.posrandom_generate() % 5) * 10) + 50;
 	    }
 	}
     }

@@ -18,7 +18,7 @@ public class MakeReservationOperation extends VacationTransaction {
     final private boolean readOnly;
     final private boolean local;
 
-    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int readOnly) {
+    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly) {
 	super(random.random_generate(), queryRange);
 	this.types = new int[numQueryPerTx];
 	this.ids = new int[numQueryPerTx];
@@ -33,18 +33,13 @@ public class MakeReservationOperation extends VacationTransaction {
 	this.maxIds[2] = -1;
 	int n;
 	this.numQuery = numQueryPerTx;
-	this.customerId = random.posrandom_generate() % 100 + 1;
-	
-	int[] baseIds = new int[20];
-	for (int i = 0; i < 20; i++) {
-	    baseIds[i] = (random.random_generate() % 100) + 1;
-	}
-	
+
+	customerId = random.posrandom_generate() % relations;
 	for (n = 0; n < numQuery; n++) {
-	    types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
-	    ids[n] = baseIds[n % 20];
-	}
-	
+            types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
+            ids[n] = (random.random_generate() % relations);
+        }
+
 	this.readOnly = (random.random_generate() % 100) <= readOnly;
 	this.local = (random.random_generate() % 100) <= readOnly;
     }
@@ -83,7 +78,7 @@ public class MakeReservationOperation extends VacationTransaction {
 	}
 
 	if (!readOnly) {
-	    if (!remote && local) {
+	    if (!remote) {
 		if (isFound) {
 		    manager.manager_addCustomer(cacheWrapper, customerId);
 		}

@@ -32,11 +32,16 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     private int queryPerTx;
     private int queryRange;
     private int readOnlyPerc;
+    private int relations;
 
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
     public static int CLIENTS;
     public static int MY_NODE;
     
+    public void setRelations(int relations) {
+        this.relations = relations;
+    }
+
     public VacationStressor() {
 	randomPtr = new Random();
 	randomPtr.random_alloc();
@@ -73,11 +78,11 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	VacationTransaction result = null;
 	
 	if (action == Definitions.ACTION_MAKE_RESERVATION) {
-	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, readOnlyPerc);
+	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc);
 	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-	    result = new DeleteCustomerOperation(randomPtr, queryRange, readOnlyPerc);
+	    result = new DeleteCustomerOperation(randomPtr, queryRange, relations, readOnlyPerc);
 	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
-	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange);
+	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange, relations);
 	} else {
 	    assert (false);
 	}
