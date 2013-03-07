@@ -566,7 +566,7 @@ public class Manager implements Serializable {
     }
     
     public void manager_doCustomer(CacheWrapper wrapper) {
-	LocatedKey key = wrapper.createKey("local" + Vacation.NODE_TARGET.get() + "-" + ((Vacation.NODE_TARGET.get() * 10000) + (VacationStressor.MY_NODE * 100) + VacationStressor.THREADID.get()), Vacation.NODE_TARGET.get());
+	LocatedKey key = wrapper.createKey("local" + Vacation.NODE_TARGET.get() + "-" + (((Vacation.NODE_TARGET.get() + 1) * 10000) + ((VacationStressor.MY_NODE + 1) * 100) + (VacationStressor.THREADID.get() + 1)), Vacation.NODE_TARGET.get());
 	Vacation.put(wrapper, key, 1);
     }
 }
