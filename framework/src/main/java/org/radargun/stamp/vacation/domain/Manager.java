@@ -91,9 +91,9 @@ import org.radargun.stamp.vacation.VacationStressor;
 
 public class Manager implements Serializable {
     public static final String CARS = "carTable";
-    public static final String ROOMS = "carTable";
-    public static final String FLIGHTS = "carTable";
-    public static final String CUSTOMERS = "carTable";
+    public static final String ROOMS = "roomsTable";
+    public static final String FLIGHTS = "flightsTable";
+    public static final String CUSTOMERS = "customersTable";
 
     private int node;
     
