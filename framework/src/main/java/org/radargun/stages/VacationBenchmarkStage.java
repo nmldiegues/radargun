@@ -56,6 +56,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 
 	VacationStressor.CLIENTS = clients;
 	VacationStressor.MY_NODE = cacheWrapper.getMyNode();
+	THREADS = localThreads;
 	vacationStressors = new VacationStressor[localThreads];
 
 	for (int t = 0; t < vacationStressors.length; t++) {
