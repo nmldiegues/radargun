@@ -1,13 +1,13 @@
 # ENVIRONMENT VARIABLES
-MASTER=localhost # this was modified!!!
+MASTER=cloudtm.ist.utl.pt # this was modified!!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`
-CLUSTER=`echo localhost` # `echo node{01..10}`
-MONITOR_OUT=/home/nmld/workspace/radargun/www/files/report.csv
-RADARGUN_DIR=/home/nmld/workspace/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
-RESULTS_DIR=/home/nmld/workspace/radargun/results-radargun
-MONITOR_PATH=/home/nmld/workspace/radargun/csv-reporter
+CLUSTER=`cat /home/ndiegues/machines` # `echo node{01..10}`
+MONITOR_OUT=/home/ndiegues/radargun/www/files/report.csv
+RADARGUN_DIR=/home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
+RESULTS_DIR=/home/ndiegues/radargun/results-radargun
+MONITOR_PATH=/home/ndiegues/radargun/csv-reporter
 
 #uncoment to start gossip router (used in futuregrid)
 #GOSSIP_ROUTER=1
@@ -189,7 +189,7 @@ wait_until_test_finish
 
 echo "kill all java";
 ./bin/master.sh -stop
-kill_java ${nodes}
+#kill_java ${nodes}
 save_logs ${i} ${nodes}
 save_keys ${i} ${nodes}
 save_dataplacement ${i} ${nodes}
@@ -221,7 +221,7 @@ cp ${RADARGUN_DIR}/plugins/infinispan4/conf/ispn.xml config/ > /dev/null
 cp ${RADARGUN_DIR}/plugins/infinispan4/conf/jgroups/jgroups.xml config/ > /dev/null
 
 echo "all complete! cleaning nodes..."
-clean_master
-clean_slaves ${nodes}
+#clean_master
+#clean_slaves ${nodes}
 }
 

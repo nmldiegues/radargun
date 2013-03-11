@@ -5,20 +5,20 @@ WORKING_DIR=`cd $(dirname $0); pwd`
 echo "loading environment..."
 . ${WORKING_DIR}/environment.sh
 
-NR_NODES_TO_USE="1"
+NR_NODES_TO_USE="40"
 EST_DURATION="1"
 
 #ISPN_DEFAULT="-stats -write-skew -versioned -clustering-mode d -extended-stats -num-owner 1"
 #RADARGUN CONFIG
 #BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
 #TPC-C CONFIG
-BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 2 -n 1 -q 100 -r 1024 -t 400000 -u 100 -ro 20"
+BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 1 -n 8 -q 5 -r 8 -t 40000 -u 100 -ro 50"
 
 echo "============ INIT BENCHMARKING ==============="
 
 clean_master
-kill_java ${CLUSTER}
-clean_slaves ${CLUSTER}
+# kill_java ${CLUSTER}
+# clean_slaves ${CLUSTER}
 
 echo "============ STARTING BENCHMARKING ==============="
 

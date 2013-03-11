@@ -46,6 +46,9 @@ public class MakeReservationOperation extends VacationTransaction {
 
 	this.readOnly = (random.random_generate() % 100) <= readOnly;
 	this.local = (random.random_generate() % 100) <= readOnly;
+        if (this.readOnly) {
+            super.node = VacationStressor.MY_NODE;
+        }
     }
 
     @Override

@@ -19,10 +19,10 @@
     <default>
         <locking
                 isolationLevel="SERIALIZABLE"
-                concurrencyLevel="32"
+                concurrencyLevel="256"
                 writeSkewCheck="false"
                 useLockStriping="false"
-                lockAcquisitionTimeout="10000"/>
+                lockAcquisitionTimeout="100000"/>
         <transaction
                 transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
@@ -47,7 +47,7 @@
             <hash
                     class="org.radargun.cachewrappers.CustomHashing"
                     numVirtualNodes="1"
-                    numOwners="1"
+                    numOwners="2"
                     rehashEnabled="false"
                     rehashRpcTimeout="600000"
                     rehashWait="60000" />
