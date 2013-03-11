@@ -100,28 +100,28 @@ echo "         oob_thread_pool.queue_max_size=\"10000\"" >> ${DEST_FILE}
 echo "         oob_thread_pool.rejection_policy=\"discard\"" >> ${DEST_FILE}
 echo "         />" >> ${DEST_FILE}
 
-if [ "${IP_MCAST}" == "true" ]; then
-   if [ "${TCP}" == "true" ]; then
+#if [ "${IP_MCAST}" == "true" ]; then
+#   if [ "${TCP}" == "true" ]; then
 #TPC discover
-echo "   <MPING" >> ${DEST_FILE}
-echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:224.0.0.1}\"" >> ${DEST_FILE}
-echo "         mcast_port=\"\${jgroups.udp.mcast_port:46655}\"" >> ${DEST_FILE}
-echo "         ip_ttl=\"\${jgroups.udp.ip_ttl:8}\"" >> ${DEST_FILE}
-else
+#echo "   <MPING" >> ${DEST_FILE}
+#echo "         mcast_addr=\"\${jgroups.udp.mcast_addr:224.0.0.1}\"" >> ${DEST_FILE}
+#echo "         mcast_port=\"\${jgroups.udp.mcast_port:46655}\"" >> ${DEST_FILE}
+#echo "         ip_ttl=\"\${jgroups.udp.ip_ttl:8}\"" >> ${DEST_FILE}
+#else
 #UDP discover
-echo "   <PING" >> ${DEST_FILE}
-fi
-else
+#echo "   <PING" >> ${DEST_FILE}
+#fi
+#else
 #we don't have IP Multicast
 echo "   <TCPGOSSIP" >> ${DEST_FILE}
-echo "         initial_hosts=\"\${jgroups.gossip_host:${INITIAL_HOST}}[12001]\"" >> ${DEST_FILE}
-fi
+echo "         initial_hosts=\"\${jgroups.gossip_host:10.100.0.1}[12001]\"" >> ${DEST_FILE}
+#fi
 #Discover common properties
 echo "         num_initial_members=\"5\"" >> ${DEST_FILE}
 echo "         break_on_coord_rsp=\"true\"" >> ${DEST_FILE}
-echo "         return_entire_cache=\"true\"" >> ${DEST_FILE}
-echo "         stagger_timeout=\"3000\"" >> ${DEST_FILE}
-echo "         timeout=\"5000\"" >> ${DEST_FILE}
+#echo "         return_entire_cache=\"true\"" >> ${DEST_FILE}
+echo "         stagger_timeout=\"500\"" >> ${DEST_FILE}
+echo "         timeout=\"2000\"" >> ${DEST_FILE}
 echo "         />" >> ${DEST_FILE}
 
 echo "   <MERGE2" >> ${DEST_FILE}
@@ -130,10 +130,8 @@ echo "         min_interval=\"10000\"" >> ${DEST_FILE}
 echo "         />" >> ${DEST_FILE}
 echo "   <FD_SOCK/>" >> ${DEST_FILE}
 echo "   <BARRIER/>" >> ${DEST_FILE}
-echo "   <pbcast.NAKACK" >> ${DEST_FILE}
-echo "         exponential_backoff=\"500\"" >> ${DEST_FILE}
-echo "         use_mcast_xmit=\"${IP_MCAST}\"" >> ${DEST_FILE}
-echo "         xmit_stagger_timeout=\"5000\"" >> ${DEST_FILE}
+echo "   <pbcast.NAKACK2" >> ${DEST_FILE}
+echo "         use_mcast_xmit=\"false\"" >> ${DEST_FILE}
 echo "         discard_delivered_msgs=\"true\"" >> ${DEST_FILE}
 echo "         />" >> ${DEST_FILE}
 
@@ -178,22 +176,22 @@ if [ "${TOA}" == "true" ]; then
 echo "   <tom.TOA/>" >> ${DEST_FILE}
 fi
 
-echo "   <UFC" >> ${DEST_FILE}
-echo "         max_credits=\"4M\"" >> ${DEST_FILE}
-echo "         min_threshold=\"0.4\"" >> ${DEST_FILE}
-echo "         />" >> ${DEST_FILE}
-echo "   <MFC" >> ${DEST_FILE}
-echo "         max_credits=\"4M\"" >> ${DEST_FILE}
-echo "         min_threshold=\"0.4\"" >> ${DEST_FILE}
-echo "         />" >> ${DEST_FILE}
-echo "   <FRAG2" >> ${DEST_FILE}
-echo "         frag_size=\"60K\"" >> ${DEST_FILE}
-echo "         />" >> ${DEST_FILE}
+#echo "   <UFC" >> ${DEST_FILE}
+#echo "         max_credits=\"4M\"" >> ${DEST_FILE}
+#echo "         min_threshold=\"0.4\"" >> ${DEST_FILE}
+#echo "         />" >> ${DEST_FILE}
+#echo "   <MFC" >> ${DEST_FILE}
+#echo "         max_credits=\"4M\"" >> ${DEST_FILE}
+#echo "         min_threshold=\"0.4\"" >> ${DEST_FILE}
+#echo "         />" >> ${DEST_FILE}
+#echo "   <FRAG2" >> ${DEST_FILE}
+#echo "         frag_size=\"60K\"" >> ${DEST_FILE}
+#echo "         />" >> ${DEST_FILE}
 echo "   <pbcast.STATE_TRANSFER/>" >> ${DEST_FILE}
-echo "   <COMPRESS" >> ${DEST_FILE}
-echo "         compression_level=\"9\"" >> ${DEST_FILE}
-echo "         min_size=\"10K\"" >> ${DEST_FILE}
-echo "         />" >> ${DEST_FILE}
+#echo "   <COMPRESS" >> ${DEST_FILE}
+#echo "         compression_level=\"9\"" >> ${DEST_FILE}
+#echo "         min_size=\"10K\"" >> ${DEST_FILE}
+#echo "         />" >> ${DEST_FILE}
 
 echo "</config>" >> ${DEST_FILE}
 
