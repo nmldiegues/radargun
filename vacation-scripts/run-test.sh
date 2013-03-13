@@ -38,7 +38,7 @@ for owner in 1; do
 #${ISPN_GEN} ${ISPN_DEFAULT} -num-owner ${owner}
 ${BENC_GEN} ${BENC_DEFAULT}
 run_test ${NR_NODES_TO_USE} "results2" ${EST_DURATION} ${CLUSTER}
-
+killall -9 java
 done
 #done
 #done

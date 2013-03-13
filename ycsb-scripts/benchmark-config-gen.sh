@@ -62,7 +62,7 @@ case $1 in
   -l) LOCAL_THREADS=$2; shift 2;;
   -rc) READCOUNT=$2; shift 2;;
   -t) TIME=$2; shift 2;;
-  -c) COUNT=$2; shift 2;;
+  -count) COUNT=$2; shift 2;;
   -ro) READONLY=$2; shift 2;;
   -rem) REMOTE=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
