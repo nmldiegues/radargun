@@ -2,6 +2,7 @@ package org.radargun.ycsb.transaction;
 
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.VacationStressor;
+import org.radargun.ycsb.YCSBStressor;
 
 public abstract class YCSBTransaction {
 
@@ -11,9 +12,9 @@ public abstract class YCSBTransaction {
     public YCSBTransaction(int random, int remotePerc) {
 	this.remote = (random % 100) < remotePerc;
 	if (this.remote) {
-	    this.node = random % VacationStressor.CLIENTS;
+	    this.node = random % YCSBStressor.CLIENTS;
 	} else {
-	    this.node = VacationStressor.MY_NODE;
+	    this.node = YCSBStressor.MY_NODE;
 	}
     }
     
