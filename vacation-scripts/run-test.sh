@@ -5,7 +5,7 @@ WORKING_DIR=`cd $(dirname $0); pwd`
 echo "loading environment..."
 . ${WORKING_DIR}/environment.sh
 
-NR_NODES_TO_USE="40"
+NR_NODES_TO_USE="80"
 EST_DURATION="1"
 
 #ISPN_DEFAULT="-stats -write-skew -versioned -clustering-mode d -extended-stats -num-owner 1"

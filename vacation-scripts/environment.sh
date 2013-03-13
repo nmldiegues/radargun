@@ -10,7 +10,7 @@ RESULTS_DIR=/home/ndiegues/radargun/results-radargun
 MONITOR_PATH=/home/ndiegues/radargun/csv-reporter
 
 #uncoment to start gossip router (used in futuregrid)
-#GOSSIP_ROUTER=1
+GOSSIP_ROUTER=1
 #uncomment to collect data placement stats
 #DATA_PLACEMENT=1
 #uncomment to collect the final keys value (if available)
@@ -37,14 +37,15 @@ RC="READ_COMMITTED"
 RR="REPEATABLE_READ"
 
 copy_to_all() {
-for node in $@; do
-echo "copy to ${node}"
-if [ "${MASTER}" == "${node}" ]; then
-echo "not copying... is the master!"
-else
-scp -r ${RADARGUN_DIR}/* ${node}:${RADARGUN_DIR} > /dev/null
-fi
-done
+#for node in $@; do
+#echo "copy to ${node}"
+#if [ "${MASTER}" == "${node}" ]; then
+#echo "not copying... is the master!"
+#else
+parallel-scp -r -h /home/ndiegues/machines /home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT/ /home/ndiegues/radargun/target/distribution/
+#scp -r ${RADARGUN_DIR}/* ${node}:${RADARGUN_DIR} > /dev/null
+#fi
+#done
 }
 
 kill_java() {
@@ -121,6 +122,7 @@ rm -r ${LOGS_DIR}/*
 rm -r ${KEYS_DIR}/*
 rm -r ${DATA_PLACEMENT_DIR}/*
 rm -r ${MONITOR_DIR}/*
+killall -9 java
 }
 
 start_gossip_router() {
