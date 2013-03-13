@@ -81,7 +81,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
             node = cacheWrapper.getMyNode();
         }
         int i = m_random.nextInt(100);
-        boolean local = ((i * k) % 100) < 50;
+        boolean local = ((i * k) % 100) < 100;
         if (i < writeRatio) {
             if (m_write) {
                 m_last = m_random.nextInt(range);

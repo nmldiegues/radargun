@@ -120,7 +120,7 @@ public class IntSetSkipList implements IntSet, Serializable {
             }
             result = true;
         } else {
-            LocatedKey key = cache.createKey("local" + cache.getMyNode() + "-" + MicrobenchmarkStressor.THREADID.get(), cache.getMyNode());
+            LocatedKey key = wrapper.createKey("local" + (((wrapper.getMyNode() + 1) * 1000) + node) + "-" + MicrobenchmarkStressor.THREADID.get(), node);
             Micro.put(cache, key, 1);
             return false;
         }
@@ -159,7 +159,7 @@ public class IntSetSkipList implements IntSet, Serializable {
             }           
             result = true;
         } else {
-            LocatedKey key = wrapper.createKey("local" + wrapper.getMyNode() + "-" + MicrobenchmarkStressor.THREADID.get(), wrapper.getMyNode());
+            LocatedKey key = wrapper.createKey("local" + (((wrapper.getMyNode() + 1) * 1000) + node) + "-" + MicrobenchmarkStressor.THREADID.get(), node);
             Micro.put(wrapper, key, 1);
             return false;
         }
