@@ -29,7 +29,7 @@ public class Insert extends YCSBTransaction {
 	    ByteIterator data= new RandomByteIterator(YCSB.fieldlengthgenerator.nextInt());
 	    values.put(fieldkey,data);
 	}
-	LocatedKey key = cacheWrapper.createKey("user" + k, super.node);
+	LocatedKey key = cacheWrapper.createKey("user" + k + "-" + super.node, super.node);
 	Map<String, String> row = StringByteIterator.getStringMap(values);
 	cacheWrapper.put(null, key, row);
     }

@@ -29,7 +29,7 @@ public class Read extends YCSBTransaction {
 	    ByteIterator data= new RandomByteIterator(YCSB.fieldlengthgenerator.nextInt());
 	    values.put(fieldkey,data);
 	}
-	LocatedKey key = cacheWrapper.createKey("user" + k, super.node);
+	LocatedKey key = cacheWrapper.createKey("user" + k + "-" + super.node, super.node);
 	Map<String, String> row = (Map) cacheWrapper.get(null, key);
 	HashMap<String, ByteIterator> result = new HashMap<String, ByteIterator>();
 	if (row != null) {

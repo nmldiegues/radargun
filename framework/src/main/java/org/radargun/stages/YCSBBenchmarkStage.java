@@ -52,6 +52,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 	for (int t = 0; t < ycsbStressors.length; t++) {
 
 	    ycsbStressors[t] = new YCSBStressor();
+	    ycsbStressors[t].setCacheWrapper(cacheWrapper);
 	    ycsbStressors[t].setRemote(this.remote);
 	    ycsbStressors[t].setNodes(this.nodes);
 	    ycsbStressors[t].setRecordCount(this.recordcount);
