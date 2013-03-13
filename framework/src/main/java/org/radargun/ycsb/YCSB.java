@@ -39,10 +39,12 @@ public class YCSB {
 	}
     }
 
-    public static void init(double readOnly, int recordCount) {
+    public static void preinit() {
 	int fieldlength= 100;
 	fieldlengthgenerator = new ZipfianGenerator(1, fieldlength);
-	
+    }
+    
+    public static void init(double readOnly, int recordCount) {
 	operationchooser=new DiscreteGenerator();
 	operationchooser.addValue(readOnly,"READ");
 	operationchooser.addValue(1 - readOnly,"READMODIFYWRITE");

@@ -2,6 +2,7 @@ package org.radargun.stages;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
+import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBPopulationStressor;
 
 public class YCSBPopulationStage extends AbstractDistStage {
@@ -14,6 +15,7 @@ public class YCSBPopulationStage extends AbstractDistStage {
     
     @Override
     public DistStageAck executeOnSlave() {
+	YCSB.preinit();
 	DefaultDistStageAck ack = newDefaultStageAck();
 	CacheWrapper wrapper = slaveState.getCacheWrapper();
 	if (wrapper == null) {
