@@ -7,11 +7,9 @@ import java.util.Map;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.stamp.vacation.VacationPopulationStressor;
 import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.state.MasterState;
 import org.radargun.ycsb.YCSB;
-import org.radargun.ycsb.YCSBPopulationStressor;
 import org.radargun.ycsb.YCSBStressor;
 
 public class YCSBBenchmarkStage extends AbstractDistStage {
@@ -29,7 +27,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     private int executiontime;
     private int nodes;
     private int threads;
-    private int readonly;
+    private double readonly;
     private int remote;
     
     @Override
@@ -168,10 +166,10 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     public void setThreads(int threads) {
         this.threads = threads;
     }
-    public int getReadonly() {
+    public double getReadonly() {
         return readonly;
     }
-    public void setReadonly(int readonly) {
+    public void setReadonly(double readonly) {
         this.readonly = readonly;
     }
     public int getRemote() {
