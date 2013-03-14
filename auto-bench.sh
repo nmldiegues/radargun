@@ -20,18 +20,18 @@ mkdir auto-results;
 
 for to in 1 2
 do
-for benchmark in 2 3
+for benchmark in 1 3
 do
-    for nodes in 2 4 #10 20 30 40 50 60 70 80
+    for nodes in 4 #10 20 30 40 50 60 70 80
     do
         tail -$nodes all_machines > /home/ndiegues/machines
-        for attempt in 1 2 #3
+        for attempt in 1 #2 #3
         do
             for alg in 1 2
             do
                 bash toggle_${algs[$alg]}
                 bash ${benchmarks[$benchmark]}-scripts/run-test.sh ${params[$benchmark]} ${totalorder[$to]}
-                cp results-radargun/test-result-results2/infinispan4_ispn_$nodes.csv auto-results/${benchmarks[$benchmark]}-${algs[$alg]}-$nodes-$attempt.csv
+                cp results-radargun/test-result-results2/infinispan4_ispn_$nodes.csv auto-results/${benchmarks[$benchmark]}-${totalorder[$to]}-${algs[$alg]}-$nodes-$attempt.csv
             done
         done
     done
