@@ -27,7 +27,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     private int executiontime;
     private int nodes;
     private int threads;
-    private double readonly;
+    private int readonly;
     private int remote;
     
     @Override
@@ -166,10 +166,10 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     public void setThreads(int threads) {
         this.threads = threads;
     }
-    public double getReadonly() {
+    public int getReadonly() {
         return readonly;
     }
-    public void setReadonly(double readonly) {
+    public void setReadonly(int readonly) {
         this.readonly = readonly;
     }
     public int getRemote() {

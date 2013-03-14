@@ -10,7 +10,7 @@ import org.radargun.ycsb.generators.ZipfianGenerator;
 public class YCSB {
 
     public static int fieldcount = 10;
-    public static DiscreteGenerator operationchooser;
+    public static int readOnly;
     public static CounterGenerator transactioninsertkeysequence;
     public static IntegerGenerator fieldlengthgenerator;
 
@@ -44,11 +44,8 @@ public class YCSB {
 	fieldlengthgenerator = new ZipfianGenerator(1, fieldlength);
     }
     
-    public static void init(double readOnly, int recordCount) {
-	operationchooser=new DiscreteGenerator();
-	operationchooser.addValue(readOnly,"READ");
-	operationchooser.addValue(1 - readOnly,"READMODIFYWRITE");
-	
+    public static void init(int readOnly, int recordCount) {
+        YCSB.readOnly = readOnly;
 	transactioninsertkeysequence=new CounterGenerator(recordCount);
     }
 
