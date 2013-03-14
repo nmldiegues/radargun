@@ -19,8 +19,8 @@ public class RMW extends YCSBTransaction {
     private int recordCount;
     
     public RMW(int k, int random, int remote, int multiplereadcount, int recordCount) {
-	super(random, remote);
-	this.random = random;
+	super(Math.abs(random), remote);
+	this.random = Math.abs(random);
 	this.k = k;
 	this.multiplereadcount = multiplereadcount;
 	this.recordCount = recordCount;
@@ -37,7 +37,7 @@ public class RMW extends YCSBTransaction {
 	}
 	
 	Map<String, String> row = StringByteIterator.getStringMap(values);
-	int toWrite = (k * random) % multiplereadcount;
+	int toWrite = (Math.abs(k * random)) % multiplereadcount;
 	for (int i = 0 ; i < multiplereadcount; i++) {
 	    LocatedKey key = cacheWrapper.createKey("user" + (i % recordCount) + "-" + super.node, super.node);
 	    if (!super.remote && toWrite == i) {

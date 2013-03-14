@@ -48,12 +48,12 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     }
     
     private YCSBTransaction generateNextTransaction() {
-        int ran = r.nextInt() % 100;
-        int keynum = r.nextInt() % recordCount;
+        int ran = (Math.abs(r.nextInt())) % 100;
+        int keynum = (Math.abs(r.nextInt())) % recordCount;
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {
-            return new RMW(keynum, r.nextInt(), remote, multiplereadcount, recordCount);
+            return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount);
         }
     }
     
@@ -84,6 +84,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 	    try {
 		transaction.executeTransaction(cacheWrapper);
 	    } catch (Throwable e) {
+try {Thread.sleep(10000);} catch(Exception e1) {}
 		successful = false;
 	    }
 
@@ -94,6 +95,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 		    setRestarts(getRestarts() + 1);
 		}
 	    } catch (Throwable rb) {
+try {Thread.sleep(10000);} catch (Exception e2) {}
 		setRestarts(getRestarts() + 1);
 		successful = false;
 	    }
