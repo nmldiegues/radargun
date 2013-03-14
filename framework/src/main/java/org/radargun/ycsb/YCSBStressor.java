@@ -53,7 +53,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {
-            return new RMW(keynum, YCSB.fieldlengthgenerator.nextInt(), remote, multiplereadcount, recordCount);
+            return new RMW(keynum, r.nextInt(), remote, multiplereadcount, recordCount);
         }
     }
     
