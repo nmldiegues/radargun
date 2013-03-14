@@ -2,6 +2,7 @@ package org.radargun.ycsb;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +35,8 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
     public static int CLIENTS;
     public static int MY_NODE;
+    
+    public static Random r = new Random();
 
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
 	this.cacheWrapper = cacheWrapper;
@@ -45,14 +48,13 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     }
     
     private YCSBTransaction generateNextTransaction() {
-	String op = YCSB.operationchooser.nextString();
-	int keynum = YCSB.fieldlengthgenerator.nextInt() % recordCount;
-	
-	if (op.compareTo("READ") == 0) {
-	    return new Read(keynum);
-	} else {
-	    return new RMW(keynum, YCSB.fieldlengthgenerator.nextInt(), remote, multiplereadcount, recordCount);
-	}
+        int ran = r.nextInt() % 100;
+        int keynum = YCSB.fieldlengthgenerator.nextInt() % recordCount;
+        if (ran < YCSB.readOnly) {
+            return new Read(keynum);
+        } else {
+            return new RMW(keynum, YCSB.fieldlengthgenerator.nextInt(), remote, multiplereadcount, recordCount);
+        }
     }
     
     @Override
