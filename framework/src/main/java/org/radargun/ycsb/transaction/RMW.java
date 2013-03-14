@@ -48,7 +48,7 @@ public class RMW extends YCSBTransaction {
 	}
 	
 	if (remote) {
-            LocatedKey key = cacheWrapper.createKey("local" + super.node + "-" + (((super.node + 1) * 10000) + ((YCSBStressor.MY_NODE + 1) * 100) + (YCSBStressor.THREADID.get() + 1)), super.node);
+            LocatedKey key = cacheWrapper.createKey("local" + super.node + "-" + (((super.node + 1) * 1000000) + ((YCSBStressor.MY_NODE + 1) * 100) + (YCSBStressor.THREADID.get() + 1)), super.node);
 	    cacheWrapper.put(null, key, row);
 	}
 	
