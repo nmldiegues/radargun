@@ -49,7 +49,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     
     private YCSBTransaction generateNextTransaction() {
         int ran = r.nextInt() % 100;
-        int keynum = YCSB.fieldlengthgenerator.nextInt() % recordCount;
+        int keynum = r.nextInt() % recordCount;
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {

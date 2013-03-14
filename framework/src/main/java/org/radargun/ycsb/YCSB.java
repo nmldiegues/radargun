@@ -11,7 +11,6 @@ public class YCSB {
 
     public static int fieldcount = 10;
     public static int readOnly;
-    public static CounterGenerator transactioninsertkeysequence;
     public static IntegerGenerator fieldlengthgenerator;
 
     public static final ThreadLocal<Integer> NODE_TARGET = new ThreadLocal<Integer>() {};
@@ -46,7 +45,6 @@ public class YCSB {
     
     public static void init(int readOnly, int recordCount) {
         YCSB.readOnly = readOnly;
-	transactioninsertkeysequence=new CounterGenerator(recordCount);
     }
 
 
