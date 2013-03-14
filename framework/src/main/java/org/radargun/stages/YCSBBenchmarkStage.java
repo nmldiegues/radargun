@@ -29,6 +29,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     private int threads;
     private int readonly;
     private int remote;
+    boolean totalOrder;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -56,6 +57,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 	    ycsbStressors[t].setRecordCount(this.recordcount);
 	    ycsbStressors[t].setMultiplereadcount(this.multiplereadcount);
 	    ycsbStressors[t].setThreadId(t);
+	    ycsbStressors[t].setTotalOrder(this.totalOrder);
 	}
 
 	try {
@@ -177,5 +179,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     }
     public void setRemote(int remote) {
         this.remote = remote;
+    }
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
     }
 }

@@ -38,6 +38,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     private int relations;
     private int transactions;	// actually it's time now
     private int user;
+    boolean totalOrder;
 
     public void setReadOnly(int ro) {
 	this.readOnly = ro;
@@ -72,6 +73,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    vacationStressors[t].setClients(getActiveSlaveCount());
 	    vacationStressors[t].setThreadid(t);
 	    vacationStressors[t].setRelations(relations);
+	    vacationStressors[t].setTotalOrder(this.totalOrder);
 	}
 
 	try {
@@ -214,7 +216,9 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     public static String getSizeInfo() {
 	return SIZE_INFO;
     }
-
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
+    }
 
 
 }

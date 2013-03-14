@@ -33,6 +33,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     private int queryRange;
     private int readOnlyPerc;
     private int relations;
+    private boolean totalOrder;
 
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
     public static int CLIENTS;
@@ -78,7 +79,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	VacationTransaction result = null;
 	
 	if (action == Definitions.ACTION_MAKE_RESERVATION) {
-	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc);
+	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc, totalOrder);
 	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
 	    result = new DeleteCustomerOperation(randomPtr, queryRange, relations, readOnlyPerc);
 	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
@@ -178,5 +179,10 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     public void setPhase(int shutdownPhase) {
 	this.m_phase = shutdownPhase;
     }
+
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
+    }
+
 
 }

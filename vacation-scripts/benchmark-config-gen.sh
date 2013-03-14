@@ -13,6 +13,7 @@ QUERIES=60
 RELATIONS=1024
 TRANSACTIONS=2000
 USER=98
+TO="false"
 
 if [ -n "${ISPN_CONFIG_FILENAME}" ]; then
   CONFIGURATION_FILE=${ISPN_CONFIG_FILENAME}
@@ -59,6 +60,7 @@ case $1 in
   -r) RELATIONS=$2; shift 2;;
   -t) TRANSACTIONS=$2; shift 2;;
   -u) USER=$2; shift 2;;
+  -to) TO=$2; shift 2;;
   -*) echo "unknown option $1"; exit 1;;
   *) break;;
 esac
@@ -102,6 +104,7 @@ echo "            number=\"${NUMBER}\"" >> ${DEST_FILE}
 echo "            queries=\"${QUERIES}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\"" >> ${DEST_FILE}
 echo "            transactions=\"${TRANSACTIONS}\"" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            user=\"${USER}\"/>" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

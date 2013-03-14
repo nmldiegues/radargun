@@ -13,6 +13,7 @@ TIME=40
 COUNT=1024
 READONLY=50
 REMOTE=5
+TO="false"
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -65,6 +66,7 @@ case $1 in
   -count) COUNT=$2; shift 2;;
   -ro) READONLY=$2; shift 2;;
   -rem) REMOTE=$2; shift 2;;
+  -to) TO=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -110,6 +112,7 @@ echo "            multiplereadcount=\"${READCOUNT}\"" >> ${DEST_FILE}
 echo "            executiontime=\"${TIME}\"" >> ${DEST_FILE}
 echo "            recordcount=\"${COUNT}\"" >> ${DEST_FILE}
 echo "            readonly=\"${READONLY}\"" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            remote=\"${REMOTE}\"/>" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

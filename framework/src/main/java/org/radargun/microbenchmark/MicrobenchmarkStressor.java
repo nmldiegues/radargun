@@ -25,8 +25,9 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     private long steps = 0;
 
     private int range;
-    private int clients;
+    public static int clients;
     private int writeRatio;
+    private boolean totalOrder;
 
     private boolean m_write = true;
     private int m_last;
@@ -85,10 +86,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         if (i < writeRatio) {
             if (m_write) {
                 m_last = m_random.nextInt(range);
-                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local, remote)))
+                if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local, remote, totalOrder)))
                     m_write = false;
             } else {
-                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last, local, remote));
+                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last, local, remote, totalOrder));
                 m_write = true;
             }
         } else {
@@ -212,5 +213,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
     public void setM_phase(int m_phase) {
         this.m_phase = m_phase;
     }
+
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
+    }
+
 
 }

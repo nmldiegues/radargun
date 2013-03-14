@@ -19,8 +19,9 @@ public class MakeReservationOperation extends VacationTransaction {
     final private int numQuery;
     final private boolean readOnly;
     final private boolean local;
+    final private boolean totalOrder;
 
-    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly) {
+    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly, boolean totalOrder) {
 	super(random.random_generate(), queryRange);
 	this.types = new int[numQueryPerTx];
 	this.ids = new int[numQueryPerTx];
@@ -49,6 +50,8 @@ public class MakeReservationOperation extends VacationTransaction {
         if (this.readOnly) {
             super.node = VacationStressor.MY_NODE;
         }
+        
+        this.totalOrder = totalOrder;
     }
 
     @Override
@@ -59,6 +62,18 @@ public class MakeReservationOperation extends VacationTransaction {
 	boolean isFound = false;
 	int n;
 	for (n = 0; n < numQuery; n++) {
+	    if (totalOrder && remote) {
+		if (n % 2 == 0) {
+		    int otherNode = (super.node + 1) % VacationStressor.CLIENTS;
+		    Vacation.NODE_TARGET.set(otherNode);
+		    key = cacheWrapper.createKey("MANAGER" + otherNode, otherNode);
+		    manager = (Manager) cacheWrapper.get(null, key);		    
+		} else {
+		    Vacation.NODE_TARGET.set(super.node);
+		    key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
+		    manager = (Manager) cacheWrapper.get(null, key);
+		}
+	    }
 	    int t = types[n];
 	    int id = ids[n];
 	    int price = -1;

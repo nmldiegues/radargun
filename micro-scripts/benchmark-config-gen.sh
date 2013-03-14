@@ -14,6 +14,7 @@ RANGE=1024
 DURATION=10000
 WRITE_RATIO=10
 SET="ll"
+TO="false"
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -62,6 +63,7 @@ case $1 in
   -d) DURATION=$2; shift 2;;
   -w) WRITE_RATIO=$2; shift 2;;
   -s) SET=$2; shift 2;;
+  -to) TO=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -108,6 +110,7 @@ echo "		  clients=\"${CLIENTS}\"" >> ${DEST_FILE}
 echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
 echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            writeRatio=\"${WRITE_RATIO}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

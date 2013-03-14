@@ -26,6 +26,7 @@ public class MicrobenchmarkStage extends AbstractDistStage {
     int duration;
     int writeRatio;
     int clients;
+    boolean totalOrder;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -46,6 +47,7 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	    microbenchmarkStressors[t].setRange(range);
 	    microbenchmarkStressors[t].setClients(clients);
 	    microbenchmarkStressors[t].setWriteRatio(writeRatio);
+	    microbenchmarkStressors[t].setTotalOrder(this.totalOrder);
 	}
 	
 	try {
@@ -169,5 +171,7 @@ public class MicrobenchmarkStage extends AbstractDistStage {
     public void setWriteRatio(int writeRatio) {
         this.writeRatio = writeRatio;
     }
-
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
+    }
 }

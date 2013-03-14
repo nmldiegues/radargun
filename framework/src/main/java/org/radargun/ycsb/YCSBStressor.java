@@ -28,10 +28,11 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     private int recordCount;
     private int nodes;
     private int remote;
+    private boolean totalOrder;
     
     private long restarts = 0;
     private long throughput = 0;
-    
+
     public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
     public static int CLIENTS;
     public static int MY_NODE;
@@ -53,7 +54,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {
-            return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount);
+            return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount, totalOrder);
         }
     }
     
@@ -167,6 +168,10 @@ try {Thread.sleep(10000);} catch (Exception e2) {}
  
     public void setPhase(int shutdownPhase) {
 	this.m_phase = shutdownPhase;
+    }
+
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
     }
 
     
