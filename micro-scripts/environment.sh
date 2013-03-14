@@ -134,7 +134,7 @@ wait_until_test_finish() {
 local MASTER_PID="";
 #30 minutes max waiting time (+ estimated test duration)
 for ((j = 0; j < 60; ++j)); do
-MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | awk '{print $2}'`
+MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | grep "ndiegues" | awk '{print $2}'`
 echo "Checking if the master finished..."
 if [ -z "${MASTER_PID}" ]; then
 echo "Master finished! No PID found! returning... @" `date`
