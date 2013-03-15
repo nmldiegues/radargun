@@ -48,9 +48,9 @@ public class CustomHashing extends DefaultConsistentHash {
     public boolean isKeyLocalToAddress(Address target, Object key, int replCount) {
 	final int actualReplCount = Math.min(replCount, caches.size());
 	if (key instanceof MagicKey) {
-	    int node = ((MagicKey)key).node;
+	    int node = ((MagicKey)key).node + getOffset((MagicKey) key);
 	    for (int i = 0; i < actualReplCount; i++) {
-		if (target.equals(addresses[(node + i + getOffset((MagicKey) key)) % addresses.length])) {
+		if (target.equals(addresses[(node + i) % addresses.length])) {
 		    return true;
 		}
 	    }
@@ -63,7 +63,7 @@ public class CustomHashing extends DefaultConsistentHash {
     private int getOffset(MagicKey key) {
 	if (totalOrder) {
 	    int hashCode = key.key.hashCode();
-	    return hashCode % 4;
+	    return Math.abs(Math.abs(hashCode) % 4);
 	} else {
 	    return 0;
 	}
@@ -72,7 +72,7 @@ public class CustomHashing extends DefaultConsistentHash {
     @Override
     public Address primaryLocation(Object key) {
 	if (key instanceof MagicKey) {
-	    return addresses[((MagicKey)key).node + getOffset((MagicKey) key)];
+	    return addresses[(((MagicKey)key).node + getOffset((MagicKey) key)) % addresses.length];
 	} else {
 	    return super.primaryLocation(key);
 	}
@@ -81,7 +81,6 @@ public class CustomHashing extends DefaultConsistentHash {
     public int getMyId(Address addr) {
 	for (int i = 0; i < addresses.length; i++) {
 	    if (addresses[i].equals(addr)) {
-		System.out.println("Node: " + i + " " + Arrays.toString(addresses));
 		return i;
 	    }
 	}
