@@ -28,6 +28,9 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
             log.info("Not executing any test as the wrapper is not set up on this slave ");
             return ack;
         }
+        if (this.totalOrder) {
+            cacheWrapper.setupTotalOrder();
+        }
         long startTime = System.currentTimeMillis();
         populate(wrapper);
         long duration = System.currentTimeMillis() - startTime;

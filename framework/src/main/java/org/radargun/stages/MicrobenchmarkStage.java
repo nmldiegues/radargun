@@ -36,9 +36,6 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	    log.info("Not running test on this slave as the wrapper hasn't been configured.");
 	    return result;
 	}
-	if (this.totalOrder) {
-	    cacheWrapper.setupTotalOrder();
-	}
 
 	log.info("Starting MicrobenchmarkBenchmarkStage: " + this.toString());
 	

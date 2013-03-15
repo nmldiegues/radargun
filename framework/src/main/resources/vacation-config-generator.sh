@@ -92,6 +92,7 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <VacationPopulation" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
