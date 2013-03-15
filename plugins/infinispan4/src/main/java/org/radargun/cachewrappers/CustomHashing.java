@@ -33,16 +33,12 @@ public class CustomHashing extends DefaultConsistentHash {
     public List<Address> locate(Object key, int replCount) {
 	final int actualReplCount = Math.min(replCount, caches.size());
 	if (key instanceof MagicKey) {
-	    if (totalOrder) {
-		return super.locate(((MagicKey)key).key, replCount);
-	    } else {
-		List<Address> result = new ArrayList<Address>(actualReplCount);
-		int node = ((MagicKey)key).node;
-		for (int i = 0; i < actualReplCount; i++) {
-		    result.add(addresses[(node + i) % addresses.length]);
-		}
-		return result;
+	    List<Address> result = new ArrayList<Address>(actualReplCount);
+	    int node = ((MagicKey)key).node + getOffset((MagicKey) key);
+	    for (int i = 0; i < actualReplCount; i++) {
+		result.add(addresses[(node + i) % addresses.length]);
 	    }
+	    return result;
 	} else {
 	    return super.locate(key, replCount); 
 	}
@@ -52,30 +48,31 @@ public class CustomHashing extends DefaultConsistentHash {
     public boolean isKeyLocalToAddress(Address target, Object key, int replCount) {
 	final int actualReplCount = Math.min(replCount, caches.size());
 	if (key instanceof MagicKey) {
-	    if (totalOrder) {
-		return super.isKeyLocalToAddress(target, ((MagicKey)key).key, replCount);
-	    } else {
-		int node = ((MagicKey)key).node;
-		for (int i = 0; i < actualReplCount; i++) {
-		    if (target.equals(addresses[(node + i) % addresses.length])) {
-			return true;
-		    }
+	    int node = ((MagicKey)key).node;
+	    for (int i = 0; i < actualReplCount; i++) {
+		if (target.equals(addresses[(node + i + getOffset((MagicKey) key)) % addresses.length])) {
+		    return true;
 		}
-		return false;
 	    }
+	    return false;
 	} else {
 	    return super.isKeyLocalToAddress(target, key, replCount);
 	}
     }
 
+    private int getOffset(MagicKey key) {
+	if (totalOrder) {
+	    int hashCode = key.key.hashCode();
+	    return hashCode % 4;
+	} else {
+	    return 0;
+	}
+    }
+    
     @Override
     public Address primaryLocation(Object key) {
 	if (key instanceof MagicKey) {
-	    if (totalOrder) {
-	    return super.primaryLocation(((MagicKey)key).key);
-	    } else {
-		return addresses[((MagicKey)key).node];
-	    }
+	    return addresses[((MagicKey)key).node + getOffset((MagicKey) key)];
 	} else {
 	    return super.primaryLocation(key);
 	}
