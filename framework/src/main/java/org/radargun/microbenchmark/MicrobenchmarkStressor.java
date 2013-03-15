@@ -122,6 +122,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
                     setRestarts(getRestarts() + 1);
                 }
             } catch (Throwable rb) {
+		rb.printStackTrace();
                 setRestarts(getRestarts() + 1);
                 successful = false;
             }

@@ -29,7 +29,7 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
             return ack;
         }
         if (this.totalOrder) {
-            cacheWrapper.setupTotalOrder();
+            wrapper.setupTotalOrder();
         }
         long startTime = System.currentTimeMillis();
         populate(wrapper);

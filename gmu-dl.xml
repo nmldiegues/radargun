@@ -22,7 +22,7 @@
                 concurrencyLevel="256"
                 writeSkewCheck="false"
                 useLockStriping="false"
-                lockAcquisitionTimeout="100000"/>
+                lockAcquisitionTimeout="10"/>
         <transaction
                 transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
