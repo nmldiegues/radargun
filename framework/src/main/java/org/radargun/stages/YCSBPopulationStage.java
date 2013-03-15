@@ -8,9 +8,14 @@ import org.radargun.ycsb.YCSBPopulationStressor;
 public class YCSBPopulationStage extends AbstractDistStage {
     
     private int recordCount;
+    private boolean totalOrder;
     
     public void setRecordCount(int recordCount) {
 	this.recordCount = recordCount;
+    }
+    
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
     }
     
     @Override
@@ -21,6 +26,9 @@ public class YCSBPopulationStage extends AbstractDistStage {
 	if (wrapper == null) {
 	    log.info("Not executing any test as the wrapper is not set up on this slave ");
 	    return ack;
+	}
+	if (this.totalOrder) {
+	    wrapper.setupTotalOrder();
 	}
 	long startTime = System.currentTimeMillis();
 	populate(wrapper);

@@ -42,12 +42,12 @@ public class RMW extends YCSBTransaction {
 	int toWrite = (Math.abs(k * random)) % multiplereadcount;
 	for (int i = 0 ; i < multiplereadcount; i++) {
 	    LocatedKey key;
-	    if (super.remote && totalOrder && (i % 2 == 0)) {
-		int otherNode = (super.node + 1) % YCSBStressor.CLIENTS;
-		key = cacheWrapper.createKey("user" + (i % recordCount) + "-" + otherNode, otherNode);
-	    } else {
+//	    if (super.remote && totalOrder && (i % 2 == 0)) {
+//		int otherNode = (super.node + 1) % YCSBStressor.CLIENTS;
+//		key = cacheWrapper.createKey("user" + (i % recordCount) + "-" + otherNode, otherNode);
+//	    } else {
 		key = cacheWrapper.createKey("user" + (i % recordCount) + "-" + super.node, super.node);
-	    }
+//	    }
 	    
 	    if (!super.remote && toWrite == i) {
 		cacheWrapper.put(null, key, row);

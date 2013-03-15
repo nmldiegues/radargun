@@ -14,6 +14,11 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
     private int range;
     private String set;
     private int clients;
+    private boolean totalOrder;
+    
+    public void setTotalOrder(boolean totalOrder) {
+	this.totalOrder = totalOrder;
+    }
 
     @Override
     public DistStageAck executeOnSlave() {

@@ -62,18 +62,18 @@ public class MakeReservationOperation extends VacationTransaction {
 	boolean isFound = false;
 	int n;
 	for (n = 0; n < numQuery; n++) {
-	    if (totalOrder && remote) {
-		if (n % 2 == 0) {
-		    int otherNode = (super.node + 1) % VacationStressor.CLIENTS;
-		    Vacation.NODE_TARGET.set(otherNode);
-		    key = cacheWrapper.createKey("MANAGER" + otherNode, otherNode);
-		    manager = (Manager) cacheWrapper.get(null, key);		    
-		} else {
-		    Vacation.NODE_TARGET.set(super.node);
-		    key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
-		    manager = (Manager) cacheWrapper.get(null, key);
-		}
-	    }
+//	    if (totalOrder && remote) {
+//		if (n % 2 == 0) {
+//		    int otherNode = (super.node + 1) % VacationStressor.CLIENTS;
+//		    Vacation.NODE_TARGET.set(otherNode);
+//		    key = cacheWrapper.createKey("MANAGER" + otherNode, otherNode);
+//		    manager = (Manager) cacheWrapper.get(null, key);		    
+//		} else {
+//		    Vacation.NODE_TARGET.set(super.node);
+//		    key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
+//		    manager = (Manager) cacheWrapper.get(null, key);
+//		}
+//	    }
 	    int t = types[n];
 	    int id = ids[n];
 	    int price = -1;

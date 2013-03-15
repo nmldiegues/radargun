@@ -100,6 +100,7 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <YCSBPopulation" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            recordCount=\"${COUNT}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

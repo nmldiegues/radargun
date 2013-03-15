@@ -10,73 +10,84 @@ import org.infinispan.remoting.transport.Address;
 
 public class CustomHashing extends DefaultConsistentHash {
 
+    public static boolean totalOrder = false;
+
     private volatile Address[] addresses;
 
     public int getAddressesSize() {
-        return addresses.length;
+	return addresses.length;
     }
-    
+
     @Override
     public void setCaches(Set<Address> newCaches) {
-        super.setCaches(newCaches);
-        addresses = new Address[newCaches.size()];
-        int i = 0;
-        for (Address addr : newCaches) {
-            addresses[i] = addr;
-            i++;
-        }
+	super.setCaches(newCaches);
+	addresses = new Address[newCaches.size()];
+	int i = 0;
+	for (Address addr : newCaches) {
+	    addresses[i] = addr;
+	    i++;
+	}
     }
 
     @Override
     public List<Address> locate(Object key, int replCount) {
-        final int actualReplCount = Math.min(replCount, caches.size());
-        if (key instanceof MagicKey) {
-            return super.locate(((MagicKey)key).key, replCount);
-//            List<Address> result = new ArrayList<Address>(actualReplCount);
-//            int node = ((MagicKey)key).node;
-//            for (int i = 0; i < actualReplCount; i++) {
-//                result.add(addresses[(node + i) % addresses.length]);
-//            }
-//            return result;
-        } else {
-            return super.locate(key, replCount); 
-        }
+	final int actualReplCount = Math.min(replCount, caches.size());
+	if (key instanceof MagicKey) {
+	    if (totalOrder) {
+		return super.locate(((MagicKey)key).key, replCount);
+	    } else {
+		List<Address> result = new ArrayList<Address>(actualReplCount);
+		int node = ((MagicKey)key).node;
+		for (int i = 0; i < actualReplCount; i++) {
+		    result.add(addresses[(node + i) % addresses.length]);
+		}
+		return result;
+	    }
+	} else {
+	    return super.locate(key, replCount); 
+	}
     }
 
     @Override
     public boolean isKeyLocalToAddress(Address target, Object key, int replCount) {
-        final int actualReplCount = Math.min(replCount, caches.size());
-        if (key instanceof MagicKey) {
-            return super.isKeyLocalToAddress(target, ((MagicKey)key).key, replCount);
-//            int node = ((MagicKey)key).node;
-//            for (int i = 0; i < actualReplCount; i++) {
-//                if (target.equals(addresses[(node + i) % addresses.length])) {
-//                    return true;
-//                }
-//            }
-//            return false;
-        } else {
-            return super.isKeyLocalToAddress(target, key, replCount);
-        }
+	final int actualReplCount = Math.min(replCount, caches.size());
+	if (key instanceof MagicKey) {
+	    if (totalOrder) {
+		return super.isKeyLocalToAddress(target, ((MagicKey)key).key, replCount);
+	    } else {
+		int node = ((MagicKey)key).node;
+		for (int i = 0; i < actualReplCount; i++) {
+		    if (target.equals(addresses[(node + i) % addresses.length])) {
+			return true;
+		    }
+		}
+		return false;
+	    }
+	} else {
+	    return super.isKeyLocalToAddress(target, key, replCount);
+	}
     }
 
     @Override
     public Address primaryLocation(Object key) {
-        if (key instanceof MagicKey) {
-            return super.primaryLocation(((MagicKey)key).key);
-//            return addresses[((MagicKey)key).node];
-        } else {
-            return super.primaryLocation(key);
-        }
+	if (key instanceof MagicKey) {
+	    if (totalOrder) {
+	    return super.primaryLocation(((MagicKey)key).key);
+	    } else {
+		return addresses[((MagicKey)key).node];
+	    }
+	} else {
+	    return super.primaryLocation(key);
+	}
     }
 
     public int getMyId(Address addr) {
-        for (int i = 0; i < addresses.length; i++) {
-            if (addresses[i].equals(addr)) {
-                System.out.println("Node: " + i + " " + Arrays.toString(addresses));
-                return i;
-            }
-        }
-        throw new RuntimeException("Could not find addr: " + addr);
+	for (int i = 0; i < addresses.length; i++) {
+	    if (addresses[i].equals(addr)) {
+		System.out.println("Node: " + i + " " + Arrays.toString(addresses));
+		return i;
+	    }
+	}
+	throw new RuntimeException("Could not find addr: " + addr);
     }
 }

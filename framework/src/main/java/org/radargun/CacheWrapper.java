@@ -128,5 +128,7 @@ public interface CacheWrapper
    
    int getMyNode();
    
+   void setupTotalOrder();
+   
    LocatedKey createKey(String key, int node);
 }

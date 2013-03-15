@@ -466,4 +466,8 @@ public class InfinispanWrapper implements CacheWrapper {
       }
       return "Not_Available";
    }
+   
+   public void setupTotalOrder() {
+       CustomHashing.totalOrder = true;
+   }
 }

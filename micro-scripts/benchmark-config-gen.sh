@@ -100,6 +100,7 @@ echo "      <MicrobenchmarkPopulation" >> ${DEST_FILE}
 echo "            items=\"${ITEMS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
 echo "		  clients=\"${CLIENTS}\"" >> ${DEST_FILE}
+echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            set=\"${SET}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

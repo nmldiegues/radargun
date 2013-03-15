@@ -73,13 +73,15 @@ public class AllBenchmarks {
 		    for (int a = 0; a < ATTEMPTS; a++) {
 			List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
 			content.remove(0);
+			double throughput = 0.0;
+			int ab = 0;
 			for (String line : content) {
-			    String[] parts = line.split(" ");
-			    double throughput = Double.parseDouble(parts[1]);
-			    int ab = Integer.parseInt(parts[2]);
-			    result.throughput.add(throughput);
-			    result.aborts.add((double)ab);
+			    String[] parts = line.split(",");
+			    throughput += Double.parseDouble(parts[1]);
+			    ab += Integer.parseInt(parts[2]);
 			}
+			result.throughput.add(throughput);
+			result.aborts.add((double)ab);
 		    }
 		    perNodes.put(alg, result);
 		}
@@ -92,6 +94,8 @@ public class AllBenchmarks {
 	    String output = "- gmu twc";
 	    String outputA = "- gmu twc";
 	    for (int nodes : POSSIBLE_NODES) {
+		output += "\n" + nodes;
+		outputA += "\n" + nodes;
 		Result gmu = allData.get(benchmark).get(nodes).get("gmu");
 		Result twc = allData.get(benchmark).get(nodes).get("twc");
 		double avgGMU = gmu.getThroughputAvg();
@@ -101,7 +105,7 @@ public class AllBenchmarks {
 		double abortsGMU = gmu.getAbortAvg();
 		double abortsTWC = twc.getAbortAvg();
 		double devAbortsGMU = gmu.getAbortDeviation();
-		double devAbortsTWC = gmu.getAbortDeviation();
+		double devAbortsTWC = twc.getAbortDeviation();
 		output += " " + roundTwoDecimals(avgGMU) + " " + roundTwoDecimals(devGMU) + " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(devTWC);
 		outputA += " " + roundTwoDecimals(abortsGMU) + " " + roundTwoDecimals(devAbortsGMU) + " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(devAbortsTWC);
 	    }
