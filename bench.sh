@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#nova list | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > all_machines
+nova list | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > all_machines
 
 algs[1]="gmu"
 algs[2]="twc"
@@ -23,7 +23,7 @@ mkdir auto-results;
 
 for benchmark in 1 2 3
 do
-    for nodes in 10 #20 30 40 50 60 70 80
+    for nodes in 10 20 30 40 50 60 70 80
     do
         tail -$nodes all_machines > /home/ndiegues/machines
         for attempt in 1 #2 #3

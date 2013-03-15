@@ -63,7 +63,7 @@ public class CustomHashing extends DefaultConsistentHash {
     private int getOffset(MagicKey key) {
 	if (totalOrder) {
 	    int hashCode = key.key.hashCode();
-	    return Math.abs(Math.abs(hashCode) % 4);
+	    return Math.abs(Math.abs(hashCode) % 2);
 	} else {
 	    return 0;
 	}
