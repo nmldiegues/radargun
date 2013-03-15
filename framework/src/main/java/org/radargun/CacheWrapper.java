@@ -124,11 +124,4 @@ public interface CacheWrapper
     */
    void resetAdditionalStats();
 
-   void clusterFormed(int expected);
-   
-   int getMyNode();
-   
-   void setupTotalOrder();
-   
-   LocatedKey createKey(String key, int node);
 }

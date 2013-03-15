@@ -5,18 +5,6 @@ import org.radargun.stamp.vacation.VacationStressor;
 
 public abstract class VacationTransaction {
 
-    protected boolean remote;
-    protected int node;
-
-    public VacationTransaction(int random, int remotePerc) {
-	this.remote = (random % 100) < remotePerc;
-	if (this.remote) {
-	    this.node = random % VacationStressor.CLIENTS;
-	} else {
-	    this.node = VacationStressor.MY_NODE;
-	}
-    }
-    
     public abstract void executeTransaction(CacheWrapper cacheWrapper) throws Throwable;
     
     public abstract boolean isReadOnly();

@@ -81,7 +81,6 @@ import org.radargun.stamp.vacation.Vacation;
 
 public class Reservation implements Comparable<Reservation>, Serializable {
     /* final */ int id;
-    int node;
     /* final */ String PREFIX; 
     static final String NUM_USED = "numUsed";
     static final String NUM_FREE = "numFree";
@@ -91,58 +90,45 @@ public class Reservation implements Comparable<Reservation>, Serializable {
     public Reservation() { }
     
     public Reservation(CacheWrapper cache, String type, int id, int numTotal, int price) {
-	this.node = Vacation.NODE_TARGET.get();
 	this.id = id;
 	this.PREFIX = UUID.randomUUID().toString() + ":" + "Reservation:" + type + ":" + id + ":";
-	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
-	Vacation.put(cache, key, 0);
-	key = cache.createKey( PREFIX + NUM_FREE + node, node);
-	Vacation.put(cache, key, numTotal);
-	key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
-	Vacation.put(cache, key, numTotal);
-	key = cache.createKey( PREFIX + PRICE + node, node);
-	Vacation.put(cache, key, price);
+	Vacation.put(cache, PREFIX + NUM_USED, 0);
+	Vacation.put(cache, PREFIX + NUM_FREE, numTotal);
+	Vacation.put(cache, PREFIX + NUM_TOTAL, numTotal);
+	Vacation.put(cache, PREFIX + PRICE, price);
 	checkReservation(cache);
     }
     
     public Integer getNumUsed(CacheWrapper cache) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
-	return (Integer) Vacation.get(cache, key);
+	return (Integer) Vacation.get(cache, PREFIX + NUM_USED);
     }
     
     public Integer getNumFree(CacheWrapper cache) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_FREE + node, node);
-	return (Integer) Vacation.get(cache, key);
+	return (Integer) Vacation.get(cache, PREFIX + NUM_FREE);
     }
     
     public Integer getNumTotal(CacheWrapper cache) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
-	return (Integer) Vacation.get(cache, key);
+	return (Integer) Vacation.get(cache, PREFIX + NUM_TOTAL);
     }
     
     public Integer getPrice(CacheWrapper cache) {
-	LocatedKey key = cache.createKey( PREFIX + PRICE + node, node);
-	return (Integer) Vacation.get(cache, key);
+	return (Integer) Vacation.get(cache, PREFIX + PRICE);
     }
     
     public void putNumUsed(CacheWrapper cache, Integer value) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_USED + node, node);
-	Vacation.put(cache, key, value);
+	Vacation.put(cache, PREFIX + NUM_USED, value);
     }
     
     public void putNumFree(CacheWrapper cache, Integer value) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_FREE + node, node);
-	Vacation.put(cache, key, value);
+	Vacation.put(cache, PREFIX + NUM_FREE, value);
     }
     
     public void putNumTotal(CacheWrapper cache, Integer value) {
-	LocatedKey key = cache.createKey( PREFIX + NUM_TOTAL + node, node);
-	Vacation.put(cache, key, value);
+	Vacation.put(cache, PREFIX + NUM_TOTAL, value);
     }
     
     public void putPrice(CacheWrapper cache, Integer value) {
-	LocatedKey key = cache.createKey( PREFIX + PRICE + node, node);
-	Vacation.put(cache, key, value);
+	Vacation.put(cache, PREFIX + PRICE, value);
     }
 
     public void checkReservation(CacheWrapper cache) {
@@ -182,12 +168,6 @@ public class Reservation implements Comparable<Reservation>, Serializable {
 	return true;
     }
 
-    /*
-     * ==========================================================================
-     * === reservation_make -- Returns TRUE on success, else FALSE
-     * ==============
-     * ===============================================================
-     */
     public boolean reservation_make(CacheWrapper cache) {
 	if (getNumFree(cache) < 1) {
 	    return false;
@@ -198,12 +178,6 @@ public class Reservation implements Comparable<Reservation>, Serializable {
 	return true;
     }
 
-    /*
-     * ==========================================================================
-     * === reservation_cancel -- Returns TRUE on success, else FALSE
-     * ============
-     * =================================================================
-     */
     boolean reservation_cancel(CacheWrapper cache) {
 	if (getNumUsed(cache) < 1) {
 	    return false;
@@ -214,13 +188,6 @@ public class Reservation implements Comparable<Reservation>, Serializable {
 	return true;
     }
 
-    /*
-     * ==========================================================================
-     * === reservation_updatePrice -- Failure if 'price' < 0 -- Returns TRUE on
-     * success, else FALSE
-     * ======================================================
-     * =======================
-     */
     boolean reservation_updatePrice(CacheWrapper cache, int newPrice) {
 	if (newPrice < 0) {
 	    return false;
@@ -231,22 +198,10 @@ public class Reservation implements Comparable<Reservation>, Serializable {
 	return true;
     }
 
-    /*
-     * ==========================================================================
-     * === reservation_compare -- Returns -1 if A < B, 0 if A = B, 1 if A > B
-     * ====
-     * =========================================================================
-     */
     int reservation_compare(Reservation aPtr, Reservation bPtr) {
 	return aPtr.id - bPtr.id;
     }
 
-    /*
-     * ==========================================================================
-     * === reservation_hash
-     * ======================================================
-     * =======================
-     */
     int reservation_hash() {
 	return id;
     }

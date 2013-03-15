@@ -94,31 +94,6 @@ public class InfinispanWrapper implements CacheWrapper {
       injectEvenConsistentHash(confAttributes);
    }
    
-   @Override
-    public void clusterFormed(int expected) {
-       ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-       if (ch instanceof CustomHashing) {
-           CustomHashing hash = (CustomHashing) ch;
-           while (hash.getAddressesSize() != expected) {
-               try {
-                   Thread.sleep(1000);
-               } catch (InterruptedException e) {}
-               hash = (CustomHashing) cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-           }
-           MagicKey.NODE_INDEX = hash.getMyId(cacheManager.getTransport().getAddress());
-       }
-    }
-   
-   @Override
-    public int getMyNode() {
-        return MagicKey.NODE_INDEX;
-    }
-   
-   @Override
-    public LocatedKey createKey(String key, int node) {
-        return new MagicKey(key, node);
-    }
-   
    public void tearDown() throws Exception {
       List<Address> addressList = cacheManager.getMembers();
       if (started) {
@@ -467,7 +442,4 @@ public class InfinispanWrapper implements CacheWrapper {
       return "Not_Available";
    }
    
-   public void setupTotalOrder() {
-       CustomHashing.totalOrder = true;
-   }
 }
