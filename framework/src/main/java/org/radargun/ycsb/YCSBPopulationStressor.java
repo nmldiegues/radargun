@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 import org.radargun.ycsb.transaction.Insert;
 
@@ -37,10 +36,6 @@ public class YCSBPopulationStressor extends AbstractCacheWrapperStressor {
     }
 
     private void performPopulation() {
-	int n = wrapper.getMyNode();
-	YCSB.NODE_TARGET.set(n);
-	YCSBStressor.MY_NODE = n;
-	
 	boolean successful = false;
 	while (!successful) {
 	    try {
@@ -50,13 +45,6 @@ public class YCSBPopulationStressor extends AbstractCacheWrapperStressor {
 		   new Insert(i).executeTransaction(wrapper);
 		}
 
-		LocatedKey key;
-		
-		for (int k = 0; k < 100; k++) {
-		    key = wrapper.createKey("local" + n + "-" + k, n);
-		    wrapper.put(null, key, 0);
-		}
-		
 		wrapper.endTransaction(true);
 		successful = true;
 		

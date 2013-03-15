@@ -4,19 +4,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.stamp.vacation.Definitions;
-import org.radargun.stamp.vacation.Random;
-import org.radargun.stamp.vacation.Vacation;
 import org.radargun.stamp.vacation.VacationStressor;
-import org.radargun.stamp.vacation.domain.Manager;
-import org.radargun.stamp.vacation.transaction.DeleteCustomerOperation;
-import org.radargun.stamp.vacation.transaction.MakeReservationOperation;
-import org.radargun.stamp.vacation.transaction.UpdateTablesOperation;
-import org.radargun.stamp.vacation.transaction.VacationTransaction;
 import org.radargun.state.MasterState;
 
 
@@ -36,9 +27,8 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     private int number;
     private int queries;
     private int relations;
-    private int transactions;	// actually it's time now
+    private int time;
     private int user;
-    boolean totalOrder;
 
     public void setReadOnly(int ro) {
 	this.readOnly = ro;
@@ -55,8 +45,6 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 
 	log.info("Starting VacationBenchmarkStage: " + this.toString());
 
-	VacationStressor.CLIENTS = clients;
-	VacationStressor.MY_NODE = cacheWrapper.getMyNode();
 	THREADS = localThreads;
 	vacationStressors = new VacationStressor[localThreads];
 
@@ -70,10 +58,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	    vacationStressors[t].setQueryRange(queries);
 	    vacationStressors[t].setReadOnlyPerc(this.readOnly);
 	    vacationStressors[t].setCacheWrapper(cacheWrapper);
-	    vacationStressors[t].setClients(getActiveSlaveCount());
-	    vacationStressors[t].setThreadid(t);
 	    vacationStressors[t].setRelations(relations);
-	    vacationStressors[t].setTotalOrder(this.totalOrder);
 	}
 
 	try {
@@ -85,7 +70,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		workers[t].start();
 	    }
 	    try {
-		Thread.sleep(transactions);
+		Thread.sleep(time);
 	    } catch (InterruptedException e) { }
 	    for (int t = 0; t < workers.length; t++) {
 		vacationStressors[t].setPhase(VacationStressor.SHUTDOWN_PHASE);
@@ -105,7 +90,7 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		aborts += vacationStressors[t].getRestarts();
 		throughput += vacationStressors[t].getThroughput();
 	    }
-	    results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / transactions) + "");
+	    results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / time) + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    log.info(sizeInfo);
 	    result.setPayload(results);
@@ -169,7 +154,6 @@ public class VacationBenchmarkStage extends AbstractDistStage {
     }
 
     public void setLocalThreads(int localThreads) {
-	THREADS = localThreads;
 	this.localThreads = localThreads;
     }
 
@@ -197,12 +181,12 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 	this.relations = relations;
     }
 
-    public int getTransactions() {
-	return transactions;
+    public int getTime() {
+	return time;
     }
 
-    public void setTransactions(int transactions) {
-	this.transactions = transactions;
+    public void setTime(int time) {
+	this.time = time;
     }
 
     public int getUser() {
@@ -215,9 +199,6 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 
     public static String getSizeInfo() {
 	return SIZE_INFO;
-    }
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
     }
 
 

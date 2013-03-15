@@ -7,14 +7,9 @@ import org.radargun.stamp.vacation.VacationPopulationStressor;
 public class VacationPopulationStage extends AbstractDistStage {
 
     private int relations;
-    private boolean totalOrder;
     
     public void setRelations(int relations) {
 	this.relations = relations;
-    }
-    
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
     }
     
     @Override
@@ -24,9 +19,6 @@ public class VacationPopulationStage extends AbstractDistStage {
 	if (wrapper == null) {
 	    log.info("Not executing any test as the wrapper is not set up on this slave ");
 	    return ack;
-	}
-	if (this.totalOrder) {
-	    wrapper.setupTotalOrder();
 	}
 
 	long startTime = System.currentTimeMillis();

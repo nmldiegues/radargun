@@ -11,9 +11,8 @@ LOCAL_THREADS=1
 NUMBER=4
 QUERIES=60
 RELATIONS=1024
-TRANSACTIONS=2000
+TIME=2000
 USER=98
-TO="false"
 
 if [ -n "${ISPN_CONFIG_FILENAME}" ]; then
   CONFIGURATION_FILE=${ISPN_CONFIG_FILENAME}
@@ -39,8 +38,8 @@ echo ""
 echo "  -r <value>               the size of the tables"
 echo "                           default: ${RELATIONS}"
 echo ""
-echo "  -t <value>        	 the number of transactions"
-echo "                           default: ${TRANSACTIONS}"
+echo "  -t <value>        	 execution time in ms"
+echo "                           default: ${TIME}"
 echo ""
 echo "  -u <value>               the percentage of reservations"
 echo "                           default: ${USER}"
@@ -58,9 +57,8 @@ case $1 in
   -n) NUMBER=$2; shift 2;;
   -q) QUERIES=$2; shift 2;;
   -r) RELATIONS=$2; shift 2;;
-  -t) TRANSACTIONS=$2; shift 2;;
+  -t) TIME=$2; shift 2;;
   -u) USER=$2; shift 2;;
-  -to) TO=$2; shift 2;;
   -*) echo "unknown option $1"; exit 1;;
   *) break;;
 esac
@@ -92,7 +90,6 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <VacationPopulation" >> ${DEST_FILE}
-echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
@@ -104,8 +101,7 @@ echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            number=\"${NUMBER}\"" >> ${DEST_FILE}
 echo "            queries=\"${QUERIES}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\"" >> ${DEST_FILE}
-echo "            transactions=\"${TRANSACTIONS}\"" >> ${DEST_FILE}
-echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
+echo "            time=\"${TIME}\"" >> ${DEST_FILE}
 echo "            user=\"${USER}\"/>" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

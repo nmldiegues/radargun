@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 
 public class IntSetRBTree implements IntSet{
 
     public enum Color {BLACK, RED};
 
-    private int myNode;
     private RBNode mySentinelNode;
     
     private void setRoot(CacheWrapper wrapper, RBNode value) {
@@ -18,13 +16,10 @@ public class IntSetRBTree implements IntSet{
     }
     
     private RBNode getRoot(CacheWrapper wrapper) {
-        LocatedKey key = wrapper.createKey(myNode + ":root", myNode);
-        return ((RBNode) Micro.get(wrapper, key)).getLeft(wrapper);
+        return ((RBNode) Micro.get(wrapper, "root")).getLeft(wrapper);
     }
 
-    public IntSetRBTree(int myNode, CacheWrapper cache) {
-        this.myNode = myNode;
-        
+    public IntSetRBTree(CacheWrapper cache) {
         mySentinelNode = new RBNode(true);
         mySentinelNode.setColor(cache, Color.BLACK);
         
@@ -32,11 +27,10 @@ public class IntSetRBTree implements IntSet{
         aux.setLeft(cache, mySentinelNode);
         aux.setValue(cache, Integer.MIN_VALUE);
         aux.setColor(cache, Color.BLACK);
-        LocatedKey key = cache.createKey(myNode + ":root", myNode);
-        Micro.put(cache, key, aux);
+        Micro.put(cache, "root", aux);
     }
 
-    public boolean add(CacheWrapper cache, final int key, boolean local, boolean remote) {
+    public boolean add(CacheWrapper cache, final int key) {
         RBNode node	= new RBNode();
         RBNode temp	= getRoot(cache);
 
@@ -85,7 +79,7 @@ public class IntSetRBTree implements IntSet{
         return false;
     }
 
-    public boolean remove(CacheWrapper cache, final int key, boolean local, boolean remote) {
+    public boolean remove(CacheWrapper cache, final int key) {
         RBNode node;
 
         node = getRoot(cache);
@@ -330,63 +324,51 @@ public class IntSetRBTree implements IntSet{
         }
         
         public int getValue(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":value", myNode);
-            return (Integer) Micro.get(wrapper, key);
+            return (Integer) Micro.get(wrapper, uuid + ":value");
         }
 
         public void setValue(CacheWrapper wrapper, int newValue){
-            LocatedKey key = wrapper.createKey(uuid + ":value", myNode);
-            Micro.put(wrapper, key, newValue);
+            Micro.put(wrapper, uuid + ":value", newValue);
         }
 
         public boolean isMarked(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":isMarked", myNode);
-            return (Boolean) Micro.get(wrapper, key);
+            return (Boolean) Micro.get(wrapper, uuid + ":isMarked");
         }
 
          public void setMarked(CacheWrapper wrapper, boolean newMarked){
-             LocatedKey key = wrapper.createKey(uuid + ":isMarked", myNode);
-             Micro.put(wrapper, key, newMarked);
+             Micro.put(wrapper, uuid + ":isMarked", newMarked);
          }
 
          public Color getColor(CacheWrapper wrapper){
-             LocatedKey key = wrapper.createKey(uuid + ":color", myNode);
-             return (Color) Micro.get(wrapper, key);
+             return (Color) Micro.get(wrapper, uuid + ":color");
          }
 
          public void setColor(CacheWrapper wrapper, Color newColor){
-             LocatedKey key = wrapper.createKey(uuid + ":color", myNode);
-             Micro.put(wrapper, key, newColor);
+             Micro.put(wrapper, uuid + ":color", newColor);
          }
 
          public RBNode getParent(CacheWrapper wrapper){
-             LocatedKey key = wrapper.createKey(uuid + ":parent", myNode);
-             return (RBNode) Micro.get(wrapper, key);
+             return (RBNode) Micro.get(wrapper, uuid + ":parent");
          }
 
          public void setParent(CacheWrapper wrapper, RBNode newParent){
-             LocatedKey key = wrapper.createKey(uuid + ":parent", myNode);
-             Micro.put(wrapper, key, newParent);
+             Micro.put(wrapper, uuid + ":parent", newParent);
          }
 
          public RBNode getLeft(CacheWrapper wrapper){
-             LocatedKey key = wrapper.createKey(uuid + ":left", myNode);
-             return (RBNode) Micro.get(wrapper, key);
+             return (RBNode) Micro.get(wrapper, uuid + ":left");
          }
 
          public void setLeft(CacheWrapper wrapper, RBNode newLeft){
-             LocatedKey key = wrapper.createKey(uuid + ":left", myNode);
-             Micro.put(wrapper, key, newLeft);
+             Micro.put(wrapper, uuid + ":left", newLeft);
          }
 
          public RBNode getRight(CacheWrapper wrapper){
-             LocatedKey key = wrapper.createKey(uuid + ":right", myNode);
-             return (RBNode) Micro.get(wrapper, key);
+             return (RBNode) Micro.get(wrapper, uuid + ":right");
          }
 
          public void setRight(CacheWrapper wrapper, RBNode newRight){
-             LocatedKey key = wrapper.createKey(uuid + ":right", myNode);
-             Micro.put(wrapper, key, newRight);
+             Micro.put(wrapper, uuid + ":right", newRight);
          }
 
     }

@@ -22,12 +22,16 @@ public class VacationPopulationStressor extends AbstractCacheWrapperStressor {
 	if (wrapper == null) {
 	    throw new IllegalStateException("Null wrapper not allowed");
 	}
-	try {
-	    log.info("Performing Population Operations");
-	    new VacationPopulation(wrapper, RELATIONS).performPopulation();
-	} catch (Exception e) {
-	    log.warn("Received exception during cache population" + e.getMessage());
-	    e.printStackTrace();
+	if (! wrapper.isTheMaster()) {
+	    log.info("Skipping Population Operations, delegate to the coordinator");
+	} else {
+	    try {
+	        log.info("Performing Population Operations");
+	        new VacationPopulation(wrapper, RELATIONS).performPopulation();
+	    } catch (Exception e) {
+	        log.warn("Received exception during cache population" + e.getMessage());
+	        e.printStackTrace();
+	    } 
 	}
 	return null;
     }

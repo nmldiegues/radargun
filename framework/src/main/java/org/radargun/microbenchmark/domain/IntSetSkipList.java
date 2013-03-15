@@ -5,8 +5,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
-import org.radargun.microbenchmark.MicrobenchmarkStressor;
 
 public class IntSetSkipList implements IntSet, Serializable {
 
@@ -22,13 +20,11 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
 
         public void setForward(CacheWrapper cache, int index, Node forward) {
-            LocatedKey key = cache.createKey(uuid + ":" + m_value + ":" + index + ":next", node);
-            Micro.put(cache, key, forward);
+            Micro.put(cache, uuid + ":" + m_value + ":" + index + ":next", forward);
         }
 
         public Node getForward(CacheWrapper cache, int index) {
-            LocatedKey key = cache.createKey(uuid + ":" + m_value + ":" + index + ":next", node);
-            return (Node) Micro.get(cache, key);
+            return (Node) Micro.get(cache, uuid + ":" + m_value + ":" + index + ":next");
         }
 
         public int getValue() {
@@ -59,21 +55,16 @@ public class IntSetSkipList implements IntSet, Serializable {
     };
 
     private void setLevel(CacheWrapper cache, int level) {
-        LocatedKey key = cache.createKey(node + "skipList:level", node);
-        Micro.put(cache, key, level);
+        Micro.put(cache, "skipList:level", level);
     }
 
     private Integer getLevel(CacheWrapper cache) {
-        LocatedKey key = cache.createKey(node + "skipList:level", node);
-        return (Integer) Micro.get(cache, key);
+        return (Integer) Micro.get(cache, "skipList:level");
     }
 
     public IntSetSkipList() { }
 
-    private int node;
-    
-    public IntSetSkipList(int node, CacheWrapper cache) {
-        this.node = node;
+    public IntSetSkipList(CacheWrapper cache) {
         setLevel(cache, 0);
 
         m_head = new Node(m_maxLevel, Integer.MIN_VALUE);
@@ -89,8 +80,8 @@ public class IntSetSkipList implements IntSet, Serializable {
         return l;
     }
 
-    public boolean add(CacheWrapper cache, int value, boolean local, boolean remote) {
-        boolean result;
+    public boolean add(CacheWrapper cache, int value) {
+        boolean result = false;
 
         Node[] update = new Node[m_maxLevel + 1];
         Node node = m_head;
@@ -106,7 +97,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(cache, 0);
 
-        if (node.getValue() != value && !remote && local) {
+        if (node.getValue() != value) {
             int newLevel = randomLevel();
             if (newLevel > level) {
                 for (int i = level + 1; i <= level; i++)
@@ -119,18 +110,13 @@ public class IntSetSkipList implements IntSet, Serializable {
                 update[i].setForward(cache, i, node);
             }
             result = true;
-        } else {
-            LocatedKey key = cache.createKey("local" + (((cache.getMyNode() + 1) * 1000) + this.node) + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
-            Micro.put(cache, key, 1);
-            return false;
         }
-
 
         return result;
     }
 
-    public boolean remove(CacheWrapper wrapper, int value, boolean local, boolean remote) {
-        boolean result;
+    public boolean remove(CacheWrapper wrapper, int value) {
+        boolean result = false;
 
         Node[] update = new Node[m_maxLevel + 1];
         Node node = m_head;
@@ -147,7 +133,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(wrapper, 0);
 
-        if (node.getValue() == value && !remote && local) {
+        if (node.getValue() == value) {
             for (int i = 0; i <= level; i++) {
                 if (update[i].getForward(wrapper, i).getValue() == node.getValue())
                     update[i].setForward(wrapper, i, node.getForward(wrapper, i));
@@ -158,10 +144,6 @@ public class IntSetSkipList implements IntSet, Serializable {
                 setLevel(wrapper, level);
             }           
             result = true;
-        } else {
-            LocatedKey key = wrapper.createKey("local" + (((wrapper.getMyNode() + 1) * 1000) + this.node) + "-" + MicrobenchmarkStressor.THREADID.get(), this.node);
-            Micro.put(wrapper, key, 1);
-            return false;
         }
 
         return result;

@@ -16,7 +16,6 @@ import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 import org.radargun.cachewrappers.parser.StatisticComponent;
 import org.radargun.cachewrappers.parser.StatsParser;
 import org.radargun.utils.TypedProperties;

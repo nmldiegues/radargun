@@ -1,12 +1,8 @@
 package org.radargun.stamp.vacation.transaction;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
-import org.radargun.stages.VacationBenchmarkStage;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
-import org.radargun.stamp.vacation.Vacation;
-import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class MakeReservationOperation extends VacationTransaction {
@@ -18,11 +14,8 @@ public class MakeReservationOperation extends VacationTransaction {
     final private int customerId;
     final private int numQuery;
     final private boolean readOnly;
-    final private boolean local;
-    final private boolean totalOrder;
 
-    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly, boolean totalOrder) {
-	super(random.random_generate(), queryRange);
+    public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly) {
 	this.types = new int[numQueryPerTx];
 	this.ids = new int[numQueryPerTx];
 
@@ -37,43 +30,21 @@ public class MakeReservationOperation extends VacationTransaction {
 	int n;
 	this.numQuery = numQueryPerTx;
 
-	int base = (relations * VacationStressor.THREADID.get()) / VacationBenchmarkStage.THREADS;
-	int parcel = relations / VacationBenchmarkStage.THREADS;
-	customerId = base + (random.posrandom_generate() % parcel);
-	for (n = 0; n < numQuery; n++) {
-            types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
-            ids[n] = base + (random.random_generate() % parcel);
-        }
+    customerId = random.posrandom_generate() % relations;
+    for (n = 0; n < numQuery; n++) {
+       types[n] = random.random_generate() % Definitions.NUM_RESERVATION_TYPE;
+       ids[n] = (random.random_generate() % relations);
+    }
 
 	this.readOnly = (random.random_generate() % 100) <= readOnly;
-	this.local = (random.random_generate() % 100) <= readOnly;
-        if (this.readOnly) {
-            super.node = VacationStressor.MY_NODE;
-        }
-        
-        this.totalOrder = totalOrder;
     }
 
     @Override
     public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
-	Vacation.NODE_TARGET.set(super.node);
-	LocatedKey key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
-	Manager manager = (Manager) cacheWrapper.get(null, key);
+	Manager manager = (Manager) cacheWrapper.get(null, "MANAGER");
 	boolean isFound = false;
 	int n;
 	for (n = 0; n < numQuery; n++) {
-//	    if (totalOrder && remote) {
-//		if (n % 2 == 0) {
-//		    int otherNode = (super.node + 1) % VacationStressor.CLIENTS;
-//		    Vacation.NODE_TARGET.set(otherNode);
-//		    key = cacheWrapper.createKey("MANAGER" + otherNode, otherNode);
-//		    manager = (Manager) cacheWrapper.get(null, key);		    
-//		} else {
-//		    Vacation.NODE_TARGET.set(super.node);
-//		    key = cacheWrapper.createKey("MANAGER" + super.node, super.node);
-//		    manager = (Manager) cacheWrapper.get(null, key);
-//		}
-//	    }
 	    int t = types[n];
 	    int id = ids[n];
 	    int price = -1;
@@ -100,7 +71,6 @@ public class MakeReservationOperation extends VacationTransaction {
 	}
 
 	if (!readOnly) {
-	    if (!remote) {
 		if (isFound) {
 		    manager.manager_addCustomer(cacheWrapper, customerId);
 		}
@@ -114,9 +84,7 @@ public class MakeReservationOperation extends VacationTransaction {
 		    manager.manager_reserveRoom(cacheWrapper, customerId, maxIds[Definitions.RESERVATION_ROOM]);
 		}
 	    }
-	    manager.manager_doCustomer(cacheWrapper);
 	}
-    }
 
     @Override
     public boolean isReadOnly() {

@@ -2,10 +2,7 @@ package org.radargun.stamp.vacation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.transaction.DeleteCustomerOperation;
 import org.radargun.stamp.vacation.transaction.MakeReservationOperation;
@@ -15,16 +12,12 @@ import org.radargun.stressors.AbstractCacheWrapperStressor;
 
 public class VacationStressor extends AbstractCacheWrapperStressor implements Runnable {
 
-    private static Log log = LogFactory.getLog(VacationStressor.class);
-
     public static final int TEST_PHASE = 2;
     public static final int SHUTDOWN_PHASE = 3;
     
     volatile protected int m_phase = TEST_PHASE;
     
     private CacheWrapper cacheWrapper;
-    private int clients;
-    private int threadid;
     private long restarts = 0;
     private long throughput = 0;
     private Random randomPtr;
@@ -33,12 +26,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     private int queryRange;
     private int readOnlyPerc;
     private int relations;
-    private boolean totalOrder;
 
-    public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
-    public static int CLIENTS;
-    public static int MY_NODE;
-    
     public void setRelations(int relations) {
         this.relations = relations;
     }
@@ -79,9 +67,9 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	VacationTransaction result = null;
 	
 	if (action == Definitions.ACTION_MAKE_RESERVATION) {
-	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc, totalOrder);
+	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc);
 	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-	    result = new DeleteCustomerOperation(randomPtr, queryRange, relations, readOnlyPerc);
+	    result = new DeleteCustomerOperation(randomPtr, queryRange, relations);
 	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
 	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange, relations);
 	} else {
@@ -103,8 +91,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
-	THREADID.set(this.threadid);
-	
 	this.cacheWrapper = wrapper;
 
 	while (m_phase == TEST_PHASE) {
@@ -156,14 +142,6 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	cacheWrapper = null;
     }
 
-    public void setClients(int clients) {
-	this.clients = clients;
-    }
-
-    public void setThreadid(int threadid) {
-	this.threadid = threadid;
-    }
-    
     public long getRestarts() {
 	return restarts;
     }
@@ -179,10 +157,5 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     public void setPhase(int shutdownPhase) {
 	this.m_phase = shutdownPhase;
     }
-
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
-    }
-
 
 }

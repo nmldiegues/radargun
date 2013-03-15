@@ -3,7 +3,6 @@ package org.radargun.stamp.vacation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class VacationPopulation {
@@ -19,10 +18,6 @@ public class VacationPopulation {
     }
 
     public void performPopulation(){
-	int n = wrapper.getMyNode();
-	Vacation.NODE_TARGET.set(n);
-	VacationStressor.MY_NODE = n;
-
 	int i;
 	int t;
 
@@ -40,7 +35,7 @@ public class VacationPopulation {
 		
 		Random randomPtr = new Random();
 		randomPtr.random_alloc();
-		Manager managerPtr = new Manager(n);
+		Manager managerPtr = new Manager();
 		
 		for (t = 0; t < 4; t++) {
 
@@ -72,13 +67,7 @@ public class VacationPopulation {
 		    }
 
 		} /* for t */
-		LocatedKey key = wrapper.createKey("MANAGER" + n, n);
-		wrapper.put(null, key, managerPtr);
-		
-		for (int k = 0; k < 100; k++) {
-		    key = wrapper.createKey("local" + n + "-" + k, n);
-		    wrapper.put(null, key, 0);
-		}
+		wrapper.put(null, "MANAGER", managerPtr);
 		
 		wrapper.endTransaction(true);
 		successful = true;

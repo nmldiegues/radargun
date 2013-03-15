@@ -8,9 +8,6 @@ import java.util.Map;
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
 import org.radargun.microbenchmark.MicrobenchmarkStressor;
-import org.radargun.microbenchmark.domain.IntSet;
-import org.radargun.microbenchmark.domain.Micro;
-import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.state.MasterState;
 
 public class MicrobenchmarkStage extends AbstractDistStage {
@@ -25,8 +22,6 @@ public class MicrobenchmarkStage extends AbstractDistStage {
     int range;
     int duration;
     int writeRatio;
-    int clients;
-    boolean totalOrder;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -42,12 +37,10 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	microbenchmarkStressors = new MicrobenchmarkStressor[localThreads];
 	
 	for (int t = 0; t < microbenchmarkStressors.length; t++) {
-	    microbenchmarkStressors[t] = new MicrobenchmarkStressor(t);
+	    microbenchmarkStressors[t] = new MicrobenchmarkStressor();
 	    microbenchmarkStressors[t].setCacheWrapper(cacheWrapper);
 	    microbenchmarkStressors[t].setRange(range);
-	    microbenchmarkStressors[t].setClients(clients);
 	    microbenchmarkStressors[t].setWriteRatio(writeRatio);
-	    microbenchmarkStressors[t].setTotalOrder(this.totalOrder);
 	}
 	
 	try {
@@ -136,10 +129,6 @@ public class MicrobenchmarkStage extends AbstractDistStage {
         return range;
     }
     
-    public int getClients() {
-        return clients;
-    }
-
     public int getDuration() {
         return duration;
     }
@@ -160,18 +149,11 @@ public class MicrobenchmarkStage extends AbstractDistStage {
         this.range = range;
     }
     
-    public void setClients(int clients) {
-        this.clients = clients;
-    }
-
     public void setDuration(int duration) {
         this.duration = duration;
     }
 
     public void setWriteRatio(int writeRatio) {
         this.writeRatio = writeRatio;
-    }
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
     }
 }

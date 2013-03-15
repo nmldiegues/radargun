@@ -1,9 +1,7 @@
 package org.radargun.stamp.vacation.transaction;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 import org.radargun.stamp.vacation.Random;
-import org.radargun.stamp.vacation.Vacation;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class DeleteCustomerOperation extends VacationTransaction {
@@ -12,7 +10,6 @@ public class DeleteCustomerOperation extends VacationTransaction {
 
     public DeleteCustomerOperation(Random randomPtr, int queryRange, int relations) {
 	this.customerId = randomPtr.posrandom_generate() % relations;
-	this.readOnly = (randomPtr.random_generate() % 100) <= readOnlyPerc;
     }
 
     @Override

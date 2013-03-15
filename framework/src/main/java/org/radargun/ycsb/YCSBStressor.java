@@ -23,20 +23,12 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
     volatile protected int m_phase = TEST_PHASE;
     
     private CacheWrapper cacheWrapper;
-    private int threadid;
     private int multiplereadcount;
     private int recordCount;
-    private int nodes;
-    private int remote;
-    private boolean totalOrder;
     
     private long restarts = 0;
     private long throughput = 0;
 
-    public static final ThreadLocal<Integer> THREADID = new ThreadLocal<Integer>() {};
-    public static int CLIENTS;
-    public static int MY_NODE;
-    
     public static Random r = new Random();
 
     public void setCacheWrapper(CacheWrapper cacheWrapper) {
@@ -54,14 +46,12 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {
-            return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount, totalOrder);
+            return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount);
         }
     }
     
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
-	THREADID.set(this.threadid);
-	
 	this.cacheWrapper = wrapper;
 	
 	while (m_phase == TEST_PHASE) {
@@ -85,7 +75,6 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 	    try {
 		transaction.executeTransaction(cacheWrapper);
 	    } catch (Throwable e) {
-try {Thread.sleep(10000);} catch(Exception e1) {}
 		successful = false;
 	    }
 
@@ -96,7 +85,6 @@ try {Thread.sleep(10000);} catch(Exception e1) {}
 		    setRestarts(getRestarts() + 1);
 		}
 	    } catch (Throwable rb) {
-try {Thread.sleep(10000);} catch (Exception e2) {}
 		setRestarts(getRestarts() + 1);
 		successful = false;
 	    }
@@ -130,22 +118,6 @@ try {Thread.sleep(10000);} catch (Exception e2) {}
         this.recordCount = recordcount;
     }
 
-    public int getNodes() {
-        return nodes;
-    }
-
-    public void setNodes(int nodes) {
-        this.nodes = nodes;
-    }
-
-    public int getRemote() {
-        return remote;
-    }
-
-    public void setRemote(int remote) {
-        this.remote = remote;
-    }
-
     public long getRestarts() {
         return restarts;
     }
@@ -162,16 +134,8 @@ try {Thread.sleep(10000);} catch (Exception e2) {}
         this.throughput = throughput;
     }
     
-    public void setThreadId(int threadid) {
-	this.threadid = threadid;
-    }
- 
     public void setPhase(int shutdownPhase) {
 	this.m_phase = shutdownPhase;
-    }
-
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
     }
 
     

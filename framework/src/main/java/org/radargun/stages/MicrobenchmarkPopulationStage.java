@@ -13,13 +13,7 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
     private int items;
     private int range;
     private String set;
-    private int clients;
-    private boolean totalOrder;
     
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
-    }
-
     @Override
     public DistStageAck executeOnSlave() {
         DefaultDistStageAck ack = newDefaultStageAck();
@@ -27,9 +21,6 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
         if (wrapper == null) {
             log.info("Not executing any test as the wrapper is not set up on this slave ");
             return ack;
-        }
-        if (this.totalOrder) {
-            cacheWrapper.setupTotalOrder();
         }
         long startTime = System.currentTimeMillis();
         populate(wrapper);
@@ -44,7 +35,6 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
         stressor.setItems(items);
         stressor.setRange(range);
         stressor.setSet(set);
-        stressor.setClients(clients);
         stressor.stress(wrapper);
     }
 
@@ -72,11 +62,4 @@ public class MicrobenchmarkPopulationStage extends AbstractDistStage {
         this.set = set;
     }
     
-    public int getClients() {
-        return clients;
-    }
-    
-    public void setClients(int clients) {
-        this.clients = clients;
-    }
 }

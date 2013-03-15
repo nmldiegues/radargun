@@ -14,7 +14,6 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
     private int items;
     private int range;
     private String set;
-    private int clients;
 
     public void setItems(int items) {
         this.items = items;
@@ -28,21 +27,21 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
         this.set = set;
     }
     
-    public void setClients(int clients) {
-        this.clients = clients;
-    }
-
     @Override
     public Map<String, String> stress(CacheWrapper wrapper) {
         if (wrapper == null) {
             throw new IllegalStateException("Null wrapper not allowed");
         }
-        try {
-            log.info("Performing Population Operations");
-            new MicrobenchmarkPopulation(wrapper, items, range, set, clients).performPopulation();
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("Received exception during cache population" + e.getMessage());
+        if (!wrapper.isTheMaster()) {
+            log.info("Skipping population, delegating to the coordinator");
+        } else {
+            try {
+                log.info("Performing Population Operations");
+                new MicrobenchmarkPopulation(wrapper, items, range, set).performPopulation();
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.warn("Received exception during cache population" + e.getMessage());
+            }
         }
         return null;
     }

@@ -1,12 +1,9 @@
 package org.radargun.stamp.vacation;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 
 public class Vacation {
 
-    public static final ThreadLocal<Integer> NODE_TARGET = new ThreadLocal<Integer>() {};
-    
     public static final void put(CacheWrapper cacheWrapper, Object key, Object value) {
 	try {
 	    cacheWrapper.put(null, key, value);

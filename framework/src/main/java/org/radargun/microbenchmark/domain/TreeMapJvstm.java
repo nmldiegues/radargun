@@ -4,27 +4,22 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 
 public class TreeMapJvstm<K extends Comparable <? super K>, V> {
 
     private static enum Color {RED, BLACK};
 
-    private int myNode;
     private Node myNilNode;
     
     private Node getRoot(CacheWrapper wrapper) {
-        LocatedKey key = wrapper.createKey(myNode + ":root", myNode);
-        return ((Node) Micro.get(wrapper, key));
+        return ((Node) Micro.get(wrapper, "root"));
     }
     
     private void setRoot(CacheWrapper wrapper, Node root) {
-        LocatedKey key = wrapper.createKey(myNode + ":root", myNode);
-        Micro.put(wrapper, key, root);
+        Micro.put(wrapper, "root", root);
     }
     
-    public TreeMapJvstm(int myNode, CacheWrapper cache, K ignoreKey, V ignoreValue) {
-        this.myNode = myNode;
+    public TreeMapJvstm(CacheWrapper cache, K ignoreKey, V ignoreValue) {
         this.myNilNode = new Node(cache, ignoreKey, ignoreValue, Color.BLACK, true);
         setRoot(cache, this.myNilNode);
     }
@@ -34,7 +29,6 @@ public class TreeMapJvstm<K extends Comparable <? super K>, V> {
     }
 
     public V get(CacheWrapper wrapper, K key) {
-        // Exploit fact that nil.value == null.
         return getNode(wrapper, key).getValue(wrapper);
     }
 
@@ -431,63 +425,51 @@ public class TreeMapJvstm<K extends Comparable <? super K>, V> {
         }
         
         public Color getColor(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":color", myNode);
-            return (Color) Micro.get(wrapper, key);
+            return (Color) Micro.get(wrapper, uuid + ":color");
         }
 
         public void setColor(CacheWrapper wrapper, Color newColor){
-            LocatedKey key = wrapper.createKey(uuid + ":color", myNode);
-            Micro.put(wrapper, key, newColor);
+            Micro.put(wrapper, uuid + ":color", newColor);
         }
         
         public Node getParent(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":parent", myNode);
-            return (Node) Micro.get(wrapper, key);
+            return (Node) Micro.get(wrapper, uuid + ":parent");
         }
 
         public void setParent(CacheWrapper wrapper, Node newParent){
-            LocatedKey key = wrapper.createKey(uuid + ":parent", myNode);
-            Micro.put(wrapper, key, newParent);
+            Micro.put(wrapper, uuid + ":parent", newParent);
         }
 
         public Node getLeft(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":left", myNode);
-            return (Node) Micro.get(wrapper, key);
+            return (Node) Micro.get(wrapper, uuid + ":left");
         }
 
         public void setLeft(CacheWrapper wrapper, Node newLeft){
-            LocatedKey key = wrapper.createKey(uuid + ":left", myNode);
-            Micro.put(wrapper, key, newLeft);
+            Micro.put(wrapper, uuid + ":left", newLeft);
         }
 
         public Node getRight(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":right", myNode);
-            return (Node) Micro.get(wrapper, key);
+            return (Node) Micro.get(wrapper, uuid + ":right");
         }
 
         public void setRight(CacheWrapper wrapper, Node newRight){
-            LocatedKey key = wrapper.createKey(uuid + ":right", myNode);
-            Micro.put(wrapper, key, newRight);
+            Micro.put(wrapper, uuid + ":right", newRight);
         }
         
         public V getValue(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":value", myNode);
-            return (V) Micro.get(wrapper, key);
+            return (V) Micro.get(wrapper, uuid + ":value");
         }
 
         public void setValue(CacheWrapper wrapper, V newValue){
-            LocatedKey key = wrapper.createKey(uuid + ":value", myNode);
-            Micro.put(wrapper, key, newValue);
+            Micro.put(wrapper, uuid + ":value", newValue);
         }
         
         public K getKey(CacheWrapper wrapper){
-            LocatedKey key = wrapper.createKey(uuid + ":key", myNode);
-            return (K) Micro.get(wrapper, key);
+            return (K) Micro.get(wrapper, uuid + ":key");
         }
 
         public void setKey(CacheWrapper wrapper, K newKey){
-            LocatedKey key = wrapper.createKey(uuid + ":key", myNode);
-            Micro.put(wrapper, key, newKey);
+            Micro.put(wrapper, uuid + ":key", newKey);
         }
         
     }

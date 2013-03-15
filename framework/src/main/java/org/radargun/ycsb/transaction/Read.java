@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
 import org.radargun.ycsb.ByteIterator;
 import org.radargun.ycsb.RandomByteIterator;
 import org.radargun.ycsb.StringByteIterator;
@@ -15,7 +14,6 @@ public class Read extends YCSBTransaction {
     private int k;
     
     public Read(int k) {
-	super(1, 0);
 	this.k = k;
     }
 
@@ -29,8 +27,7 @@ public class Read extends YCSBTransaction {
 	    ByteIterator data= new RandomByteIterator(YCSB.fieldlengthgenerator.nextInt());
 	    values.put(fieldkey,data);
 	}
-	LocatedKey key = cacheWrapper.createKey("user" + k + "-" + super.node, super.node);
-	Map<String, String> row = (Map) cacheWrapper.get(null, key);
+	Map<String, String> row = (Map) cacheWrapper.get(null, "user" + k);
 	HashMap<String, ByteIterator> result = new HashMap<String, ByteIterator>();
 	if (row != null) {
 	    result.clear();

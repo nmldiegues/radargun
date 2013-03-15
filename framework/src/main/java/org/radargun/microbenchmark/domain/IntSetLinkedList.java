@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import org.radargun.CacheWrapper;
-import org.radargun.LocatedKey;
-import org.radargun.microbenchmark.MicrobenchmarkStressor;
 
 
 public class IntSetLinkedList implements IntSet, Serializable {
@@ -30,32 +28,27 @@ public class IntSetLinkedList implements IntSet, Serializable {
 
         public void setNext(CacheWrapper wrapper, Node next) {
             if (next != null) {
-                LocatedKey key = wrapper.createKey(m_value + ":" + uuid + ":next", node);
-                Micro.put(wrapper, key, next);
+                Micro.put(wrapper, m_value + ":" + uuid + ":next", next);
             }
         }
 
         public Node getNext(CacheWrapper wrapper) {
-            LocatedKey key = wrapper.createKey(m_value + ":" + uuid + ":next", node);
-            return (Node) Micro.get(wrapper, key);
+            return (Node) Micro.get(wrapper, m_value + ":" + uuid + ":next");
         }
     }
 
     /* final */ private Node m_first;
 
-    int node;
-    
     public IntSetLinkedList() { }
 
-    public IntSetLinkedList(int node, CacheWrapper wrapper) {
-        this.node = node;
+    public IntSetLinkedList(CacheWrapper wrapper) {
         Node min = new Node(wrapper, Integer.MIN_VALUE);
         Node max = new Node(wrapper, Integer.MAX_VALUE);
         min.setNext(wrapper, max);
         m_first = min;
     }
 
-    public boolean add(CacheWrapper wrapper, int value, boolean local, boolean remote) {
+    public boolean add(CacheWrapper wrapper, int value) {
         boolean result;
 
         Node previous = m_first;
@@ -66,17 +59,14 @@ public class IntSetLinkedList implements IntSet, Serializable {
             next = previous.getNext(wrapper);
         }
         result = v != value;
-        if (result && !remote && local) {
+        if (result) {
             previous.setNext(wrapper, new Node(wrapper, value, next));
-        } else {
-            LocatedKey key = wrapper.createKey("local" + (((wrapper.getMyNode() + 1) * 1000) + node) + "-" + MicrobenchmarkStressor.THREADID.get(), node);
-            Micro.put(wrapper, key, 1);
         }
-
+        
         return result;
     }
 
-    public boolean remove(CacheWrapper wrapper, final int value, boolean local, boolean remote) {
+    public boolean remove(CacheWrapper wrapper, final int value) {
         boolean result;
 
         Node previous = m_first;
@@ -87,11 +77,8 @@ public class IntSetLinkedList implements IntSet, Serializable {
             next = previous.getNext(wrapper);
         }
         result = v == value;
-        if (result && !remote && local) {
+        if (result) {
             previous.setNext(wrapper, next.getNext(wrapper));
-        } else {
-            LocatedKey key = wrapper.createKey("local" + (((wrapper.getMyNode() + 1) * 1000) + node) + "-" + MicrobenchmarkStressor.THREADID.get(), node);
-            Micro.put(wrapper, key, 1);
         }
 
         return result;

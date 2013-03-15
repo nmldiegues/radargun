@@ -20,16 +20,11 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
     private transient YCSBStressor[] ycsbStressors;
 
-    public static int THREADS;
-    
     private int multiplereadcount;
     private int recordcount;
     private int executiontime;
-    private int nodes;
     private int threads;
     private int readonly;
-    private int remote;
-    boolean totalOrder;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -43,21 +38,14 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 	log.info("Starting YCSBBenchmarkStage: " + this.toString());
 
 	YCSB.init(this.readonly, recordcount);
-	YCSBStressor.CLIENTS = nodes;
-	YCSBStressor.MY_NODE = cacheWrapper.getMyNode();
-	THREADS = threads;
 	ycsbStressors = new YCSBStressor[threads];
 
 	for (int t = 0; t < ycsbStressors.length; t++) {
 
 	    ycsbStressors[t] = new YCSBStressor();
 	    ycsbStressors[t].setCacheWrapper(cacheWrapper);
-	    ycsbStressors[t].setRemote(this.remote);
-	    ycsbStressors[t].setNodes(this.nodes);
 	    ycsbStressors[t].setRecordCount(this.recordcount);
 	    ycsbStressors[t].setMultiplereadcount(this.multiplereadcount);
-	    ycsbStressors[t].setThreadId(t);
-	    ycsbStressors[t].setTotalOrder(this.totalOrder);
 	}
 
 	try {
@@ -156,12 +144,6 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     public void setExecutiontime(int executiontime) {
         this.executiontime = executiontime;
     }
-    public int getNodes() {
-        return nodes;
-    }
-    public void setNodes(int nodes) {
-        this.nodes = nodes;
-    }
     public int getThreads() {
         return threads;
     }
@@ -173,14 +155,5 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
     }
     public void setReadonly(int readonly) {
         this.readonly = readonly;
-    }
-    public int getRemote() {
-        return remote;
-    }
-    public void setRemote(int remote) {
-        this.remote = remote;
-    }
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
     }
 }
