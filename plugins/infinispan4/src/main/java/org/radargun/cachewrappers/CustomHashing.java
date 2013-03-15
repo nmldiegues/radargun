@@ -31,12 +31,13 @@ public class CustomHashing extends DefaultConsistentHash {
     public List<Address> locate(Object key, int replCount) {
         final int actualReplCount = Math.min(replCount, caches.size());
         if (key instanceof MagicKey) {
-            List<Address> result = new ArrayList<Address>(actualReplCount);
-            int node = ((MagicKey)key).node;
-            for (int i = 0; i < actualReplCount; i++) {
-                result.add(addresses[(node + i) % addresses.length]);
-            }
-            return result;
+            return super.locate(((MagicKey)key).key, replCount);
+//            List<Address> result = new ArrayList<Address>(actualReplCount);
+//            int node = ((MagicKey)key).node;
+//            for (int i = 0; i < actualReplCount; i++) {
+//                result.add(addresses[(node + i) % addresses.length]);
+//            }
+//            return result;
         } else {
             return super.locate(key, replCount); 
         }
@@ -46,13 +47,14 @@ public class CustomHashing extends DefaultConsistentHash {
     public boolean isKeyLocalToAddress(Address target, Object key, int replCount) {
         final int actualReplCount = Math.min(replCount, caches.size());
         if (key instanceof MagicKey) {
-            int node = ((MagicKey)key).node;
-            for (int i = 0; i < actualReplCount; i++) {
-                if (target.equals(addresses[(node + i) % addresses.length])) {
-                    return true;
-                }
-            }
-            return false;
+            return super.isKeyLocalToAddress(target, ((MagicKey)key).key, replCount);
+//            int node = ((MagicKey)key).node;
+//            for (int i = 0; i < actualReplCount; i++) {
+//                if (target.equals(addresses[(node + i) % addresses.length])) {
+//                    return true;
+//                }
+//            }
+//            return false;
         } else {
             return super.isKeyLocalToAddress(target, key, replCount);
         }
@@ -61,7 +63,8 @@ public class CustomHashing extends DefaultConsistentHash {
     @Override
     public Address primaryLocation(Object key) {
         if (key instanceof MagicKey) {
-            return addresses[((MagicKey)key).node];
+            return super.primaryLocation(((MagicKey)key).key);
+//            return addresses[((MagicKey)key).node];
         } else {
             return super.primaryLocation(key);
         }
