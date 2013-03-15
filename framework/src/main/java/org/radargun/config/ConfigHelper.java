@@ -74,7 +74,6 @@ public class ConfigHelper {
                if (editor == null) {
                   throw new RuntimeException("Couldn't find a property editor for parameter type " + parameterType);
                }
-
                editor.setAsText((String) attribs.get(propName));
 
                Object parameter = editor.getValue();

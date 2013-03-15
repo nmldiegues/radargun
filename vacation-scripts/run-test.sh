@@ -5,10 +5,6 @@ WORKING_DIR=`cd $(dirname $0); pwd`
 echo "loading environment..."
 . ${WORKING_DIR}/environment.sh
 
-READONLY=$1
-REMOTE=$2
-COUNT=$3
-TO=$4
 NR_NODES_TO_USE="`wc -l /home/ndiegues/machines | awk '{print $1}'`"
 EST_DURATION="1"
 
@@ -16,7 +12,7 @@ EST_DURATION="1"
 #RADARGUN CONFIG
 #BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
 #TPC-C CONFIG
-BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 1 -n $COUNT -q $REMOTE -r $COUNT -t 40000 -u 100 -ro $READONLY -to $TO"
+BENC_DEFAULT="-c $NR_NODES_TO_USE -l 1 -n 2 -r 64 -t 10000 -u 98 -ro 99"
 
 echo "============ INIT BENCHMARKING ==============="
 
@@ -40,6 +36,8 @@ for owner in 1; do
 #for bfFp in 0.01 0.10; do
 
 #${ISPN_GEN} ${ISPN_DEFAULT} -num-owner ${owner}
+pwd
+echo "${BENC_GEN} ${BENC_DEFAULT}"
 ${BENC_GEN} ${BENC_DEFAULT}
 run_test ${NR_NODES_TO_USE} "results2" ${EST_DURATION} ${CLUSTER}
 killall -9 java
