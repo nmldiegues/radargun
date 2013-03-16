@@ -12,7 +12,6 @@ READCOUNT=20
 TIME=40
 COUNT=1024
 READONLY=50
-REMOTE=5
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -26,29 +25,14 @@ fi
 help_and_exit(){
 echo "usage: ${0} <options>"
 echo "options:"
-echo "  -c <value>               number of clients (also means number of nodes used)"
-echo "                           default: ${CLIENTS}"
-echo ""
-echo "  -l <value>               number of threads per node"
-echo "                           default: ${LOCAL_THREADS}"
-echo ""
-echo "  -n <value>               number of operations per transaction"
-echo "                           default: ${NUMBER}"
-echo ""
-echo "  -q <value>               the range of data to touch"
-echo "                           default: ${QUERIES}"
-echo ""
-echo "  -r <value>               the size of the tables"
-echo "                           default: ${RELATIONS}"
-echo ""
-echo "  -t <value>        	 the number of transactions"
-echo "                           default: ${TRANSACTIONS}"
-echo ""
-echo "  -u <value>               the percentage of reservations"
-echo "                           default: ${USER}"
-echo ""
 echo "  -ro <value>               the percentage of read-only"
 echo "                           default: ${READONLY}"
+echo ""
+echo "  -rc <value>               elements to read"
+echo "                           default: ${READCOUNT}"
+echo ""
+echo "  -count <value>               total elements"
+echo "                           default: ${COUNT}"
 echo ""
 echo ""
 echo "  -h                       show this message and exit"
@@ -64,7 +48,6 @@ case $1 in
   -t) TIME=$2; shift 2;;
   -count) COUNT=$2; shift 2;;
   -ro) READONLY=$2; shift 2;;
-  -rem) REMOTE=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;

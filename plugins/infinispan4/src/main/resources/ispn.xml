@@ -22,7 +22,7 @@
                 concurrencyLevel="32"
                 writeSkewCheck="false"
                 useLockStriping="false"
-                lockAcquisitionTimeout="10000"/>
+                lockAcquisitionTimeout="250"/>
         <transaction
                 transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
@@ -35,7 +35,6 @@
                 eagerLockSingleNode="false"
                 use1PcForAutoCommitTransactions="false"
                 autoCommit="true"
-		        ssiValidation="false"
                 />
         <jmxStatistics
                 enabled="true"/>
@@ -45,7 +44,6 @@
             <sync
                     replTimeout="15000" />
             <hash
-                    class="org.radargun.cachewrappers.CustomHashing"
                     numVirtualNodes="1"
                     numOwners="1"
                     rehashEnabled="false"

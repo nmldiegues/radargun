@@ -12,7 +12,7 @@ EST_DURATION="1"
 #RADARGUN CONFIG
 #BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
 #TPC-C CONFIG
-BENC_DEFAULT="-c $NR_NODES_TO_USE -l 1 -n 2 -r 64 -t 10000 -u 98 -ro 99"
+BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 1 -n 2 -r 64 -t 10000 -u 98 -ro 99"
 
 echo "============ INIT BENCHMARKING ==============="
 

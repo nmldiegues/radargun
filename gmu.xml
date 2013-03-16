@@ -22,7 +22,7 @@
                 concurrencyLevel="256"
                 writeSkewCheck="false"
                 useLockStriping="false"
-                lockAcquisitionTimeout="100000"/>
+                lockAcquisitionTimeout="200"/>
         <transaction
                 transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
@@ -45,7 +45,6 @@
             <sync
                     replTimeout="15000" />
             <hash
-                    class="org.radargun.cachewrappers.CustomHashing"
                     numVirtualNodes="1"
                     numOwners="2"
                     rehashEnabled="false"
