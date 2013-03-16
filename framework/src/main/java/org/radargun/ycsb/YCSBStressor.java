@@ -80,12 +80,12 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 	while (true) {
 	    if (m_phase != TEST_PHASE) {
 		this.throughput--;
+		break;
 	    }
 	    cacheWrapper.startTransaction(transaction.isReadOnly());
 	    try {
 		transaction.executeTransaction(cacheWrapper);
 	    } catch (Throwable e) {
-try {Thread.sleep(10000);} catch(Exception e1) {}
 		successful = false;
 	    }
 
@@ -96,7 +96,6 @@ try {Thread.sleep(10000);} catch(Exception e1) {}
 		    setRestarts(getRestarts() + 1);
 		}
 	    } catch (Throwable rb) {
-try {Thread.sleep(10000);} catch (Exception e2) {}
 		setRestarts(getRestarts() + 1);
 		successful = false;
 	    }
