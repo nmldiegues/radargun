@@ -276,6 +276,10 @@ public class InfinispanWrapper implements CacheWrapper {
       return false;
    }
 
+   public boolean isCoordinator() {
+       return transport.isCoordinator();
+   }
+   
    @Override
    public boolean isTheMaster() {
       return !isPassiveReplication() || transport.isCoordinator();

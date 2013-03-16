@@ -22,7 +22,7 @@ public class YCSBPopulationStage extends AbstractDistStage {
 	    log.info("Not executing any test as the wrapper is not set up on this slave ");
 	    return ack;
 	}
-	if (! wrapper.isTheMaster()) {
+	if (! wrapper.isCoordinator()) {
 	    log.info("Skipping population, delegating to the coordinator");
 	} else {
 	    long startTime = System.currentTimeMillis();

@@ -22,8 +22,7 @@ public class VacationPopulationStressor extends AbstractCacheWrapperStressor {
 	if (wrapper == null) {
 	    throw new IllegalStateException("Null wrapper not allowed");
 	}
-System.out.println("The master:  " + wrapper.isTheMaster());
-	if (! wrapper.isTheMaster()) {
+	if (! wrapper.isCoordinator()) {
 	    log.info("Skipping Population Operations, delegate to the coordinator");
 	} else {
 	    try {

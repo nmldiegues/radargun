@@ -119,6 +119,8 @@ public interface CacheWrapper
     */
    boolean isTheMaster();
 
+   boolean isCoordinator();
+   
    /**
     * it resets the additional stats
     */

@@ -32,7 +32,7 @@ public class MicrobenchmarkPopulationStressor extends AbstractCacheWrapperStress
         if (wrapper == null) {
             throw new IllegalStateException("Null wrapper not allowed");
         }
-        if (!wrapper.isTheMaster()) {
+        if (! wrapper.isCoordinator()) {
             log.info("Skipping population, delegating to the coordinator");
         } else {
             try {
