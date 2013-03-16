@@ -34,12 +34,12 @@ public class RMW extends YCSBTransaction {
 	}
 	
 	Map<String, String> row = StringByteIterator.getStringMap(values);
-	int toWrite = (Math.abs(k * random)) % multiplereadcount;
+	int toWrite = (Math.abs(random)) % multiplereadcount;
 	for (int i = 0 ; i < multiplereadcount; i++) {
 	    if (toWrite == i) {
-		cacheWrapper.put(null, "user" + (i % recordCount), row);
+		cacheWrapper.put(null, "user" + ((k + i) % recordCount), row);
 	    } else {
-		cacheWrapper.get(null, "user" + (i % recordCount));
+		cacheWrapper.get(null, "user" + ((k + i) % recordCount));
 	    }
 	}
 	
