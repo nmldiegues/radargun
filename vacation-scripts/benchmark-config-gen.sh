@@ -13,6 +13,9 @@ RELATIONS=1024
 TIME=2000
 USER=98
 READONLY=50
+CACHE_CONFIG_FILE="ispn.xml"
+PARTIAL_REPLICATION="false"
+PASSIVE_REPLICATION="false"
 
 if [ -n "${ISPN_CONFIG_FILENAME}" ]; then
   CONFIGURATION_FILE=${ISPN_CONFIG_FILENAME}
@@ -56,6 +59,8 @@ case $1 in
   -t) TIME=$2; shift 2;;
   -u) USER=$2; shift 2;;
   -ro) READONLY=$2; shift 2;;
+  -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
+  -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
   *) break;;
 esac
