@@ -11,7 +11,6 @@ public class MagicKey implements LocatedKey, Serializable {
     
     public final String key;
     public final int node;
-    public final boolean totalOrder;
     
     public static int local = 0;
     public static int remote = 0;
@@ -25,13 +24,11 @@ public class MagicKey implements LocatedKey, Serializable {
 	} else {
 	    remote++;
 	}
-	this.totalOrder = false;
     }
     
     public MagicKey(String key, int baseNode, boolean totalOrder) {
 	this.key = key;
 	this.node = baseNode;
-	this.totalOrder = totalOrder;
     }
     
     @Override

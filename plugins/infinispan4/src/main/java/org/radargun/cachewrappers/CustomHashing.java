@@ -1,7 +1,6 @@
 package org.radargun.cachewrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -61,12 +60,12 @@ public class CustomHashing extends DefaultConsistentHash {
     }
 
     private int getOffset(MagicKey key) {
-	if (totalOrder) {
-	    int hashCode = key.key.hashCode();
-	    return Math.abs(Math.abs(hashCode) % 2);
-	} else {
+//	if (totalOrder) {
+//	    int hashCode = key.key.hashCode();
+//	    return Math.abs(Math.abs(hashCode) % 2);
+//	} else {
 	    return 0;
-	}
+//	}
     }
     
     @Override

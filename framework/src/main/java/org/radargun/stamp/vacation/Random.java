@@ -12,7 +12,7 @@ public class Random {
   int[] mag01;
 
   public Random() {
-    RANDOM_DEFAULT_SEED = 0;
+    RANDOM_DEFAULT_SEED = new java.util.Random().nextInt() % 100;
     N = 624;
     M = 397;
     mt = new int[N];
@@ -27,7 +27,7 @@ public class Random {
   }
 
   public void random_alloc() {
-    init_genrand(this.RANDOM_DEFAULT_SEED);
+    init_genrand(new java.util.Random().nextInt() % 100);
   }
 
   /* initializes mt[N] with a seed */
@@ -43,10 +43,6 @@ public class Random {
       /* for >32 bit machines */
     }
     this.mti=mti;
-  }
-
-  public void random_seed(int seed) {
-    init_genrand(seed);
   }
 
   public int random_generate() {
