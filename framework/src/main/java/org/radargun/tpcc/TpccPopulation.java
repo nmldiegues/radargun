@@ -460,7 +460,7 @@ public class TpccPopulation {
    }
 
    protected final Warehouse createWarehouse(int warehouseId) {
-      return new Warehouse(warehouseId,
+      return new Warehouse(wrapper, slaveIndex, warehouseId,
                            tpccTools.get().aleaChainec(6, 10),
                            tpccTools.get().aleaChainec(10, 20),
                            tpccTools.get().aleaChainec(10, 20),
@@ -500,7 +500,7 @@ public class TpccPopulation {
    }
 
    protected final District createDistrict(int districtId, int warehouseId) {
-      return new District(warehouseId,
+      return new District(wrapper, slaveIndex, warehouseId,
                           districtId,
                           tpccTools.get().aleaChainec(6, 10),
                           tpccTools.get().aleaChainec(10, 20),
@@ -514,7 +514,7 @@ public class TpccPopulation {
    }
 
    protected final Customer createCustomer(int warehouseId, long districtId, long customerId, String customerLastName) {
-      return new Customer(warehouseId,
+      return new Customer(wrapper, slaveIndex, warehouseId,
                           districtId,
                           customerId,
                           tpccTools.get().aleaChainec(8, 16),

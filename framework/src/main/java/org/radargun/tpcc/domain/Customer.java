@@ -1,7 +1,9 @@
 package org.radargun.tpcc.domain;
 
 import org.radargun.CacheWrapper;
+import org.radargun.LocatedKey;
 import org.radargun.tpcc.DomainObject;
+import org.radargun.tpcc.TpccTools;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -45,7 +47,7 @@ public class Customer implements Serializable, Comparable, DomainObject {
 
    private double c_discount;
 
-   private double c_balance;
+   // private double c_balance;
 
    private double c_ytd_payment;
 
@@ -59,7 +61,7 @@ public class Customer implements Serializable, Comparable, DomainObject {
 
    }
 
-   public Customer(long c_w_id, long c_d_id, long c_id, String c_first, String c_middle, String c_last, String c_street1, String c_street2, String c_city, String c_state, String c_zip, String c_phone, Date c_since, String c_credit, double c_credit_lim, double c_discount, double c_balance, double c_ytd_payment, int c_payment_cnt, int c_delivery_cnt, String c_data) {
+   public Customer(CacheWrapper wrapper, int nodeIndex, long c_w_id, long c_d_id, long c_id, String c_first, String c_middle, String c_last, String c_street1, String c_street2, String c_city, String c_state, String c_zip, String c_phone, Date c_since, String c_credit, double c_credit_lim, double c_discount, double c_balance, double c_ytd_payment, int c_payment_cnt, int c_delivery_cnt, String c_data) {
       this.c_w_id = c_w_id;
       this.c_d_id = c_d_id;
       this.c_id = c_id;
@@ -76,7 +78,7 @@ public class Customer implements Serializable, Comparable, DomainObject {
       this.c_credit = c_credit;
       this.c_credit_lim = c_credit_lim;
       this.c_discount = c_discount;
-      this.c_balance = c_balance;
+      setC_balance(wrapper, nodeIndex, c_balance);
       this.c_ytd_payment = c_ytd_payment;
       this.c_payment_cnt = c_payment_cnt;
       this.c_delivery_cnt = c_delivery_cnt;
@@ -147,10 +149,14 @@ public class Customer implements Serializable, Comparable, DomainObject {
       return c_discount;
    }
 
-   public double getC_balance() {
-      return c_balance;
+   public Double getC_balance(CacheWrapper wrapper, int nodeIndex) {
+       return TpccTools.get(wrapper, wrapper.createKey(getKeyC_balance(), nodeIndex));
    }
 
+   public String getKeyC_balance() {
+       return this.getKey() + ":c_balance";
+   }
+   
    public double getC_ytd_payment() {
       return c_ytd_payment;
    }
@@ -231,8 +237,14 @@ public class Customer implements Serializable, Comparable, DomainObject {
       this.c_discount = c_discount;
    }
 
-   public void setC_balance(double c_balance) {
-      this.c_balance = c_balance;
+   public void setC_balance(CacheWrapper wrapper, int nodeIndex, double c_balance) {
+       TpccTools.put(wrapper, wrapper.createKey(getKeyC_balance(), nodeIndex), c_balance);
+   }
+   
+   public void incC_balance(CacheWrapper wrapper, int nodeIndex, double inc) {
+       LocatedKey key = wrapper.createKey(getKeyC_balance(), nodeIndex);
+       double newValue = ((Double) wrapper.getDelayed(key)) + inc;
+       wrapper.putDelayed(key, newValue);
    }
 
    public void setC_ytd_payment(double c_ytd_payment) {
@@ -277,7 +289,6 @@ public class Customer implements Serializable, Comparable, DomainObject {
 
       if (loaded == null) return false;
 
-      this.c_balance = loaded.c_balance;
       this.c_city = loaded.c_city;
       this.c_credit = loaded.c_credit;
       this.c_credit_lim = loaded.c_credit_lim;
@@ -319,7 +330,6 @@ public class Customer implements Serializable, Comparable, DomainObject {
 
       Customer customer = (Customer) o;
 
-      if (Double.compare(customer.c_balance, c_balance) != 0) return false;
       if (Double.compare(customer.c_credit_lim, c_credit_lim) != 0) return false;
       if (c_d_id != customer.c_d_id) return false;
       if (c_delivery_cnt != customer.c_delivery_cnt) return false;
@@ -366,7 +376,6 @@ public class Customer implements Serializable, Comparable, DomainObject {
       result = 31 * result + (int) (temp ^ (temp >>> 32));
       temp = c_discount != +0.0d ? Double.doubleToLongBits(c_discount) : 0L;
       result = 31 * result + (int) (temp ^ (temp >>> 32));
-      temp = c_balance != +0.0d ? Double.doubleToLongBits(c_balance) : 0L;
       result = 31 * result + (int) (temp ^ (temp >>> 32));
       temp = c_ytd_payment != +0.0d ? Double.doubleToLongBits(c_ytd_payment) : 0L;
       result = 31 * result + (int) (temp ^ (temp >>> 32));
