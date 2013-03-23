@@ -100,14 +100,14 @@ public class NewOrderTransaction implements TpccTransaction {
       c.setC_d_id(districtID);
       c.setC_w_id(warehouseID);
 
-      boolean found = c.load(cacheWrapper, (int) warehouseID);
+      boolean found = c.load(cacheWrapper, ((int) warehouseID - 1));
 
       if (!found)
          throw new ElementNotFoundException("W_ID=" + warehouseID + " C_D_ID=" + districtID + " C_ID=" + customerID + " not found!");
 
       w.setW_id(warehouseID);
 
-      found = w.load(cacheWrapper, (int) warehouseID);
+      found = w.load(cacheWrapper, ((int) warehouseID - 1));
       if (!found) throw new ElementNotFoundException("W_ID=" + warehouseID + " not found!");
 
 
@@ -117,7 +117,7 @@ public class NewOrderTransaction implements TpccTransaction {
 
       d.setD_id(districtID);
       d.setD_w_id(warehouseID);
-      found = d.load(cacheWrapper, (int) warehouseID);
+      found = d.load(cacheWrapper, ((int) warehouseID - 1));
       if (!found) throw new ElementNotFoundException("D_ID=" + districtID + " D_W_ID=" + warehouseID + " not found!");
 
 
@@ -126,16 +126,16 @@ public class NewOrderTransaction implements TpccTransaction {
 
       NewOrder no = new NewOrder(o_id, districtID, warehouseID);
 
-      no.store(cacheWrapper, (int) warehouseID);
+      no.store(cacheWrapper, ((int) warehouseID - 1));
 
       d.setD_next_o_id(d.getD_next_o_id() + 1);
 
-      d.store(cacheWrapper, (int) warehouseID);
+      d.store(cacheWrapper, ((int) warehouseID - 1));
 
 
       Order o = new Order(o_id, districtID, warehouseID, customerID, new Date(), -1, numItems, allLocal);
 
-      o.store(cacheWrapper, (int) warehouseID);
+      o.store(cacheWrapper, ((int) warehouseID - 1));
 
 
       // see clause 2.4.2.2 (dot 8)
@@ -147,7 +147,7 @@ public class NewOrderTransaction implements TpccTransaction {
          // clause 2.4.2.2 (dot 8.1)
          Item i = new Item();
          i.setI_id(ol_i_id);
-         found = i.load(cacheWrapper, (int) ol_supply_w_id);
+         found = i.load(cacheWrapper, ((int) ol_supply_w_id - 1));
          if (!found) throw new ElementNotFoundException("I_ID=" + ol_i_id + " not found!");
 
 
@@ -158,7 +158,7 @@ public class NewOrderTransaction implements TpccTransaction {
          Stock s = new Stock();
          s.setS_i_id(ol_i_id);
          s.setS_w_id(ol_supply_w_id);
-         found = s.load(cacheWrapper, (int) ol_supply_w_id);
+         found = s.load(cacheWrapper, ((int) ol_supply_w_id - 1));
          if (!found) throw new ElementNotFoundException("I_ID=" + ol_i_id + " not found!");
 
 
@@ -181,7 +181,7 @@ public class NewOrderTransaction implements TpccTransaction {
          s.setS_ytd(s.getS_ytd() + ol_quantity);
          s.setS_remote_cnt(s.getS_remote_cnt() + s_remote_cnt_increment);
          s.setS_order_cnt(s.getS_order_cnt() + 1);
-         s.store(cacheWrapper, (int) ol_supply_w_id);
+         s.store(cacheWrapper, ((int) ol_supply_w_id - 1));
 
 
          // clause 2.4.2.2 (dot 8.3)
@@ -233,7 +233,7 @@ public class NewOrderTransaction implements TpccTransaction {
 
          OrderLine ol = new OrderLine(o_id, districtID, warehouseID, ol_number, ol_i_id, ol_supply_w_id, null,
                                       ol_quantity, ol_amount, ol_dist_info);
-         ol.store(cacheWrapper, (int) warehouseID);
+         ol.store(cacheWrapper, ((int) warehouseID - 1));
 
       }
 

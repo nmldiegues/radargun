@@ -23,7 +23,7 @@ public final class CustomerDAC {
 
 		CustomerLookup customerLookup = new CustomerLookup(c_last, c_w_id, c_d_id);
 
-		customerLookup.load(cacheWrapper, (int) c_w_id);
+		customerLookup.load(cacheWrapper, ((int) c_w_id - 1));
 
 		Customer current=null;
 		boolean found = false;
@@ -41,7 +41,7 @@ public final class CustomerDAC {
 				current.setC_d_id(c_d_id);
 				current.setC_w_id(c_w_id);
 
-				found = current.load(cacheWrapper, (int) c_w_id);
+				found = current.load(cacheWrapper, ((int) c_w_id - 1));
 
 				if(found){
 					result.add(current);

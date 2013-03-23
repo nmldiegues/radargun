@@ -101,7 +101,7 @@ public class OrderStatusTransaction implements TpccTransaction {
          c.setC_id(customerID);
          c.setC_d_id(districtID);
          c.setC_w_id(terminalWarehouseID);
-         found = c.load(cacheWrapper, (int) terminalWarehouseID);
+         found = c.load(cacheWrapper, ((int) terminalWarehouseID - 1));
          if (!found)
             throw new ElementNotFoundException("C_ID=" + customerID + " C_D_ID=" + districtID + " C_W_ID=" + terminalWarehouseID + " not found!");
 

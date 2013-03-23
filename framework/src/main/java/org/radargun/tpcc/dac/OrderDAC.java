@@ -31,7 +31,7 @@ public final class OrderDAC {
          current.setO_w_id(w_id);
          current.setO_d_id(d_id);
 
-         found = current.load(cacheWrapper, (int) w_id);
+         found = current.load(cacheWrapper, ((int) w_id - 1));
 
          if (found && current.getO_c_id() == c_id) {
 
