@@ -109,20 +109,20 @@ public class PaymentTransaction implements TpccTransaction {
       Warehouse w = new Warehouse();
       w.setW_id(terminalWarehouseID);
 
-      boolean found = w.load(cacheWrapper);
+      boolean found = w.load(cacheWrapper, (int) terminalWarehouseID);
       if (!found) throw new ElementNotFoundException("W_ID=" + terminalWarehouseID + " not found!");
       w.setW_ytd(paymentAmount);
-      w.store(cacheWrapper);
+      w.store(cacheWrapper, (int) terminalWarehouseID);
 
 
       District d = new District();
       d.setD_id(districtID);
       d.setD_w_id(terminalWarehouseID);
-      found = d.load(cacheWrapper);
+      found = d.load(cacheWrapper, (int) terminalWarehouseID);
       if (!found) throw new ElementNotFoundException("D_ID=" + districtID + " D_W_ID=" + terminalWarehouseID + " not found!");
 
       d.setD_ytd(paymentAmount);
-      d.store(cacheWrapper);
+      d.store(cacheWrapper, (int) terminalWarehouseID);
 
 
       Customer c = null;
@@ -151,7 +151,7 @@ public class PaymentTransaction implements TpccTransaction {
          c.setC_id(customerID);
          c.setC_d_id(customerDistrictID);
          c.setC_w_id(customerWarehouseID);
-         found = c.load(cacheWrapper);
+         found = c.load(cacheWrapper, (int) customerWarehouseID);
          if (!found)
             throw new ElementNotFoundException("C_ID=" + customerID + " C_D_ID=" + customerDistrictID + " C_W_ID=" + customerWarehouseID + " not found!");
 
@@ -175,11 +175,11 @@ public class PaymentTransaction implements TpccTransaction {
 
          c.setC_data(c_new_data);
 
-         c.store(cacheWrapper);
+         c.store(cacheWrapper, (int) customerWarehouseID);
 
 
       } else {
-         c.store(cacheWrapper);
+         c.store(cacheWrapper, (int) customerWarehouseID);
 
       }
 

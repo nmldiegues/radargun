@@ -12,13 +12,6 @@ public interface DomainObject {
 
    /**
     * it stores the domain object in the cache wrapper
-    * @param wrapper the cache wrapper
-    * @throws Throwable if something wrong occurs
-    */
-   void store(CacheWrapper wrapper) throws Throwable;
-
-   /**
-    * it stores the domain object in the cache wrapper
     * 
     * @param wrapper    the cache wrapper
     * @param nodeIndex  the node index which stores this object               
@@ -41,5 +34,5 @@ public interface DomainObject {
     * @return true if the domain object was found, false otherwise
     * @throws Throwable if something wrong occurs
     */
-   boolean load(CacheWrapper wrapper) throws Throwable;
+   boolean load(CacheWrapper wrapper, int nodeIndex) throws Throwable;
 }

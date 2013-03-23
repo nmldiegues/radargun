@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 40, 80, 120 };
-    public static final String[] ALGS = { "twc" };
+    public static final int[] POSSIBLE_NODES = { 20, 40, 80, 120 };
+    public static final String[] ALGS = { "gmu", "twc" };
     public static final String[] BENCHS = { "micro", "vacation" };
     public static final String[] TOS = { "", "to" };
     public static final int ATTEMPTS = 1;
@@ -63,13 +63,14 @@ public class AllBenchmarks {
     }
 
     public static void main(String[] args) {
-        gmuVersusTWC(args);
+//            gmuVersusTWC(args, i);
 //        totalOrder(args);
-//        normalWorkloadWithTO(args);
+            normalWorkloadWithTO(args, 3);
+            normalWorkloadWithTO(args, 7);
     }
 
     // normal workload and what TO does on top of it
-    protected static void normalWorkloadWithTO(String[] args) {
+    protected static void normalWorkloadWithTO(String[] args, int pos) {
         // Benchmark -> Nodes -> Algorithm -> totalOrder
         Map<String, Map<Integer, Map<String, Map<Boolean, Result>>>> allData = new HashMap<String, Map<Integer, Map<String, Map<Boolean, Result>>>>();
         for (String benchmark : BENCHS) {
@@ -83,9 +84,9 @@ public class AllBenchmarks {
                         for (int a = 0; a < ATTEMPTS; a++) {
                             List<String> content;
                             if (to.equals("to")) {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+1) + ".csv");
                             } else {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
                             }
                             content.remove(0);
                             double throughput = 0.0;
@@ -115,26 +116,28 @@ public class AllBenchmarks {
                 output += "\n" + nodes;
                 outputA += "\n" + nodes;
                 Result gmu = allData.get(benchmark).get(nodes).get("gmu").get(false);
-                Result twc = allData.get(benchmark).get(nodes).get("twc").get(false);
                 Result gmuTO = allData.get(benchmark).get(nodes).get("gmu").get(true);
+                Result twc = allData.get(benchmark).get(nodes).get("twc").get(false);
                 Result twcTO = allData.get(benchmark).get(nodes).get("twc").get(true);
                 double avgGMU = gmu.getThroughputAvg();
-                double avgTWC = twc.getThroughputAvg();
                 double devGMU = gmu.getThroughputDeviation();
-                double devTWC = twc.getThroughputDeviation();
                 double abortsGMU = gmu.getAbortAvg();
-                double abortsTWC = twc.getAbortAvg();
                 double avgGMUTO = gmuTO.getThroughputAvg();
-                double avgTWCTO = twcTO.getThroughputAvg();
                 double devGMUTO = gmuTO.getThroughputDeviation();
-                double devTWCTO = twcTO.getThroughputDeviation();
                 double abortsGMUTO = gmuTO.getAbortAvg();
+                double avgTWC = twc.getThroughputAvg();
+                double devTWC = twc.getThroughputDeviation();
+                double abortsTWC = twc.getAbortAvg();
+                double avgTWCTO = twcTO.getThroughputAvg();
+                double devTWCTO = twcTO.getThroughputDeviation();
                 double abortsTWCTO = twcTO.getAbortAvg();
                 output += " " + roundTwoDecimals(avgGMU) + " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(avgGMUTO) + " " + roundTwoDecimals(avgTWCTO);
                 outputA += " " + roundTwoDecimals(abortsGMU) + " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(abortsGMUTO) + " " + roundTwoDecimals(abortsTWCTO);
+//                output += " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(avgTWCTO);
+//                outputA += " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(abortsTWCTO);
             }
-            writeToFile(args[0] + "/results/to-" + benchmark + "-throughput.output", output);
-            writeToFile(args[0] + "/results/to-" + benchmark + "-aborts.output", outputA);
+            writeToFile(args[0] + "/results/to-" + benchmark + "-" + pos + "-throughput.output", output);
+            writeToFile(args[0] + "/results/to-" + benchmark + "-" + pos + "-aborts.output", outputA);
         }
     }
     
@@ -203,7 +206,7 @@ public class AllBenchmarks {
         }
     }
     
-    protected static void gmuVersusTWC(String[] args) {
+    protected static void gmuVersusTWC(String[] args, int pos) {
         // Benchmark -> Nodes -> Algorithm
         Map<String, Map<Integer, Map<String, Result>>> allData = new HashMap<String, Map<Integer, Map<String, Result>>>();
         for (String benchmark : BENCHS) {
@@ -213,7 +216,7 @@ public class AllBenchmarks {
                 for (String alg : ALGS) {
                     Result result = new Result();
                     for (int a = 0; a < ATTEMPTS; a++) {
-                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
+                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
                         content.remove(0);
                         double throughput = 0.0;
                         int ab = 0;

@@ -34,7 +34,7 @@ public final class OrderLineDAC {
          current.setOl_o_id(order.getO_id());
          current.setOl_number(i);
 
-         found = current.load(cacheWrapper);
+         found = current.load(cacheWrapper, (int) order.getO_w_id());
 
          if (found) list.add(current);
 

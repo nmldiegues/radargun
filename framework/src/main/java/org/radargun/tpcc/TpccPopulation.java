@@ -383,7 +383,7 @@ public class TpccPopulation {
    protected final boolean txAwareLoad(DomainObject domainObject) {
       if (wrapper.isInTransaction()) {
          try {
-            domainObject.load(wrapper);
+            domainObject.load(wrapper, slaveIndex);
          } catch (Throwable throwable) {
             return false;
          }
@@ -391,7 +391,7 @@ public class TpccPopulation {
          boolean loadDone = false;
          do {
             try {
-               domainObject.load(wrapper);
+               domainObject.load(wrapper, slaveIndex);
                loadDone = true;
             } catch (Throwable e) {
                logErrorWhileGet(domainObject, e);

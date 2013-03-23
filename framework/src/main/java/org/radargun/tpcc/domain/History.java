@@ -120,7 +120,7 @@ public class History implements Serializable, DomainObject {
    @Override
    public void store(CacheWrapper wrapper, int slaveIndex) throws Throwable {
       String id = generateId(slaveIndex);
-      wrapper.put(null, id, this);
+      wrapper.put(null, wrapper.createKey(id, slaveIndex), this);
    }
 
    @Override
@@ -167,14 +167,8 @@ public class History implements Serializable, DomainObject {
       return result;
    }
 
-
    @Override
-   public void store(CacheWrapper wrapper) throws Throwable {
-      store(wrapper, -1);
-   }
-
-   @Override
-   public boolean load(CacheWrapper wrapper) throws Throwable {
+   public boolean load(CacheWrapper wrapper, int nodeIndex) throws Throwable {
       return true;
    }
 }

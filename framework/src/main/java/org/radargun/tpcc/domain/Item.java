@@ -78,13 +78,8 @@ public class Item implements Serializable, DomainObject {
    }
 
    @Override
-   public void store(CacheWrapper wrapper) throws Throwable {
-      wrapper.put(null, this.getKey(), this);
-   }
-
-   @Override
    public void store(CacheWrapper wrapper, int nodeIndex) throws Throwable {
-      store(wrapper);
+       wrapper.put(null, wrapper.createKey(this.getKey(), nodeIndex), this);
    }
 
    @Override
@@ -97,9 +92,9 @@ public class Item implements Serializable, DomainObject {
    }
 
    @Override
-   public boolean load(CacheWrapper wrapper) throws Throwable {
+   public boolean load(CacheWrapper wrapper, int nodeIndex) throws Throwable {
 
-      Item loaded = (Item) wrapper.get(null, this.getKey());
+      Item loaded = (Item) wrapper.get(null, wrapper.createKey(this.getKey(), nodeIndex));
 
       if (loaded == null) return false;
 
