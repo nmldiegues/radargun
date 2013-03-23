@@ -1,5 +1,7 @@
 package org.radargun.stamp.vacation.transaction;
 
+import java.util.Random;
+
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.VacationStressor;
 
@@ -8,10 +10,12 @@ public abstract class VacationTransaction {
     protected boolean remote;
     protected int node;
 
+    static Random r = new Random();
+    
     public VacationTransaction(int random, int remotePerc) {
 	this.remote = (random % 100) < remotePerc;
 	if (this.remote) {
-	    this.node = random % VacationStressor.CLIENTS;
+	    this.node = r.nextInt() % VacationStressor.CLIENTS;
 	} else {
 	    this.node = VacationStressor.MY_NODE;
 	}

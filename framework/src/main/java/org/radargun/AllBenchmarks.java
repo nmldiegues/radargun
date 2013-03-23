@@ -84,9 +84,9 @@ public class AllBenchmarks {
                         for (int a = 0; a < ATTEMPTS; a++) {
                             List<String> content;
                             if (to.equals("to")) {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+2) + ".csv");
                             } else {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+2) + ".csv");
                             }
                             content.remove(0);
                             double throughput = 0.0;
