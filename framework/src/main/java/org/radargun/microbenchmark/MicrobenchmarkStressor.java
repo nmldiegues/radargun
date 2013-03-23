@@ -77,7 +77,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 	boolean remote = false;
         if (k < 5) {
 	    remote = true;
-            node = m_random.nextInt() % clients;
+            node = Math.abs(Math.abs(m_random.nextInt()) % clients);
         } else {
             node = cacheWrapper.getMyNode();
         }

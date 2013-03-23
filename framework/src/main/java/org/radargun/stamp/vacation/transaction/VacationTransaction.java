@@ -15,7 +15,7 @@ public abstract class VacationTransaction {
     public VacationTransaction(int random, int remotePerc) {
 	this.remote = (random % 100) < remotePerc;
 	if (this.remote) {
-	    this.node = r.nextInt() % VacationStressor.CLIENTS;
+	    this.node = Math.abs(Math.abs(r.nextInt()) % VacationStressor.CLIENTS);
 	} else {
 	    this.node = VacationStressor.MY_NODE;
 	}
