@@ -106,7 +106,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(cache, 0);
 
-        if (node.getValue() != value && !remote && local) {
+        if (node.getValue() != value && !remote) {
             int newLevel = randomLevel();
             if (newLevel > level) {
                 for (int i = level + 1; i <= level; i++)
@@ -147,7 +147,7 @@ public class IntSetSkipList implements IntSet, Serializable {
         }
         node = node.getForward(wrapper, 0);
 
-        if (node.getValue() == value && !remote && local) {
+        if (node.getValue() == value && !remote) {
             for (int i = 0; i <= level; i++) {
                 if (update[i].getForward(wrapper, i).getValue() == node.getValue())
                     update[i].setForward(wrapper, i, node.getForward(wrapper, i));

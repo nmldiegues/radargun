@@ -15,9 +15,9 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 40, 80, 120, 160 };
+    public static final int[] POSSIBLE_NODES = { 10, 20, 40, 60, 80, 120, 160 };
     public static final String[] ALGS = { "gmu", "twc" };
-    public static final String[] BENCHS = { "vacation" };
+    public static final String[] BENCHS = { "micro" };
     public static final String[] TOS = { "", "to" };
     public static final int ATTEMPTS = 1;
 
