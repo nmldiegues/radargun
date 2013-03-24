@@ -131,4 +131,10 @@ public interface CacheWrapper
    void setupTotalOrder();
    
    LocatedKey createKey(String key, int node);
+   
+   void delayComputation(IDelayedComputation<?> computation);
+   
+   Object getDelayed(Object key);
+   
+   void putDelayed(Object key, Object value);
 }

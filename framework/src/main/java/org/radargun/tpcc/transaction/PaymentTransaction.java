@@ -1,6 +1,7 @@
 package org.radargun.tpcc.transaction;
 
 import org.radargun.CacheWrapper;
+import org.radargun.IDelayedComputation;
 import org.radargun.tpcc.ElementNotFoundException;
 import org.radargun.tpcc.TpccTerminal;
 import org.radargun.tpcc.TpccTools;
@@ -10,6 +11,7 @@ import org.radargun.tpcc.domain.District;
 import org.radargun.tpcc.domain.History;
 import org.radargun.tpcc.domain.Warehouse;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -96,7 +98,7 @@ public class PaymentTransaction implements TpccTransaction {
    }
 
 
-   private void paymentTransaction(CacheWrapper cacheWrapper) throws Throwable {
+   private void paymentTransaction(final CacheWrapper cacheWrapper) throws Throwable {
       String w_name;
       String d_name;
       long nameCnt;
@@ -106,26 +108,48 @@ public class PaymentTransaction implements TpccTransaction {
       String c_data, c_new_data, h_data;
 
 
-      Warehouse w = new Warehouse();
+      final Warehouse w = new Warehouse();
       w.setW_id(terminalWarehouseID);
 
       boolean found = w.load(cacheWrapper, ((int) terminalWarehouseID - 1));
       if (!found) throw new ElementNotFoundException("W_ID=" + terminalWarehouseID + " not found!");
-      w.setW_ytd(paymentAmount);
-      w.store(cacheWrapper, ((int) terminalWarehouseID - 1));
+      // delay computation
+      cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
+        public Collection getIAffectedKeys() {
+            return Collections.singleton(w.getKeyW_ytd());
+        }
+
+        public Void computeI() {
+            w.incW_ytd(cacheWrapper, ((int) terminalWarehouseID - 1), paymentAmount);
+            return null;
+        }
+      });
+      // w.setW_ytd(w.getW_ytd() + paymentAmount);
+//      w.store(cacheWrapper, ((int) terminalWarehouseID - 1));
 
 
-      District d = new District();
+      final District d = new District();
       d.setD_id(districtID);
       d.setD_w_id(terminalWarehouseID);
       found = d.load(cacheWrapper, ((int) terminalWarehouseID - 1));
       if (!found) throw new ElementNotFoundException("D_ID=" + districtID + " D_W_ID=" + terminalWarehouseID + " not found!");
 
-      d.setD_ytd(paymentAmount);
-      d.store(cacheWrapper, ((int) terminalWarehouseID - 1));
+      // delay computation
+      cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
+          public Collection getIAffectedKeys() {
+              return Collections.singleton(d.getKeyD_ytd());
+          }
+
+          public Void computeI() {
+              d.incD_ytd(cacheWrapper, ((int) terminalWarehouseID - 1), paymentAmount);
+              return null;
+          }
+        });
+      // d.setD_ytd(d.getD_ytd() + paymentAmount);
+//      d.store(cacheWrapper, ((int) terminalWarehouseID - 1));
 
 
-      Customer c = null;
+      Customer cW = null;
 
       if (customerByName) {
          new_c_last = customerLastName;
@@ -143,45 +167,53 @@ public class PaymentTransaction implements TpccTransaction {
          Iterator<Customer> itr = cList.iterator();
 
          for (int i = 1; i <= nameCnt / 2; i++) {
-            c = itr.next();
+            cW = itr.next();
          }
       } else {
 
-         c = new Customer();
-         c.setC_id(customerID);
-         c.setC_d_id(customerDistrictID);
-         c.setC_w_id(customerWarehouseID);
-         found = c.load(cacheWrapper, ((int) customerWarehouseID - 1));
+         cW = new Customer();
+         cW.setC_id(customerID);
+         cW.setC_d_id(customerDistrictID);
+         cW.setC_w_id(customerWarehouseID);
+         found = cW.load(cacheWrapper, ((int) customerWarehouseID - 1));
          if (!found)
             throw new ElementNotFoundException("C_ID=" + customerID + " C_D_ID=" + customerDistrictID + " C_W_ID=" + customerWarehouseID + " not found!");
 
 
       }
+      
+      final Customer c = cW;
 
+      // Delay Computation
+      cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
+          public Collection getIAffectedKeys() {
+              return Collections.singleton(c.getKeyC_balance());
+          }
 
-      c.setC_balance(c.getC_balance() + paymentAmount);
-      if (c.getC_credit().equals("BC")) {
-
-         c_data = c.getC_data();
-
-         c_new_data = c.getC_id() + " " + customerDistrictID + " " + customerWarehouseID + " " + districtID + " " + terminalWarehouseID + " " + paymentAmount + " |";
-         if (c_data.length() > c_new_data.length()) {
-            c_new_data += c_data.substring(0, c_data.length() - c_new_data.length());
-         } else {
-            c_new_data += c_data;
-         }
-
-         if (c_new_data.length() > 500) c_new_data = c_new_data.substring(0, 500);
-
-         c.setC_data(c_new_data);
-
-         c.store(cacheWrapper, ((int) customerWarehouseID - 1));
-
-
-      } else {
-         c.store(cacheWrapper, ((int) customerWarehouseID - 1));
-
-      }
+          public Void computeI() {
+              c.incC_balance(cacheWrapper, ((int) customerWarehouseID - 1), paymentAmount);
+              return null;
+          }
+      });
+      // c.setC_balance(c.getC_balance() + paymentAmount);
+//      if (c.getC_credit().equals("BC")) {
+//
+//         // TODO Delay Computation
+//         c_data = c.getC_data();
+//
+//         c_new_data = c.getC_id() + " " + customerDistrictID + " " + customerWarehouseID + " " + districtID + " " + terminalWarehouseID + " " + paymentAmount + " |";
+//         if (c_data.length() > c_new_data.length()) {
+//            c_new_data += c_data.substring(0, c_data.length() - c_new_data.length());
+//         } else {
+//            c_new_data += c_data;
+//         }
+//
+//         if (c_new_data.length() > 500) c_new_data = c_new_data.substring(0, 500);
+//
+//         c.setC_data(c_new_data);
+//
+//      } 
+//      c.store(cacheWrapper, ((int) customerWarehouseID - 1));
 
       w_name = w.getW_name();
       d_name = d.getD_name();

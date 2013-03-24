@@ -16,6 +16,7 @@ import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.radargun.CacheWrapper;
+import org.radargun.IDelayedComputation;
 import org.radargun.LocatedKey;
 import org.radargun.cachewrappers.parser.StatisticComponent;
 import org.radargun.cachewrappers.parser.StatsParser;
@@ -469,5 +470,20 @@ public class InfinispanWrapper implements CacheWrapper {
    
    public void setupTotalOrder() {
        CustomHashing.totalOrder = true;
+   }
+
+   @Override
+   public void delayComputation(IDelayedComputation computation) {
+       cache.delayedComputation(new ConcreteDelayedComputation(computation));
+   }
+
+   @Override
+   public Object getDelayed(Object key) {
+       return cache.delayedGet(key);
+   }
+
+   @Override
+   public void putDelayed(Object key, Object value) {
+       cache.delayedPut(key, value);
    }
 }
