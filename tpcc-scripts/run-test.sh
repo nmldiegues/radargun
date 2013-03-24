@@ -12,7 +12,7 @@ EST_DURATION="1"
 #RADARGUN CONFIG
 #BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
 #TPC-C CONFIG
-BENC_DEFAULT="-population-batch-level 25 -population-threads 8 -nr-thread 1 -simul-time 30 -distributed -nr-warehouse 1 -payment-weight 5 -order-status-weight 90 -same-warehouse-access -read-only"
+BENC_DEFAULT="-population-batch-level 25 -population-threads 4 -nr-thread 4 -simul-time 30 -distributed -nr-warehouse 1 -payment-weight 80 -order-status-weight 20 -same-warehouse-access -read-only"
 
 echo "============ INIT BENCHMARKING ==============="
 

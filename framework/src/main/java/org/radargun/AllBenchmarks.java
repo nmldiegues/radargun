@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 20, 40, 80, 120 };
+    public static final int[] POSSIBLE_NODES = { 20, 40, 80, 120, 160 };
     public static final String[] ALGS = { "gmu", "twc" };
     public static final String[] BENCHS = { "micro", "vacation" };
     public static final String[] TOS = { "", "to" };
@@ -84,9 +84,9 @@ public class AllBenchmarks {
                         for (int a = 0; a < ATTEMPTS; a++) {
                             List<String> content;
                             if (to.equals("to")) {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+2) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+1) + ".csv");
                             } else {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+2) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
                             }
                             content.remove(0);
                             double throughput = 0.0;

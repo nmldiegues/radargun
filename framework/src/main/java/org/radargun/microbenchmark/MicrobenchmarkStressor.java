@@ -39,6 +39,8 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 
     private int threadid;
 
+    private int remote;
+
     public MicrobenchmarkStressor(int threadid) {
         this.threadid = threadid;
     }
@@ -75,7 +77,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         int k = m_random.nextInt() % 100;
         int node = -1;
 	boolean remote = false;
-        if (k < 5) {
+        if (k < this.remote) {
 	    remote = true;
             node = Math.abs(Math.abs(m_random.nextInt()) % clients);
         } else {
@@ -217,6 +219,10 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
 
     public void setTotalOrder(boolean totalOrder) {
 	this.totalOrder = totalOrder;
+    }
+
+    public void setRemote(int remote) {
+        this.remote = remote;
     }
 
 
