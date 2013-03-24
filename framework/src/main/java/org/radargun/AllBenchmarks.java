@@ -15,9 +15,9 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 20, 40, 80, 120, 160 };
+    public static final int[] POSSIBLE_NODES = { 40, 80, 120, 160 };
     public static final String[] ALGS = { "gmu", "twc" };
-    public static final String[] BENCHS = { "micro", "vacation" };
+    public static final String[] BENCHS = { "vacation" };
     public static final String[] TOS = { "", "to" };
     public static final int ATTEMPTS = 1;
 
@@ -63,10 +63,10 @@ public class AllBenchmarks {
     }
 
     public static void main(String[] args) {
-//            gmuVersusTWC(args, i);
+            gmuVersusTWC(args);
 //        totalOrder(args);
-            normalWorkloadWithTO(args, 3);
-            normalWorkloadWithTO(args, 7);
+//            normalWorkloadWithTO(args, 3);
+//            normalWorkloadWithTO(args, 7);
     }
 
     // normal workload and what TO does on top of it
@@ -206,7 +206,7 @@ public class AllBenchmarks {
         }
     }
     
-    protected static void gmuVersusTWC(String[] args, int pos) {
+    protected static void gmuVersusTWC(String[] args) {
         // Benchmark -> Nodes -> Algorithm
         Map<String, Map<Integer, Map<String, Result>>> allData = new HashMap<String, Map<Integer, Map<String, Result>>>();
         for (String benchmark : BENCHS) {
@@ -216,7 +216,7 @@ public class AllBenchmarks {
                 for (String alg : ALGS) {
                     Result result = new Result();
                     for (int a = 0; a < ATTEMPTS; a++) {
-                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
+                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
                         content.remove(0);
                         double throughput = 0.0;
                         int ab = 0;
@@ -241,21 +241,21 @@ public class AllBenchmarks {
             for (int nodes : POSSIBLE_NODES) {
                 output += "\n" + nodes;
                 outputA += "\n" + nodes;
-//                Result gmu = allData.get(benchmark).get(nodes).get("gmu");
+                Result gmu = allData.get(benchmark).get(nodes).get("gmu");
                 Result twc = allData.get(benchmark).get(nodes).get("twc");
                 double avgTWC = twc.getThroughputAvg();
                 double devTWC = twc.getThroughputDeviation();
                 double abortsTWC = twc.getAbortAvg();
                 double devAbortsTWC = twc.getAbortDeviation();
-//                double avgGMU = gmu.getThroughputAvg();
-//                double devGMU = gmu.getThroughputDeviation();
-//                double abortsGMU = gmu.getAbortAvg();
-//                double devAbortsGMU = gmu.getAbortDeviation();
-//                output += " " + roundTwoDecimals(avgGMU) + " " + roundTwoDecimals(devGMU) + " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(devTWC);
-//                outputA += " " + roundTwoDecimals(abortsGMU) + " " + roundTwoDecimals(devAbortsGMU) + " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(devAbortsTWC);
+                double avgGMU = gmu.getThroughputAvg();
+                double devGMU = gmu.getThroughputDeviation();
+                double abortsGMU = gmu.getAbortAvg();
+                double devAbortsGMU = gmu.getAbortDeviation();
+                output += " " + roundTwoDecimals(avgGMU) + " " + roundTwoDecimals(devGMU) + " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(devTWC);
+                outputA += " " + roundTwoDecimals(abortsGMU) + " " + roundTwoDecimals(devAbortsGMU) + " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(devAbortsTWC);
                 
-                output += " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(devTWC);
-                outputA += " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(devAbortsTWC);
+//                output += " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(devTWC);
+//                outputA += " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(devAbortsTWC);
             }
             writeToFile(args[0] + "/results/" + benchmark + "-throughput.output", output);
             writeToFile(args[0] + "/results/" + benchmark + "-aborts.output", outputA);
