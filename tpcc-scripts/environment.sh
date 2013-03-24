@@ -1,16 +1,16 @@
 # ENVIRONMENT VARIABLES
-MASTER=localhost
+MASTER=cloudtm.ist.utl.pt # this was modified!!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`
-CLUSTER=`echo localhost` # `echo node{01..10}`
-MONITOR_OUT=/home/nmld/workspace/radargun/www/files/report.csv
-RADARGUN_DIR=/home/nmld/workspace/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
-RESULTS_DIR=/home/nmld/workspace/radargun/results-radargun
-MONITOR_PATH=/home/nmld/workspace/radargun/csv-reporter
+CLUSTER=`cat /home/ndiegues/machines` # `echo node{01..10}`
+MONITOR_OUT=/home/ndiegues/radargun/www/files/report.csv
+RADARGUN_DIR=/home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
+RESULTS_DIR=/home/ndiegues/radargun/results-radargun
+MONITOR_PATH=/home/ndiegues/radargun/csv-reporter
 
 #uncoment to start gossip router (used in futuregrid)
-#GOSSIP_ROUTER=1
+GOSSIP_ROUTER=1
 #uncomment to collect data placement stats
 #DATA_PLACEMENT=1
 #uncomment to collect the final keys value (if available)
@@ -37,14 +37,15 @@ RC="READ_COMMITTED"
 RR="REPEATABLE_READ"
 
 copy_to_all() {
-for node in $@; do
-echo "copy to ${node}"
-if [ "${MASTER}" == "${node}" ]; then
-echo "not copying... is the master!"
-else
-scp -r ${RADARGUN_DIR}/* ${node}:${RADARGUN_DIR} > /dev/null
-fi
-done
+#for node in $@; do
+#echo "copy to ${node}"
+#if [ "${MASTER}" == "${node}" ]; then
+#echo "not copying... is the master!"
+#else
+parallel-scp -r -h /home/ndiegues/machines /home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT/ /home/ndiegues/radargun/target/distribution/
+#scp -r ${RADARGUN_DIR}/* ${node}:${RADARGUN_DIR} > /dev/null
+#fi
+#done
 }
 
 kill_java() {
@@ -121,6 +122,7 @@ rm -r ${LOGS_DIR}/*
 rm -r ${KEYS_DIR}/*
 rm -r ${DATA_PLACEMENT_DIR}/*
 rm -r ${MONITOR_DIR}/*
+killall -9 java
 }
 
 start_gossip_router() {
@@ -132,7 +134,7 @@ wait_until_test_finish() {
 local MASTER_PID="";
 #30 minutes max waiting time (+ estimated test duration)
 for ((j = 0; j < 60; ++j)); do
-MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | awk '{print $2}'`
+MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | grep "ndiegues" | awk '{print $2}'`
 echo "Checking if the master finished..."
 if [ -z "${MASTER_PID}" ]; then
 echo "Master finished! No PID found! returning... @" `date`
@@ -189,7 +191,7 @@ wait_until_test_finish
 
 echo "kill all java";
 ./bin/master.sh -stop
-kill_java ${nodes}
+#kill_java ${nodes}
 save_logs ${i} ${nodes}
 save_keys ${i} ${nodes}
 save_dataplacement ${i} ${nodes}
@@ -221,7 +223,7 @@ cp ${RADARGUN_DIR}/plugins/infinispan4/conf/ispn.xml config/ > /dev/null
 cp ${RADARGUN_DIR}/plugins/infinispan4/conf/jgroups/jgroups.xml config/ > /dev/null
 
 echo "all complete! cleaning nodes..."
-clean_master
-clean_slaves ${nodes}
+#clean_master
+#clean_slaves ${nodes}
 }
 

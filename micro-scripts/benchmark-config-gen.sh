@@ -114,7 +114,7 @@ echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
 echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}
 echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
-echo "            remote=\"${REM}\"" >> ${DEST_FILE}
+echo "            remote=\"${REMOTE}\"" >> ${DEST_FILE}
 echo "            writeRatio=\"${WRITE_RATIO}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
