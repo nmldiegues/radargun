@@ -13,6 +13,7 @@ ITEMS=128
 RANGE=1024
 DURATION=10000
 WRITE_RATIO=10
+REMOTE=5
 SET="ll"
 TO="false"
 CACHE_CONFIG_FILE="ispn.xml"
@@ -62,6 +63,7 @@ case $1 in
   -r) RANGE=$2; shift 2;;
   -d) DURATION=$2; shift 2;;
   -w) WRITE_RATIO=$2; shift 2;;
+  -rem) REMOTE=$2; shift 2;;
   -s) SET=$2; shift 2;;
   -to) TO=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
@@ -112,6 +114,7 @@ echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            range=\"${RANGE}\"" >> ${DEST_FILE}
 echo "            duration=\"${DURATION}\"" >> ${DEST_FILE}
 echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
+echo "            remote=\"${REM}\"" >> ${DEST_FILE}
 echo "            writeRatio=\"${WRITE_RATIO}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
