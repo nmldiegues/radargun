@@ -15,11 +15,11 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 10, 20, 40, 60, 80, 120, 160 };
+    public static final int[] POSSIBLE_NODES = { 30, 50, 100, 130, 150 };
     public static final String[] ALGS = { "gmu", "twc" };
     public static final String[] BENCHS = { "micro" };
     public static final String[] TOS = { "", "to" };
-    public static final int ATTEMPTS = 1;
+    public static final int ATTEMPTS = 3;
 
     public static class Result {
         public List<Double> throughput = new ArrayList<Double>();
@@ -63,14 +63,13 @@ public class AllBenchmarks {
     }
 
     public static void main(String[] args) {
-            gmuVersusTWC(args);
+//            gmuVersusTWC(args);
 //        totalOrder(args);
-//            normalWorkloadWithTO(args, 3);
-//            normalWorkloadWithTO(args, 7);
+            normalWorkloadWithTO(args);
     }
 
     // normal workload and what TO does on top of it
-    protected static void normalWorkloadWithTO(String[] args, int pos) {
+    protected static void normalWorkloadWithTO(String[] args) {
         // Benchmark -> Nodes -> Algorithm -> totalOrder
         Map<String, Map<Integer, Map<String, Map<Boolean, Result>>>> allData = new HashMap<String, Map<Integer, Map<String, Map<Boolean, Result>>>>();
         for (String benchmark : BENCHS) {
@@ -84,9 +83,9 @@ public class AllBenchmarks {
                         for (int a = 0; a < ATTEMPTS; a++) {
                             List<String> content;
                             if (to.equals("to")) {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-to-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (a+1) + ".csv");
                             } else {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + pos + "-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
                             }
                             content.remove(0);
                             double throughput = 0.0;
@@ -136,8 +135,8 @@ public class AllBenchmarks {
 //                output += " " + roundTwoDecimals(avgTWC) + " " + roundTwoDecimals(avgTWCTO);
 //                outputA += " " + roundTwoDecimals(abortsTWC) + " " + roundTwoDecimals(abortsTWCTO);
             }
-            writeToFile(args[0] + "/results/to-" + benchmark + "-" + pos + "-throughput.output", output);
-            writeToFile(args[0] + "/results/to-" + benchmark + "-" + pos + "-aborts.output", outputA);
+            writeToFile(args[0] + "/results/to-" + benchmark + "-throughput.output", output);
+            writeToFile(args[0] + "/results/to-" + benchmark + "-aborts.output", outputA);
         }
     }
     

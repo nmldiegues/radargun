@@ -199,19 +199,12 @@ public class TpccPopulation {
 
    protected void populateWarehouses() {
       log.trace("Populate warehouses");
-      if (this.numWarehouses > 0) {
-         for (int warehouseId = 1; warehouseId <= this.numWarehouses; warehouseId++) {
-            log.info("Populate Warehouse " + warehouseId);
-            if (this.slaveIndex == 0) {// Warehouse assigned to node 0 if I have more than one node
-               txAwarePut(createWarehouse(warehouseId));
-            }
-            populateStock(warehouseId);
+      log.info("Populate Warehouse " + (slaveIndex + 1));
+      txAwarePut(createWarehouse(slaveIndex + 1));
+      populateStock(slaveIndex + 1);
+      populateDistricts(slaveIndex + 1);
 
-            populateDistricts(warehouseId);
-
-            printMemoryInfo();
-         }
-      }
+      printMemoryInfo();
    }
 
    protected void populateStock(int warehouseId) {
@@ -224,18 +217,6 @@ public class TpccPopulation {
       long init_id_item = 1;
       long num_of_items = TpccTools.NB_MAX_ITEM;
 
-      if (numSlaves > 1) {
-         num_of_items = TpccTools.NB_MAX_ITEM / numSlaves;
-         long remainder = TpccTools.NB_MAX_ITEM % numSlaves;
-
-         init_id_item = (slaveIndex * num_of_items) + 1;
-
-         if (slaveIndex == numSlaves - 1) {
-            num_of_items += remainder;
-         }
-
-
-      }
       logStockPopulation(warehouseId, init_id_item, init_id_item - 1 + num_of_items);
       for (long stockId = init_id_item; stockId <= (init_id_item - 1 + num_of_items); stockId++) {
          txAwarePut(createStock(stockId, warehouseId));
@@ -252,19 +233,6 @@ public class TpccPopulation {
       int init_districtId = 1;
       int num_of_districts = TpccTools.NB_MAX_DISTRICT;
 
-      if (numSlaves > 1) {
-         num_of_districts = TpccTools.NB_MAX_DISTRICT / numSlaves;
-         int remainder = TpccTools.NB_MAX_DISTRICT % numSlaves;
-
-         if (slaveIndex <= remainder) {
-            init_districtId = (slaveIndex * (num_of_districts + 1)) + 1;
-         } else {
-            init_districtId = (((remainder) * (num_of_districts + 1)) + ((slaveIndex - remainder) * num_of_districts)) + 1;
-         }
-         if (slaveIndex < remainder) {
-            num_of_districts += 1;
-         }
-      }
       logDistrictPopulation(warehouseId, init_districtId, init_districtId - 1 + num_of_districts);
       for (int districtId = init_districtId; districtId <= (init_districtId - 1 + num_of_districts); districtId++) {
          txAwarePut(createDistrict(districtId, warehouseId));
