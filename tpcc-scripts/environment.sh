@@ -141,7 +141,7 @@ echo "Master finished! No PID found! returning... @" `date`
 return;
 fi
 echo "Master is running. PID is ${MASTER_PID}. @" `date`
-sleep 30s
+sleep 5s
 done
 echo "Timeout!! Master is running. PID is ${MASTER_PID}. @" `date`
 }
