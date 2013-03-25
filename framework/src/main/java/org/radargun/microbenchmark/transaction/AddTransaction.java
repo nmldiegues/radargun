@@ -25,7 +25,6 @@ public class AddTransaction implements MicrobenchmarkTransaction {
     public boolean executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
         LocatedKey key = cacheWrapper.createKey("SET" + node, node);
         IntSet set = (IntSet)cacheWrapper.get(null, key);
-System.out.println("AddTransaction: " + key + " -- " + value + " remote? " + remote + " node- " + node);
         boolean res = set.add(cacheWrapper, this.value, local, remote);
 //        if (totalOrder && remote) {
 //            int otherNode = (node + 1) % MicrobenchmarkStressor.clients;
@@ -33,7 +32,6 @@ System.out.println("AddTransaction: " + key + " -- " + value + " remote? " + rem
 //            set = (IntSet)cacheWrapper.get(null, key);
 //            set.add(cacheWrapper, this.value, local, remote);    
 //        }
-System.out.println("\t" + res);
         return res;
     }
 

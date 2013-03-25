@@ -17,11 +17,11 @@ public final class TpccTools {
 
    public static final int NB_MAX_DISTRICT = 10;
 
-   public static final long NB_MAX_ITEM = 100000;
+   public static final long NB_MAX_ITEM = 10000; // 100000
 
-   public static final int NB_MAX_CUSTOMER = 3000;
+   public static final int NB_MAX_CUSTOMER = 50; // 3000
 
-   public static final int NB_MAX_ORDER = 3000;
+   public static final int NB_MAX_ORDER = 50; // 3000
 
    public static final String CHAINE_5_1 = "11111";
 

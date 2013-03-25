@@ -77,7 +77,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
         int k = Math.abs(Math.abs(m_random.nextInt()) % 100);
         int node = -1;
 	boolean remote = false;
-        if (k < this.remote) {
+        if (k < (this.remote * 2)) {
 	    remote = true;
             node = Math.abs(Math.abs(m_random.nextInt()) % clients);
         } else {
@@ -91,7 +91,7 @@ public class MicrobenchmarkStressor extends AbstractCacheWrapperStressor impleme
                 if (processTransaction(cacheWrapper, new AddTransaction(node, m_last, local, remote, totalOrder)))
                     m_write = false;
             } else {
-                processTransaction(cacheWrapper, new RemoveTransaction(node, m_last, local, remote, totalOrder));
+                processTransaction(cacheWrapper, new RemoveTransaction(cacheWrapper.getMyNode(), m_last, local, remote, totalOrder));
                 m_write = true;
             }
         } else {

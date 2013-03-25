@@ -25,15 +25,13 @@ public class RemoveTransaction implements MicrobenchmarkTransaction {
     public boolean executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
         LocatedKey key = cacheWrapper.createKey("SET" + node, node);
         IntSet intset = ((IntSet)cacheWrapper.get(null, key));
-System.out.println("RemoveTransaction: " + key + " -- " + value + " remote? " + remote + " node- " + node);
-        boolean res = intset.remove(cacheWrapper, this.value, local, remote);
+        boolean res = intset.remove(cacheWrapper, this.value, local, false);
 //        if (totalOrder && remote) {
 //            int otherNode = (node + 1) % MicrobenchmarkStressor.clients;
 //            key = cacheWrapper.createKey("SET" + otherNode, otherNode);
 //            intset = (IntSet)cacheWrapper.get(null, key);
 //            intset.remove(cacheWrapper, this.value, local, remote);      
 //        }
-System.out.println("\t" + res);
         return res;
     }
 
