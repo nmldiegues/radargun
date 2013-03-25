@@ -29,7 +29,7 @@ public final class TpccTools {
 
    public final static int MAX_C_LAST = 999;
 
-   public final static String[] C_LAST = {"BAR", "OUGHT", "ABLE", "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING"};
+   public final static String[] C_LAST = {"BAR", "OUGHT","ABLE"/*, "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING"*/};
 
    public final static int LIMIT_ORDER = 2101;
 

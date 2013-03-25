@@ -136,7 +136,7 @@ public class TpccPopulation {
          alea = "0" + alea;
       }
       for (int i = 0; i < 3; i++) {
-         c_last += TpccTools.C_LAST[Integer.parseInt(alea.substring(i, i + 1))];
+         c_last += TpccTools.C_LAST[(Integer.parseInt(alea.substring(i, i + 1))) % TpccTools.C_LAST.length];
       }
       return c_last;
    }
