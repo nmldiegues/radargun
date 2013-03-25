@@ -77,21 +77,11 @@ public class TpccPopulation {
    }
 
    public void performPopulation(){
-       boolean successful = false;
-       try {
-           while (!successful) {
-           this.wrapper.startTransaction(false);
       initializeToolsParameters();
 
       populateItem();
 
       populateWarehouses();
-      this.wrapper.endTransaction(true);
-      successful = true;
-           }
-       } catch (Exception e) {
-           this.wrapper.endTransaction(false);
-       }
 
       System.gc();
    }
