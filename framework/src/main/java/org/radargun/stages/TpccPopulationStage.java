@@ -87,7 +87,7 @@ public class TpccPopulationStage extends AbstractDistStage{
    private void populate(CacheWrapper wrapper) {
       TpccPopulationStressor populationStressor = new TpccPopulationStressor();
       populationStressor.setNumWarehouses(numWarehouses);
-      populationStressor.setSlaveIndex(getSlaveIndex());
+      populationStressor.setSlaveIndex(wrapper.getMyNode());
       populationStressor.setNumSlaves(getActiveSlaveCount());
       populationStressor.setCLastMask(this.cLastMask);
       populationStressor.setOlIdMask(this.olIdMask);
