@@ -95,9 +95,8 @@ public class PaymentTransaction implements TpccTransaction {
    }
 
    private String lastName(int num) {
-      return TpccTerminal.nameTokens[num / 100] + TpccTerminal.nameTokens[(num / 10) % 10] + TpccTerminal.nameTokens[num % 10];
+      return TpccTerminal.nameTokens[(num / 100) % TpccTerminal.nameTokens.length] + TpccTerminal.nameTokens[(num / 10) % TpccTerminal.nameTokens.length] + TpccTerminal.nameTokens[num % TpccTerminal.nameTokens.length];
    }
-
 
    private void paymentTransaction(final CacheWrapper cacheWrapper) throws Throwable {
       String w_name;
