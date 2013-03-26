@@ -110,7 +110,6 @@ public class PaymentTransaction implements TpccTransaction {
 
       String c_data, c_new_data, h_data;
 
-
       final Warehouse w = new Warehouse();
       w.setW_id(terminalWarehouseID);
 
