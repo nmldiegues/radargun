@@ -573,8 +573,10 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
          boolean isReadOnly;
          boolean successful;
          transaction = null;
+         boolean notfound = false;
 
          while (assertRunning()) {
+             notfound = false;
             successful = true;
 
             long start = System.nanoTime();
@@ -629,6 +631,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
                   log.warn("Exception while executing transaction: " + e.getMessage());
                }
                if (e instanceof ElementNotFoundException) {
+        	   notfound = true;
                   this.appFailures++;
                }
             }
@@ -725,7 +728,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
                this.commitWriteDuration += end - commit_start;
             }
 
-            if (successful) {
+            if (successful || notfound) {
         	transaction = null;
             }
             
