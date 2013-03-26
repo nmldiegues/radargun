@@ -975,6 +975,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
 
    private Stressor createStressor(int threadIndex) {
       int localWarehouse = getWarehouseForThread(threadIndex);
+System.out.println("~~~~~~~~~~~~~~~~~local warehouse: " + localWarehouse + " ~~~~~~~~~~~~~~~~~~");
       return new Stressor(localWarehouse, threadIndex, nodeIndex, arrivalRate, paymentWeight,orderStatusWeight);
    }
 
