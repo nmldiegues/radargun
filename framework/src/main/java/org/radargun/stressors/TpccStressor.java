@@ -572,44 +572,46 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
 
          boolean isReadOnly;
          boolean successful;
+         transaction = null;
 
          while (assertRunning()) {
             successful = true;
-            transaction = null;
 
             long start = System.nanoTime();
-            if (arrivalRate != 0.0) {  //Open system
-               try {
-                  RequestType request = queue.take();
+            if (transaction == null) {
+        	if (arrivalRate != 0.0) {  //Open system
+        	    try {
+        		RequestType request = queue.take();
 
-                  endInQueueTime = System.nanoTime();
+        		endInQueueTime = System.nanoTime();
 
-                  if (request.transactionType == TpccTerminal.NEW_ORDER) {
-                     numWriteDequeued++;
-                     numNewOrderDequeued++;
-                     writeInQueueTime += endInQueueTime - request.timestamp;
-                     newOrderInQueueTime += endInQueueTime - request.timestamp;
-                  } else if (request.transactionType == TpccTerminal.PAYMENT) {
-                     numWriteDequeued++;
-                     numPaymentDequeued++;
-                     writeInQueueTime += endInQueueTime - request.timestamp;
-                     paymentInQueueTime += endInQueueTime - request.timestamp;
-                  } else if (request.transactionType == TpccTerminal.ORDER_STATUS) {
-                     numReadDequeued++;
-                     readInQueueTime += endInQueueTime - request.timestamp;
-                  }
+        		if (request.transactionType == TpccTerminal.NEW_ORDER) {
+        		    numWriteDequeued++;
+        		    numNewOrderDequeued++;
+        		    writeInQueueTime += endInQueueTime - request.timestamp;
+        		    newOrderInQueueTime += endInQueueTime - request.timestamp;
+        		} else if (request.transactionType == TpccTerminal.PAYMENT) {
+        		    numWriteDequeued++;
+        		    numPaymentDequeued++;
+        		    writeInQueueTime += endInQueueTime - request.timestamp;
+        		    paymentInQueueTime += endInQueueTime - request.timestamp;
+        		} else if (request.transactionType == TpccTerminal.ORDER_STATUS) {
+        		    numReadDequeued++;
+        		    readInQueueTime += endInQueueTime - request.timestamp;
+        		}
 
-                  transaction = terminal.createTransaction(request.transactionType);
-                  if (cacheWrapper.isPassiveReplication() &&
-                        ((cacheWrapper.isTheMaster() && transaction.isReadOnly()) ||
-                               (!cacheWrapper.isTheMaster() && !transaction.isReadOnly()))) {
-                     continue;
-                  }
-               } catch (InterruptedException ir) {
-                  log.error("»»»»»»»THREAD INTERRUPTED WHILE TRYING GETTING AN OBJECT FROM THE QUEUE«««««««");
-               }
-            } else {
-               transaction = terminal.choiceTransaction(cacheWrapper.isPassiveReplication(), cacheWrapper.isTheMaster());
+        		transaction = terminal.createTransaction(request.transactionType);
+        		if (cacheWrapper.isPassiveReplication() &&
+        			((cacheWrapper.isTheMaster() && transaction.isReadOnly()) ||
+        				(!cacheWrapper.isTheMaster() && !transaction.isReadOnly()))) {
+        		    continue;
+        		}
+        	    } catch (InterruptedException ir) {
+        		log.error("»»»»»»»THREAD INTERRUPTED WHILE TRYING GETTING AN OBJECT FROM THE QUEUE«««««««");
+        	    }
+        	} else {
+        	    transaction = terminal.choiceTransaction(cacheWrapper.isPassiveReplication(), cacheWrapper.isTheMaster());
+        	}
             }
             isReadOnly = transaction.isReadOnly();
 
@@ -723,6 +725,10 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
                this.commitWriteDuration += end - commit_start;
             }
 
+            if (successful) {
+        	transaction = null;
+            }
+            
             blockIfInactive();
          }
       }
