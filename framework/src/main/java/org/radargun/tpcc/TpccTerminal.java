@@ -18,7 +18,7 @@ public class TpccTerminal {
 
    public final static int NEW_ORDER = 1, PAYMENT = 2, ORDER_STATUS = 3, DELIVERY = 4, STOCK_LEVEL = 5;
 
-   public final static String[] nameTokens = {"BAR", "OUGHT", "ABLE"/*, "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING"*/};
+   public final static String[] nameTokens = {"BAR", "OUGHT"/*, "ABLE", "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING"*/};
 
    private double paymentWeight;
 
