@@ -2,6 +2,7 @@ package org.radargun.tpcc.transaction;
 
 import org.radargun.CacheWrapper;
 import org.radargun.IDelayedComputation;
+import org.radargun.LocatedKey;
 import org.radargun.tpcc.ElementNotFoundException;
 import org.radargun.tpcc.TpccTerminal;
 import org.radargun.tpcc.TpccTools;
@@ -113,14 +114,18 @@ public class PaymentTransaction implements TpccTransaction {
 
       boolean found = w.load(cacheWrapper, ((int) terminalWarehouseID - 1));
       if (!found) throw new ElementNotFoundException("W_ID=" + terminalWarehouseID + " not found!");
+      
+      final String warehouseYtdKey = w.getKeyW_ytd();
       // delay computation
       cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
         public Collection getIAffectedKeys() {
-            return Collections.singleton(w.getKeyW_ytd());
+            return Collections.singleton(warehouseYtdKey);
         }
 
         public Void computeI() {
-            w.incW_ytd(cacheWrapper, ((int) terminalWarehouseID - 1), paymentAmount);
+            LocatedKey key = cacheWrapper.createKey(warehouseYtdKey, ((int) terminalWarehouseID - 1));
+            double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
+            cacheWrapper.putDelayed(key, newValue);
             return null;
         }
       });
@@ -134,14 +139,18 @@ public class PaymentTransaction implements TpccTransaction {
       found = d.load(cacheWrapper, ((int) terminalWarehouseID - 1));
       if (!found) throw new ElementNotFoundException("D_ID=" + districtID + " D_W_ID=" + terminalWarehouseID + " not found!");
 
+      final String districtYtdKey = d.getKeyD_ytd();
+      
       // delay computation
       cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
           public Collection getIAffectedKeys() {
-              return Collections.singleton(d.getKeyD_ytd());
+              return Collections.singleton(districtYtdKey);
           }
 
           public Void computeI() {
-              d.incD_ytd(cacheWrapper, ((int) terminalWarehouseID - 1), paymentAmount);
+              LocatedKey key = cacheWrapper.createKey(districtYtdKey, ((int) terminalWarehouseID - 1));
+              double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
+              cacheWrapper.putDelayed(key, newValue);
               return null;
           }
         });
@@ -183,15 +192,18 @@ public class PaymentTransaction implements TpccTransaction {
       }
       
       final Customer c = cW;
+      final String customerBalanceKey = c.getKeyC_balance();
 
       // Delay Computation
       cacheWrapper.delayComputation(new IDelayedComputation<Void>() {
           public Collection getIAffectedKeys() {
-              return Collections.singleton(c.getKeyC_balance());
+              return Collections.singleton(customerBalanceKey);
           }
 
           public Void computeI() {
-              c.incC_balance(cacheWrapper, ((int) customerWarehouseID - 1), paymentAmount);
+              LocatedKey key = cacheWrapper.createKey(customerBalanceKey, ((int) customerWarehouseID - 1));
+              double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
+              cacheWrapper.putDelayed(key, newValue);
               return null;
           }
       });

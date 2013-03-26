@@ -241,12 +241,6 @@ public class Customer implements Serializable, Comparable, DomainObject {
        TpccTools.put(wrapper, wrapper.createKey(getKeyC_balance(), nodeIndex), c_balance);
    }
    
-   public void incC_balance(CacheWrapper wrapper, int nodeIndex, double inc) {
-       LocatedKey key = wrapper.createKey(getKeyC_balance(), nodeIndex);
-       double newValue = ((Double) wrapper.getDelayed(key)) + inc;
-       wrapper.putDelayed(key, newValue);
-   }
-
    public void setC_ytd_payment(double c_ytd_payment) {
       this.c_ytd_payment = c_ytd_payment;
    }
