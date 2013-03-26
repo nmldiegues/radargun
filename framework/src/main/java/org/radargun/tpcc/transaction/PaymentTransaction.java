@@ -83,9 +83,12 @@ public class PaymentTransaction implements TpccTransaction {
 
 
    }
+   
+   public static CacheWrapper WRAPPER;
 
    @Override
    public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
+       WRAPPER = cacheWrapper;
       paymentTransaction(cacheWrapper);
    }
 
@@ -122,9 +125,9 @@ public class PaymentTransaction implements TpccTransaction {
         }
 
         public Void computeI() {
-            LocatedKey key = cacheWrapper.createKey(warehouseYtdKey, ((int) terminalWarehouseID - 1));
-            double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
-            cacheWrapper.putDelayed(key, newValue);
+            LocatedKey key = WRAPPER.createKey(warehouseYtdKey, ((int) terminalWarehouseID - 1));
+            double newValue = ((Double) WRAPPER.getDelayed(key)) + paymentAmount;
+            WRAPPER.putDelayed(key, newValue);
             return null;
         }
       });
@@ -147,9 +150,9 @@ public class PaymentTransaction implements TpccTransaction {
           }
 
           public Void computeI() {
-              LocatedKey key = cacheWrapper.createKey(districtYtdKey, ((int) terminalWarehouseID - 1));
-              double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
-              cacheWrapper.putDelayed(key, newValue);
+              LocatedKey key = WRAPPER.createKey(districtYtdKey, ((int) terminalWarehouseID - 1));
+              double newValue = ((Double) WRAPPER.getDelayed(key)) + paymentAmount;
+              WRAPPER.putDelayed(key, newValue);
               return null;
           }
         });
@@ -200,9 +203,9 @@ public class PaymentTransaction implements TpccTransaction {
           }
 
           public Void computeI() {
-              LocatedKey key = cacheWrapper.createKey(customerBalanceKey, ((int) customerWarehouseID - 1));
-              double newValue = ((Double) cacheWrapper.getDelayed(key)) + paymentAmount;
-              cacheWrapper.putDelayed(key, newValue);
+              LocatedKey key = WRAPPER.createKey(customerBalanceKey, ((int) customerWarehouseID - 1));
+              double newValue = ((Double) WRAPPER.getDelayed(key)) + paymentAmount;
+              WRAPPER.putDelayed(key, newValue);
               return null;
           }
       });
