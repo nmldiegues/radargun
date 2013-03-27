@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.transaction.DeleteCustomerOperation;
 import org.radargun.stamp.vacation.transaction.MakeReservationOperation;
+import org.radargun.stamp.vacation.transaction.UpdateNumberCustomers;
 import org.radargun.stamp.vacation.transaction.UpdateTablesOperation;
 import org.radargun.stamp.vacation.transaction.VacationTransaction;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
@@ -81,12 +82,8 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	if (action == Definitions.ACTION_MAKE_RESERVATION) {
 	    result = new MakeReservationOperation(randomPtr, queryPerTx, queryRange, relations, readOnlyPerc, totalOrder);
 	} else if (action == Definitions.ACTION_DELETE_CUSTOMER) {
-	    result = new DeleteCustomerOperation(randomPtr, queryRange, relations, readOnlyPerc);
-	} else if (action == Definitions.ACTION_UPDATE_TABLES) {
-	    result = new UpdateTablesOperation(randomPtr, queryPerTx, queryRange, relations);
-	} else {
-	    assert (false);
-	}
+	    result = new UpdateNumberCustomers(randomPtr, queryRange);
+	} 
 	
 	return result;
     }
@@ -94,11 +91,8 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     public int selectAction(int r, int percentUser) {
 	if (r < percentUser) {
 	    return Definitions.ACTION_MAKE_RESERVATION;
-	} else if ((r & 1) == 1) {
+	} else 
 	    return Definitions.ACTION_DELETE_CUSTOMER;
-	} else {
-	    return Definitions.ACTION_UPDATE_TABLES;
-	}
     }
     
     @Override

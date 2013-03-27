@@ -41,6 +41,7 @@ public class VacationPopulation {
 		Random randomPtr = new Random();
 		randomPtr.random_alloc();
 		Manager managerPtr = new Manager(n);
+		managerPtr.putNumberResources(wrapper, 100);
 		
 		for (t = 0; t < 4; t++) {
 

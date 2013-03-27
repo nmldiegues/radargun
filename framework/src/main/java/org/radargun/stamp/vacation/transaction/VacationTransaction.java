@@ -7,6 +7,8 @@ import org.radargun.stamp.vacation.VacationStressor;
 
 public abstract class VacationTransaction {
 
+    protected static CacheWrapper WRAPPER;
+    
     protected boolean remote;
     protected int node;
 

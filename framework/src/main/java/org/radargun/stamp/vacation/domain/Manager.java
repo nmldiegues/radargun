@@ -94,13 +94,28 @@ public class Manager implements Serializable {
     public static final String ROOMS = "roomsTable";
     public static final String FLIGHTS = "flightsTable";
     public static final String CUSTOMERS = "customersTable";
-
+    public static final String NUMBER_RESOURCES = "numberResources";
+    
     private int node;
     
     public Manager() { }
     
     public Manager(int node) {
 	this.node = node;
+    }
+    
+    public LocatedKey getNumberResourcesKey(CacheWrapper cache) {
+        return cache.createKey(NUMBER_RESOURCES + ":manager:" + node, node);
+    }
+    
+    public void putNumberResources(CacheWrapper cache, int number) {
+        LocatedKey key =  cache.createKey(NUMBER_RESOURCES + ":manager:" + node, node);
+        Vacation.put(cache, key, number);
+    }
+    
+    int getNumberResources(CacheWrapper cache) {
+        LocatedKey key =  cache.createKey(NUMBER_RESOURCES + ":manager:" + node, node);
+        return (Integer) Vacation.get(cache, key);
     }
 
     void putCustomer(CacheWrapper cache, int id, Customer val) {
