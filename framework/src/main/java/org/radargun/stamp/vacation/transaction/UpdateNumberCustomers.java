@@ -31,7 +31,7 @@ public class UpdateNumberCustomers extends VacationTransaction {
       }
 
       public Void computeI() {
-          double newValue = ((Integer) WRAPPER.getDelayed(key1)) + 1;
+          Integer newValue = ((Integer) WRAPPER.getDelayed(key1)) + 1;
           WRAPPER.putDelayed(key1, newValue);
           return null;
       }

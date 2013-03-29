@@ -123,6 +123,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	    try {
 		transaction.executeTransaction(cacheWrapper);
 	    } catch (Throwable e) {
+e.printStackTrace();
 		successful = false;
 	    }
 
@@ -133,6 +134,7 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 		    setRestarts(getRestarts() + 1);
 		}
 	    } catch (Throwable rb) {
+rb.printStackTrace(); 
 		setRestarts(getRestarts() + 1);
 		successful = false;
 	    }
