@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
+import org.radargun.ycsb.transaction.InsertTx;
 import org.radargun.ycsb.transaction.RMW;
 import org.radargun.ycsb.transaction.Read;
 import org.radargun.ycsb.transaction.YCSBTransaction;
@@ -54,7 +55,8 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
         if (ran < YCSB.readOnly) {
             return new Read(keynum);
         } else {
-            return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount, totalOrder);
+            return new InsertTx(keynum, Math.abs(r.nextInt()), remote);
+            // return new RMW(keynum, Math.abs(r.nextInt()), remote, multiplereadcount, recordCount, totalOrder);
         }
     }
     

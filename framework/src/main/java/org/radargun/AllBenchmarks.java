@@ -15,11 +15,11 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 30, 50, 100, 130, 150 };
+    public static final int[] POSSIBLE_NODES = { 10, 20, 40, 60, 80, 100, 120, 140, 160 };
     public static final String[] ALGS = { "gmu", "twc" };
-    public static final String[] BENCHS = { "micro" };
+    public static final String[] BENCHS = { "tpcc" };
     public static final String[] TOS = { "", "to" };
-    public static final int ATTEMPTS = 3;
+    public static final int ATTEMPTS = 1;
 
     public static class Result {
         public List<Double> throughput = new ArrayList<Double>();
@@ -63,9 +63,9 @@ public class AllBenchmarks {
     }
 
     public static void main(String[] args) {
-//            gmuVersusTWC(args);
+            gmuVersusTWC(args);
 //        totalOrder(args);
-            normalWorkloadWithTO(args);
+//            normalWorkloadWithTO(args);
     }
 
     // normal workload and what TO does on top of it
@@ -92,8 +92,13 @@ public class AllBenchmarks {
                             int ab = 0;
                             for (String line : content) {
                                 String[] parts = line.split(",");
-                                throughput += Double.parseDouble(parts[1]);
-                                ab += Integer.parseInt(parts[2]);
+                                if (benchmark.equals("tpcc")) {
+                                    throughput += Double.parseDouble(parts[2]);
+                                    ab += Integer.parseInt(parts[11]);                                    
+                                } else {
+                                    throughput += Double.parseDouble(parts[1]);
+                                    ab += Integer.parseInt(parts[2]);
+                                }
                             }
                             result.throughput.add(throughput);
                             result.aborts.add((double)ab);
@@ -215,14 +220,19 @@ public class AllBenchmarks {
                 for (String alg : ALGS) {
                     Result result = new Result();
                     for (int a = 0; a < ATTEMPTS; a++) {
-                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
+                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (a+1) + ".csv");
                         content.remove(0);
                         double throughput = 0.0;
                         int ab = 0;
                         for (String line : content) {
                             String[] parts = line.split(",");
-                            throughput += Double.parseDouble(parts[1]);
-                            ab += Integer.parseInt(parts[2]);
+                            if (benchmark.equals("tpcc")) {
+                                throughput += Double.parseDouble(parts[2]);
+                                ab += Integer.parseInt(parts[11]);                                    
+                            } else {
+                                throughput += Double.parseDouble(parts[1]);
+                                ab += Integer.parseInt(parts[2]);
+                            }
                         }
                         result.throughput.add(throughput);
                         result.aborts.add((double)ab);
