@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.state.MasterState;
 import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBStressor;
@@ -72,7 +71,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 		Thread.sleep(executiontime);
 	    } catch (InterruptedException e) { }
 	    for (int t = 0; t < workers.length; t++) {
-		ycsbStressors[t].setPhase(VacationStressor.SHUTDOWN_PHASE);
+		ycsbStressors[t].setPhase(YCSBStressor.SHUTDOWN_PHASE);
 	    }
 	    for (int t = 0; t < workers.length; t++) {
 		workers[t].join();

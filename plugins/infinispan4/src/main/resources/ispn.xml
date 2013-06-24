@@ -22,7 +22,7 @@
                 concurrencyLevel="32"
                 writeSkewCheck="false"
                 useLockStriping="false"
-                lockAcquisitionTimeout="10000"/>
+                lockAcquisitionTimeout="500"/>
         <transaction
                 transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
@@ -34,9 +34,9 @@
                 lockingMode="OPTIMISTIC"
                 eagerLockSingleNode="false"
                 use1PcForAutoCommitTransactions="false"
-                autoCommit="true"
-		        ssiValidation="false"
-                />
+                autoCommit="true" >
+                <recovery enabled="false" />
+        </transaction>
         <jmxStatistics
                 enabled="true"/>
         <deadlockDetection
@@ -45,20 +45,20 @@
             <sync
                     replTimeout="15000" />
             <hash
-                    class="org.radargun.cachewrappers.CustomHashing"
-                    numVirtualNodes="1"
+                    numVirtualNodes="100"
                     numOwners="1"
-                    rehashEnabled="false"
-                    rehashRpcTimeout="600000"
-                    rehashWait="60000" />
+                    >
+                    <groups enabled="true" />
+            </hash>
             <l1
                     enabled="false"
                     onRehash="false"
                     lifespan="600000"
-                    invalidationThreshold="0" />
+                    invalidationThreshold="-1"
+                    cleanupTaskFrequency="600000" />
         </clustering>
         <customInterceptors>
-            <!-- <interceptor
+            <!--  <interceptor
                     after="org.infinispan.interceptors.InvocationContextInterceptor"
                     class="org.infinispan.distribution.wrappers.DistCustomStatsInterceptor"/>
             <interceptor

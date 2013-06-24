@@ -15,10 +15,10 @@ import java.util.Map;
 
 public class AllBenchmarks {
 
-    public static final int[] POSSIBLE_NODES = { 10, 20, 40, 60, 80, 100, 120, 140, 160 };
+    public static final int[] POSSIBLE_NODES = { 20, 40, 60, 80 };
     public static final String[] ALGS = { "gmu", "twc" };
-    public static final String[] BENCHS = { "tpcc" };
-    public static final String[] TOS = { "", "to" };
+    public static final String[] BENCHS = { "ycsb" };
+    public static final String[] TOS = { "dl", "to" };
     public static final int ATTEMPTS = 1;
 
     public static class Result {
@@ -63,9 +63,9 @@ public class AllBenchmarks {
     }
 
     public static void main(String[] args) {
-            gmuVersusTWC(args);
+//            gmuVersusTWC(args, 1);
 //        totalOrder(args);
-//            normalWorkloadWithTO(args);
+            normalWorkloadWithTO(args);
     }
 
     // normal workload and what TO does on top of it
@@ -85,7 +85,7 @@ public class AllBenchmarks {
                             if (to.equals("to")) {
                                 content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (a+1) + ".csv");
                             } else {
-                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-" + nodes + "-" + (a+1) + ".csv");
+                                content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-dl-" + nodes + "-" + (a+1) + ".csv");
                             }
                             content.remove(0);
                             double throughput = 0.0;
@@ -210,7 +210,7 @@ public class AllBenchmarks {
         }
     }
     
-    protected static void gmuVersusTWC(String[] args) {
+    protected static void gmuVersusTWC(String[] args, int pos) {
         // Benchmark -> Nodes -> Algorithm
         Map<String, Map<Integer, Map<String, Result>>> allData = new HashMap<String, Map<Integer, Map<String, Result>>>();
         for (String benchmark : BENCHS) {
@@ -220,7 +220,7 @@ public class AllBenchmarks {
                 for (String alg : ALGS) {
                     Result result = new Result();
                     for (int a = 0; a < ATTEMPTS; a++) {
-                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (a+1) + ".csv");
+                        List<String> content = getFileContent(args[0] + "/" + benchmark + "-" + alg + "-to-" + nodes + "-" + (1) + ".csv");
                         content.remove(0);
                         double throughput = 0.0;
                         int ab = 0;

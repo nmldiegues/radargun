@@ -7,28 +7,23 @@ import java.util.Map;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.microbenchmark.MicrobenchmarkStressor;
+import org.radargun.btree.BTreeStressor;
 import org.radargun.state.MasterState;
 
-public class MicrobenchmarkStage extends AbstractDistStage {
+public class BTreeBenchmarkStage extends AbstractDistStage {
 
     private static final String SIZE_INFO = "SIZE_INFO";
 
     private transient CacheWrapper cacheWrapper;
     
-    private transient MicrobenchmarkStressor[] microbenchmarkStressors;
+    private transient BTreeStressor[] btreeStressors;
     
-    int localThreads;
-    int range;
-    int duration;
-    int writeRatio;
-    int clients;
-    boolean totalOrder;
-    int remote;
-    
-    public void setRemote(int remote) {
-        this.remote = remote;
-    }
+    private String execMode;
+    private int remoteProb;
+    private int opPerTx;
+    private int keysSize;
+    private int seconds;
+    private int localThreads;
     
     @Override
     public DistStageAck executeOnSlave() {
@@ -39,34 +34,34 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	    return result;
 	}
 
-	log.info("Starting MicrobenchmarkBenchmarkStage: " + this.toString());
+	log.info("Starting BTreeBenchmarkStage: " + this.toString());
 	
-	microbenchmarkStressors = new MicrobenchmarkStressor[localThreads];
+	btreeStressors = new BTreeStressor[localThreads];
 	
-	for (int t = 0; t < microbenchmarkStressors.length; t++) {
-	    microbenchmarkStressors[t] = new MicrobenchmarkStressor(t);
-	    microbenchmarkStressors[t].setCacheWrapper(cacheWrapper);
-	    microbenchmarkStressors[t].setRange(range);
-	    microbenchmarkStressors[t].setClients(clients);
-	    microbenchmarkStressors[t].setWriteRatio(writeRatio);
-	    microbenchmarkStressors[t].setRemote(this.remote);
-	    microbenchmarkStressors[t].setTotalOrder(this.totalOrder);
+	for (int t = 0; t < btreeStressors.length; t++) {
+	    btreeStressors[t] = new BTreeStressor();
+	    btreeStressors[t].setCache(cacheWrapper);
+	    btreeStressors[t].setExecMode(execMode);
+	    btreeStressors[t].setRemoteProb(remoteProb);
+	    btreeStressors[t].setOpPerTx(opPerTx);
+	    btreeStressors[t].setKeysSize(keysSize);
+	    btreeStressors[t].setSeconds(seconds);
 	}
 	
 	try {
-	    Thread[] workers = new Thread[microbenchmarkStressors.length];
+	    Thread[] workers = new Thread[btreeStressors.length];
 	    for (int t = 0; t < workers.length; t++) {
-		workers[t] = new Thread(microbenchmarkStressors[t]);
+		workers[t] = new Thread(btreeStressors[t]);
 	    }
 	    for (int t = 0; t < workers.length; t++) {
 		workers[t].start();
 	    }
 	    try {
-		Thread.sleep(duration);
+		Thread.sleep(seconds * 1000);
 	    } catch (InterruptedException e) {
 	    }
 	    for (int t = 0; t < workers.length; t++) {
-		microbenchmarkStressors[t].setM_phase(MicrobenchmarkStressor.SHUTDOWN_PHASE);
+		btreeStressors[t].setM_phase(BTreeStressor.SHUTDOWN_PHASE);
 	    }
 	    
 	    for (int t = 0; t < workers.length; t++) {
@@ -78,14 +73,12 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 		    ", nodeIndex:" + super.getSlaveIndex() +
 		    ", cacheSize: " + cacheWrapper.getCacheSize();
 	    results.put(SIZE_INFO, sizeInfo);
-	    long aborts = 0L;
 	    double steps = 0.0;
 	    for (int t = 0; t < workers.length; t++) {
-		aborts += microbenchmarkStressors[t].getRestarts();
-		steps += microbenchmarkStressors[t].getSteps();
+		steps += btreeStressors[t].steps;
 	    }
-	    results.put("TOTAL_THROUGHPUT", ((steps * 1000) / duration) + "");
-	    results.put("TOTAL_RESTARTS", aborts + "");
+	    results.put("TOTAL_THROUGHPUT", ((steps) / seconds) + "");
+	    results.put("TOTAL_RESTARTS", 0 + "");
 	    log.info(sizeInfo);
 	    result.setPayload(results);
 	    return result;
@@ -127,54 +120,40 @@ public class MicrobenchmarkStage extends AbstractDistStage {
 	return success;
     }
     
-    public CacheWrapper getCacheWrapper() {
-        return cacheWrapper;
+    public String getExecMode() {
+        return execMode;
     }
-
-    public int getLocalThreads() {
-        return localThreads;
+    public void setExecMode(String execMode) {
+        this.execMode = execMode;
     }
-
-    public int getRange() {
-        return range;
+    public int getRemoteProb() {
+        return remoteProb;
     }
-    
-    public int getClients() {
-        return clients;
+    public void setRemoteProb(int remoteProb) {
+        this.remoteProb = remoteProb;
     }
-
-    public int getDuration() {
-        return duration;
+    public int getOpPerTx() {
+        return opPerTx;
     }
-
-    public int getWriteRatio() {
-        return writeRatio;
+    public void setOpPerTx(int opPerTx) {
+        this.opPerTx = opPerTx;
     }
-
-    public void setCacheWrapper(CacheWrapper cacheWrapper) {
-        this.cacheWrapper = cacheWrapper;
+    public int getKeysSize() {
+        return keysSize;
     }
-
+    public void setKeysSize(int keysSize) {
+        this.keysSize = keysSize;
+    }
+    public int getSeconds() {
+        return seconds;
+    }
+    public void setSeconds(int seconds) {
+        this.seconds = seconds;
+    }
     public void setLocalThreads(int localThreads) {
-        this.localThreads = localThreads;
+	this.localThreads = localThreads;
     }
-
-    public void setRange(int range) {
-        this.range = range;
-    }
-    
-    public void setClients(int clients) {
-        this.clients = clients;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public void setWriteRatio(int writeRatio) {
-        this.writeRatio = writeRatio;
-    }
-    public void setTotalOrder(boolean totalOrder) {
-	this.totalOrder = totalOrder;
+    public int getLocalThreads() {
+	return this.localThreads;
     }
 }

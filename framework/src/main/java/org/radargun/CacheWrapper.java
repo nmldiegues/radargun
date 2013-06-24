@@ -3,7 +3,9 @@ package org.radargun;
 
 import org.radargun.utils.TypedProperties;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * CacheWrappers wrap caching products tp provide RadarGun with a standard way of
@@ -132,9 +134,16 @@ public interface CacheWrapper
    
    LocatedKey createKey(String key, int node);
    
-   void delayComputation(IDelayedComputation<?> computation);
+   LocatedKey createGroupingKey(String key, int group);
    
-   Object getDelayed(Object key);
+   int getLocalGrouping();
    
-   void putDelayed(Object key, Object value);
+   Object getMyAddress();
+   
+   List getAllAddresses();
+   
+   DEF createDEF();
+   
+   <T> DEFTask<T> createTask(Callable<T> callable);
+   
 }

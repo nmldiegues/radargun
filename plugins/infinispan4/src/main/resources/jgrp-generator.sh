@@ -114,7 +114,7 @@ echo "         />" >> ${DEST_FILE}
 #else
 #we don't have IP Multicast
 echo "   <TCPGOSSIP" >> ${DEST_FILE}
-echo "         initial_hosts=\"\${jgroups.gossip_host:10.100.0.1}[12001]\"" >> ${DEST_FILE}
+echo "         initial_hosts=\"\${jgroups.gossip_host:10.100.0.1}[13248]\"" >> ${DEST_FILE}
 #fi
 #Discover common properties
 echo "         num_initial_members=\"5\"" >> ${DEST_FILE}

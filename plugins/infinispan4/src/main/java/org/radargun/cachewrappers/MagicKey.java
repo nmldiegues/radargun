@@ -25,6 +25,14 @@ public class MagicKey implements LocatedKey, Serializable {
 	    remote++;
 	}
     }
+
+public String getKey() {
+	return null;
+}
+
+public int getGroup() {
+	return 0;
+}
     
     public MagicKey(String key, int baseNode, boolean totalOrder) {
 	this.key = key;

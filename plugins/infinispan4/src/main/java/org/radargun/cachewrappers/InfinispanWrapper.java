@@ -1,7 +1,26 @@
 package org.radargun.cachewrappers;
 
-import com.arjuna.ats.arjuna.common.arjPropertyManager;
-import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.radargun.utils.Utils.mBeanAttributes2String;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Callable;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.infinispan.AdvancedCache;
@@ -16,30 +35,16 @@ import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.radargun.CacheWrapper;
-import org.radargun.IDelayedComputation;
+import org.radargun.DEF;
+import org.radargun.DEFTask;
 import org.radargun.LocatedKey;
 import org.radargun.cachewrappers.parser.StatisticComponent;
 import org.radargun.cachewrappers.parser.StatsParser;
 import org.radargun.utils.TypedProperties;
 import org.radargun.utils.Utils;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.radargun.utils.Utils.mBeanAttributes2String;
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 
 public class InfinispanWrapper implements CacheWrapper {
    private static final String GET_ATTRIBUTE_ERROR = "Exception while obtaining the attribute [%s] from [%s]";
@@ -94,21 +99,6 @@ public class InfinispanWrapper implements CacheWrapper {
       blockForRehashing();
       injectEvenConsistentHash(confAttributes);
    }
-   
-   @Override
-    public void clusterFormed(int expected) {
-       ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-       if (ch instanceof CustomHashing) {
-           CustomHashing hash = (CustomHashing) ch;
-           while (hash.getAddressesSize() != expected) {
-               try {
-                   Thread.sleep(1000);
-               } catch (InterruptedException e) {}
-               hash = (CustomHashing) cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-           }
-           MagicKey.NODE_INDEX = hash.getMyId(cacheManager.getTransport().getAddress());
-       }
-    }
    
    @Override
     public int getMyNode() {
@@ -184,10 +174,6 @@ public class InfinispanWrapper implements CacheWrapper {
       assertTm();
       try {
          tm.begin();
-         if (!isReadOnly) {
-             cache.markAsWriteTransaction();
-         }
-         
          Transaction transaction = tm.getTransaction();
          if (enlistExtraXAResource) {
             transaction.enlistResource(new DummyXAResource());
@@ -237,15 +223,6 @@ public class InfinispanWrapper implements CacheWrapper {
    private void injectEvenConsistentHash(TypedProperties confAttributes) {
       if (cache.getConfiguration().getCacheMode().isDistributed()) {
          ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-         if (ch instanceof EvenSpreadingConsistentHash) {
-            int threadsPerNode = confAttributes.getIntProperty("threadsPerNode", -1);
-            if (threadsPerNode < 0) throw new IllegalStateException("When EvenSpreadingConsistentHash is used threadsPerNode must also be set.");
-            int keysPerThread = confAttributes.getIntProperty("keysPerThread", -1);
-            if (keysPerThread < 0) throw new IllegalStateException("When EvenSpreadingConsistentHash is used must also be set.");
-            ((EvenSpreadingConsistentHash)ch).init(threadsPerNode, keysPerThread);
-            log.info("Using an even consistent hash!");
-         }
-
       }
    }
 
@@ -469,21 +446,50 @@ public class InfinispanWrapper implements CacheWrapper {
    }
    
    public void setupTotalOrder() {
-       CustomHashing.totalOrder = true;
    }
 
    @Override
-   public void delayComputation(IDelayedComputation computation) {
-       cache.delayedComputation(new ConcreteDelayedComputation(computation));
+   public LocatedKey createGroupingKey(String key, int group) {
+       return new GroupingKey(key, group);
    }
 
+   private final Random random = new Random();
+   
    @Override
-   public Object getDelayed(Object key) {
-       return cache.delayedGet(key);
+   public int getLocalGrouping() {
+       ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+       Address me = transport.getAddress();
+       while (true) {
+	   int id = Math.abs(random.nextInt());
+	   if (ch.isKeyLocalToNode(me, "" + id)) {
+	       return id;
+	   }
+       }
+   }
+   
+   @Override
+   public Object getMyAddress() {
+       return transport.getAddress();
+   }
+   
+   @Override
+   public List getAllAddresses() {
+       return transport.getMembers();
+   }
+   
+   @Override
+   public DEF createDEF() {
+       return new ISPNDEF(cache);
+   }
+   
+   @Override
+   public <T> DEFTask<T> createTask(Callable<T> callable) {
+       return new ISPNDEFTask(callable);
    }
 
-   @Override
-   public void putDelayed(Object key, Object value) {
-       cache.delayedPut(key, value);
-   }
+@Override
+public void clusterFormed(int expected) {
+    // TODO Auto-generated method stub
+    
+}
 }
