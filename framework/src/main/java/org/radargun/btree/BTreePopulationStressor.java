@@ -45,6 +45,8 @@ public class BTreePopulationStressor extends AbstractCacheWrapperStressor{
 		    wrapper.put(null, key, "" + k);
 		}
 		wrapper.put(null, myAddr + "-id", "" + myGroup);
+		LocatedKey myKey = wrapper.createGroupingKey(myAddr + "-myKey", myGroup);
+		wrapper.put(null, myKey, "");
 System.err.println("Wrote " + keysSize + " keys; my id is " + myAddr + " " + myGroup);
 //		wrapper.endTransaction(true);
 //		successful = true;

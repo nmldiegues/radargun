@@ -35,6 +35,7 @@ import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.radargun.CacheWrapper;
+import org.radargun.CallableWrapper;
 import org.radargun.DEF;
 import org.radargun.DEFTask;
 import org.radargun.LocatedKey;
@@ -487,6 +488,16 @@ public class InfinispanWrapper implements CacheWrapper {
        return new ISPNDEFTask(callable);
    }
 
+   @Override
+   public <T> CallableWrapper<T> createCacheCallable(Callable<T> callable) {
+       return new CacheCallableWrapper<T>(callable);
+   }
+   
+   @Override
+   public <T> T execDEF(CallableWrapper<T> callable, Object key) throws Exception {
+       return cache.executeDEF((CacheCallableWrapper<T>) callable, key);
+   }
+   
 @Override
 public void clusterFormed(int expected) {
     // TODO Auto-generated method stub

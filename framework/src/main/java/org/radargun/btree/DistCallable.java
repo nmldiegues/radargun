@@ -16,46 +16,34 @@ import org.radargun.LocatedKey;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 
 
-    public class DistCallable implements Callable<Boolean>, Serializable {
+public class DistCallable implements Callable<Boolean>, Serializable {
 
-        private static final long serialVersionUID = -7433902731655964700L;
+    private static final long serialVersionUID = -7433902731655964700L;
 
-        private final int k;
-        private final int id;
-	private final int keysSize;
-	private final int opPerTx;
+    private final int k;
+    private final int id;
+    private final int keysSize;
+    private final int opPerTx;
 
-        public DistCallable(int k, int id, int keysSize, int opPerTx) {
-            this.k = k;
-            this.id = id;
-	    this.keysSize = keysSize;
-	    this.opPerTx = opPerTx;
-        }
-
-        @Override
-        public Boolean call() throws Exception {
-            boolean success = false;
-            try {
-                BTreeStressor.cache.startTransaction(true);
-                for (int i = 0; i < opPerTx; ++i) {
-                    LocatedKey key = BTreeStressor.cache.createGroupingKey("key"+ ((k + i) % keysSize), id);
-                    String res = (String) BTreeStressor.cache.get(null, key);
-                    if (res == null) {
-                        System.err.println("Problem: " + key + " " + key.getGroup() + " " + key.getKey() + " is null" + " id " + this.id);
-			Thread.sleep(1);
-			BTreeStressor.cache.endTransaction(false);
-			return true;
-                        //System.exit(1);
-                    }
-                }
-                BTreeStressor.cache.endTransaction(true);
-                success = true;
-            } catch (Exception e) {
-                System.err.println("Exception caught: " + e.getMessage());
-                e.printStackTrace();
-                System.exit(0);
-            }
-            return success;
-        }
-
+    public DistCallable(int k, int id, int keysSize, int opPerTx) {
+	this.k = k;
+	this.id = id;
+	this.keysSize = keysSize;
+	this.opPerTx = opPerTx;
     }
+
+    @Override
+    public Boolean call() throws Exception {
+	for (int i = 0; i < opPerTx; ++i) {
+	    LocatedKey key = BTreeStressor.cache.createGroupingKey("key"+ ((k + i) % keysSize), id);
+	    String res = (String) BTreeStressor.cache.get(null, key);
+	    if (res == null) {
+		System.err.println("Problem: " + key + " " + key.getGroup() + " " + key.getKey() + " is null" + " id " + this.id);
+		Thread.sleep(1);
+		return true;
+	    }
+	}
+	return true;
+    }
+
+}

@@ -85,32 +85,37 @@ System.err.println("Exec mode: " + execMode + " remote prob " + remoteProb + " o
     }
     
     protected void step(int phase) {
-	try {
+	Object myAddress = cache.getMyAddress();
+	boolean successful = false;
+	while (! successful) {
+	    try {
+		cache.startTransaction(false);
+		LocatedKey myKey = cache.createGroupingKey(myAddress + "-myKey", myGroup);
+		cache.put(null, myKey, "");
+		
+		boolean remote = (Math.abs(random.nextInt()) % 100) < remoteProb;
+		int k = Math.abs(random.nextInt()) % keysSize;
+		int id = !remote ? myGroup : groups[Math.abs(random.nextInt()) % groups.length];
 
-	    boolean remote = (Math.abs(random.nextInt()) % 100) < remoteProb;
-	    int k = Math.abs(random.nextInt()) % keysSize;
-	    int id = !remote ? myGroup : groups[Math.abs(random.nextInt()) % groups.length];
-
-	    DEFTask<Boolean> task = cache.createTask(new DistCallable(k, id, keysSize, opPerTx));
-	    boolean success = false;
-	    if (execMode.equals("DEF_LOCAL")) {
-		if (!remote) {
-		    success = task.justExecute();
+		if (execMode.equals("DEF_LOCAL")) {
+		    DEFTask<Boolean> task = cache.createTask(new DistCallable(k, id, keysSize, opPerTx));
+		    if (!remote) {
+			task.justExecute();
+		    } else {
+			Future<Boolean> answer = des.submit(task, cache.createGroupingKey("key" + k, id));
+			answer.get();
+		    }
+		} else if (execMode.equals("DEF")){
+		    cache.execDEF(cache.createCacheCallable(new DistCallable(k, id, keysSize, opPerTx)), cache.createGroupingKey("key" + k, id));
 		} else {
-		    Future<Boolean> answer = des.submit(task, cache.createGroupingKey("key" + k, id));
-		    success = answer.get();
+		    new DistCallable(k, id, keysSize, opPerTx).call();
 		}
-	    } else if (execMode.equals("DEF")){
-		Future<Boolean> answer = des.submit(task, cache.createGroupingKey("key" + k, id));
-		success = answer.get();
-	    } else {
-		success = task.justExecute();
-	    }
 
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    System.err.println("Should not have had an exception here..!");
-	    System.exit(1);
+		cache.endTransaction(true);
+		successful = true;
+	    } catch (Exception e) {
+		cache.endTransaction(false);
+	    }
 	}
     }
     

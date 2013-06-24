@@ -1,11 +1,11 @@
 package org.radargun;
 
 
-import org.radargun.utils.TypedProperties;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import org.radargun.utils.TypedProperties;
 
 /**
  * CacheWrappers wrap caching products tp provide RadarGun with a standard way of
@@ -146,4 +146,7 @@ public interface CacheWrapper
    
    <T> DEFTask<T> createTask(Callable<T> callable);
    
+   public <T> CallableWrapper<T> createCacheCallable(Callable<T> callable);
+   
+   public <T> T execDEF(CallableWrapper<T> callable, Object key) throws Exception;
 }
