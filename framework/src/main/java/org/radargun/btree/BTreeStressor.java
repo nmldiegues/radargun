@@ -106,9 +106,15 @@ System.err.println("Exec mode: " + execMode + " remote prob " + remoteProb + " o
 			answer.get();
 		    }
 		} else if (execMode.equals("DEF")){
-		    cache.execDEF(cache.createCacheCallable(new DistCallable(k, id, keysSize, opPerTx)), cache.createGroupingKey("key" + k, id));
+		    DistCallable task = new DistCallable(k, id, keysSize, opPerTx);
+		    if (!remote) {
+			task.call();
+		    } else {
+			cache.execDEF(cache.createCacheCallable(task), cache.createGroupingKey("key" + k, id));
+		    }
 		} else {
-		    new DistCallable(k, id, keysSize, opPerTx).call();
+		    DEFTask<Boolean> task = cache.createTask(new DistCallable(k, id, keysSize, opPerTx));
+		    task.justExecute();
 		}
 
 		cache.endTransaction(true);
