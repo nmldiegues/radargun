@@ -27,6 +27,7 @@ import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.config.Configuration;
 import org.infinispan.context.Flag;
+import org.infinispan.distexec.DefaultExecutorService;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.factories.ComponentRegistry;
@@ -34,6 +35,7 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
+import org.infinispan.transaction.TransactionCoordinator;
 import org.radargun.CacheWrapper;
 import org.radargun.CallableWrapper;
 import org.radargun.DEF;
@@ -93,6 +95,7 @@ public class InfinispanWrapper implements CacheWrapper {
             //just ignore
             isPassiveReplicationMethod = null;
          }
+         TransactionCoordinator.des = new DefaultExecutorService(cache);
       }
       log.debug("Loading JGroups from: " + org.jgroups.Version.class.getProtectionDomain().getCodeSource().getLocation());
       log.info("JGroups version: " + org.jgroups.Version.printDescription());
