@@ -1,11 +1,12 @@
 package org.radargun.cachewrappers;
 
+import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import org.infinispan.transaction.CacheCallable;
 import org.radargun.CallableWrapper;
 
-public class CacheCallableWrapper<T> extends CacheCallable<T> implements CallableWrapper<T> {
+public class CacheCallableWrapper<T> extends CacheCallable<T> implements CallableWrapper<T>, Serializable {
 
     private Callable<T> task;
     
