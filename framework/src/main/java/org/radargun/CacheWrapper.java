@@ -51,7 +51,15 @@ public interface CacheWrapper
    /**
     * @see #put(String, Object, Object)
     */
-   Object get(String bucket, Object key) throws Exception;
+   Object get(String bucket, Object key);
+   
+   Object get(Object key);
+   
+   Object getGhost(Object key);
+   
+   void registerKey(Object key);
+   
+   void put(Object key, Object value);
 
    /**
     * This is called after each test type (if emptyCacheBetweenTests is set to true in benchmark.xml) and is
@@ -136,6 +144,10 @@ public interface CacheWrapper
    
    LocatedKey createGroupingKey(String key, int group);
    
+   LocatedKey createGroupingKeyWithRepl(String key, int group, int repl);
+   
+   Map<Object,Integer> getGroups();
+   
    int getLocalGrouping();
    
    Object getMyAddress();
@@ -149,4 +161,6 @@ public interface CacheWrapper
    public <T> CallableWrapper<T> createCacheCallable(Callable<T> callable);
    
    public <T> T execDEF(CallableWrapper<T> callable, Object key) throws Exception;
+   
+   public void initDEF();
 }

@@ -63,10 +63,10 @@ public class BTreeStressor extends AbstractCacheWrapperStressor implements Runna
             groups = new int[others.size()];
             for (Object member : others) {
         	groups[i] = Integer.parseInt((String) cache.get(null, member + "-id"));
-System.err.println("Group " + member + " " + groups[i]);
+        	System.err.println("Group " + member + " " + groups[i]);
 		i++;
             }
-System.err.println("Exec mode: " + execMode + " remote prob " + remoteProb + " opPerTx " + opPerTx + " keysSize " + keysSize + " seconds " + seconds + " myGroup " + myGroup);
+            System.err.println("Exec mode: " + execMode + " remote prob " + remoteProb + " opPerTx " + opPerTx + " keysSize " + keysSize + " seconds " + seconds + " myGroup " + myGroup);
             cache.endTransaction(true);
         } catch (Exception e) {
             e.printStackTrace();

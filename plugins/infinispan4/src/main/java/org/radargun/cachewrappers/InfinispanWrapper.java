@@ -62,6 +62,8 @@ public class InfinispanWrapper implements CacheWrapper {
    private static Log log = LogFactory.getLog(InfinispanWrapper.class);
    DefaultCacheManager cacheManager;
    private Cache<Object, Object> cache;
+   private Cache<Object, Object> cacheNoRead;
+   private Cache<Object, Object> cacheGhost;
    TransactionManager tm;
    boolean started = false;
    String config;
@@ -85,6 +87,8 @@ public class InfinispanWrapper implements CacheWrapper {
             throw new IllegalStateException("The requested cache(" + cacheName + ") is not defined. Defined cache " +
                                                   "names are " + cacheNames);
          cache = cacheManager.getCache(cacheName);
+         cacheNoRead = cache.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
+         cacheGhost = cache.getAdvancedCache().withFlags(Flag.READ_WITHOUT_REGISTERING);
          started = true;
          tm = cache.getAdvancedCache().getTransactionManager();
          log.info("Using transaction manager: " + tm);
@@ -136,7 +140,7 @@ public class InfinispanWrapper implements CacheWrapper {
       }
    }
 
-   public Object get(String bucket, Object key) throws Exception {
+   public Object get(String bucket, Object key) {
       return cache.get(key);
    }
 
@@ -286,7 +290,7 @@ public class InfinispanWrapper implements CacheWrapper {
 
    @Override
    public boolean isTheMaster() {
-      return !isPassiveReplication() || transport.isCoordinator();
+      return transport.isCoordinator();
    }
 
    private boolean isPassiveReplicationWithSwitch() {
@@ -456,19 +460,43 @@ public class InfinispanWrapper implements CacheWrapper {
    public LocatedKey createGroupingKey(String key, int group) {
        return new GroupingKey(key, group);
    }
+   
+   @Override
+    public LocatedKey createGroupingKeyWithRepl(String key, int group, int repl) {
+	return new GroupingKey(key, group, repl);
+    }
 
    private final Random random = new Random();
    
+   private static transient Map<Object, Integer> groupMapping = null;
+   private static transient Integer myGroup = null; 
+   
+   @Override
+   public Map<Object, Integer> getGroups() {
+	if (groupMapping == null) {
+	    Map<Object, Integer> mapping = new HashMap<Object, Integer>();
+	    List<Address> members = cache.getCacheManager().getTransport().getMembers();
+	    ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+	    for (Address addr : members) {
+		for (int i = 1; ; i++) {
+		    if (ch.isKeyLocalToNode(addr, "" + i)) {
+			mapping.put(addr, i);
+			break;
+		    }
+		}
+	    }
+	    groupMapping = mapping;
+	}
+	return groupMapping;
+   }
+   
    @Override
    public int getLocalGrouping() {
-       ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-       Address me = transport.getAddress();
-       while (true) {
-	   int id = Math.abs(random.nextInt());
-	   if (ch.isKeyLocalToNode(me, "" + id)) {
-	       return id;
-	   }
-       }
+	if (myGroup == null) {
+	    Map<Object, Integer> groups = getGroups();
+	    myGroup = groups.get(cache.getCacheManager().getTransport().getAddress());
+	}
+	return myGroup;
    }
    
    @Override
@@ -501,9 +529,39 @@ public class InfinispanWrapper implements CacheWrapper {
        return cache.executeDEF((CacheCallableWrapper<T>) callable, key);
    }
    
-@Override
-public void clusterFormed(int expected) {
-    // TODO Auto-generated method stub
-    
-}
+   @Override
+   public void clusterFormed(int expected) {
+
+   }
+
+   @Override
+   public Object get(Object key) {
+       return this.cache.get(key);
+   }
+
+   @Override
+   public Object getGhost(Object key)  {
+       return this.cacheGhost.get(key);
+   }
+
+   @Override
+   public void registerKey(Object key) {
+       try {
+	   AdvancedCache advCache = cache.getAdvancedCache();
+	   advCache.getTxTable().getLocalTransaction(advCache.getTransactionManager().getTransaction()).addReadKey(key);
+       } catch (SystemException e) {
+	   e.printStackTrace();
+	   System.exit(-1);
+       }
+   }
+
+   @Override
+   public void put(Object key, Object value)  {
+       this.cacheNoRead.put(key, value);
+   }
+
+   @Override
+   public void initDEF() {
+       TransactionCoordinator.des = new DefaultExecutorService(this.cache);
+   }
 }

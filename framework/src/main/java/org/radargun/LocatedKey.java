@@ -6,4 +6,5 @@ public interface LocatedKey {
 
 	public String getKey();
 
+	public int getReplicationDegree();
 }

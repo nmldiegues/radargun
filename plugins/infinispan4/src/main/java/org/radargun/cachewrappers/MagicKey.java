@@ -57,4 +57,10 @@ public int getGroup() {
     public String toString() {
         return this.node + " owns " + this.key; 
     }
+
+    @Override
+    public int getReplicationDegree() {
+	// TODO Auto-generated method stub
+	return 0;
+    }
 }
