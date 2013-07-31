@@ -24,7 +24,7 @@
                 useLockStriping="false"
                 lockAcquisitionTimeout="500"/>
         <transaction
-                transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"
                 useEagerLocking="false"
                 transactionMode="TRANSACTIONAL"
                 syncRollbackPhase="false"
