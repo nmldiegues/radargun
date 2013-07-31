@@ -521,7 +521,7 @@ public class InfinispanWrapper implements CacheWrapper {
    }
 
    @Override
-   public <T> CallableWrapper<T> createCacheCallable(Callable<T> callable) {
+   public <T> CallableWrapper<T> createCacheCallable(CallableWrapper<T> callable) {
        return new CacheCallableWrapper<T>(callable);
    }
    

@@ -158,7 +158,7 @@ public interface CacheWrapper
    
    <T> DEFTask<T> createTask(Callable<T> callable);
    
-   public <T> CallableWrapper<T> createCacheCallable(Callable<T> callable);
+   public <T> CallableWrapper<T> createCacheCallable(CallableWrapper<T> callable);
    
    public <T> T execDEF(CallableWrapper<T> callable, Object key) throws Exception;
    

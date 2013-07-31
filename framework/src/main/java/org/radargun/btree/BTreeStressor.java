@@ -110,7 +110,8 @@ public class BTreeStressor extends AbstractCacheWrapperStressor implements Runna
 		    if (!remote) {
 			task.call();
 		    } else {
-			cache.execDEF(cache.createCacheCallable(task), cache.createGroupingKey("key" + k, id));
+			// cache.execDEF(cache.createCacheCallable(task), cache.createGroupingKey("key" + k, id));
+			throw new RuntimeException("fix this if needed");
 		    }
 		} else {
 		    DEFTask<Boolean> task = cache.createTask(new DistCallable(k, id, keysSize, opPerTx));

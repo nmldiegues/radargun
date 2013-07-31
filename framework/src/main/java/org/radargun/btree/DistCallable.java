@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.radargun.CacheWrapper;
+import org.radargun.CallableWrapper;
 import org.radargun.DEF;
 import org.radargun.DEFTask;
 import org.radargun.LocatedKey;

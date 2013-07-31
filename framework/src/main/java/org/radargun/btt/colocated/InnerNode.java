@@ -105,7 +105,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     public AbstractNode insert(boolean remote, Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {
 	    try {
-		return (AbstractNode) AbstractNode.executeDEF(new InsertRemoteTask(this, key, value, height, localRootsUUID, cutoffKey), super.parentKey);
+		return (AbstractNode) AbstractNode.executeDEF(BPlusTree.wrapper.createCacheCallable(new InsertRemoteTask(this, key, value, height, localRootsUUID, cutoffKey)), super.parentKey);
 	    } catch (Exception e) {
 		if (e instanceof RuntimeException) {
 		    throw (RuntimeException) e;
@@ -308,7 +308,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     public AbstractNode remove(boolean remote, Comparable key, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {
 	    try {
-		return (AbstractNode) AbstractNode.executeDEF(new RemoveRemoteTask(this, key, height, localRootsUUID, cutoffKey), super.parentKey);
+		return (AbstractNode) AbstractNode.executeDEF(BPlusTree.wrapper.createCacheCallable(new RemoveRemoteTask(this, key, height, localRootsUUID, cutoffKey)), super.parentKey);
 	    } catch (Exception e) {
 		if (e instanceof RuntimeException) {
 		    throw (RuntimeException) e;
@@ -646,7 +646,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     public boolean containsKey(boolean remote, Comparable key) {
 	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {
 	    try {
-		return (Boolean) AbstractNode.executeDEF(new ContainsRemoteTask(this, key), super.parentKey);
+		return (Boolean) AbstractNode.executeDEF(BPlusTree.wrapper.createCacheCallable(new ContainsRemoteTask(this, key)), super.parentKey);
 	    } catch (Exception e) {
 		if (e instanceof RuntimeException) {
 		    throw (RuntimeException) e;

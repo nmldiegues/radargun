@@ -8,15 +8,15 @@ import org.radargun.CallableWrapper;
 
 public class CacheCallableWrapper<T> extends CacheCallable<T> implements CallableWrapper<T>, Serializable {
 
-    private Callable<T> task;
+    private CallableWrapper<T> task;
     
-    public CacheCallableWrapper(Callable<T> task) {
+    public CacheCallableWrapper(CallableWrapper<T> task) {
 	this.task = task;
     }
     
     @Override
     public T call() throws Exception {
-	return this.task.call();
+	return this.task.doTask();
     }
 
     @Override
