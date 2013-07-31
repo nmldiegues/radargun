@@ -24,13 +24,13 @@
                 useLockStriping="false"
                 lockAcquisitionTimeout="500"/>
         <transaction
-                transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
                 useEagerLocking="false"
                 transactionMode="TRANSACTIONAL"
                 syncRollbackPhase="false"
                 cacheStopTimeout="30000"
                 useSynchronization="false"
-                syncCommitPhase="false"
+                syncCommitPhase="true"
                 lockingMode="OPTIMISTIC"
                 eagerLockSingleNode="false"
                 use1PcForAutoCommitTransactions="false"
@@ -43,9 +43,9 @@
                 enabled="false"/>
         <clustering mode="d">
             <sync
-                    replTimeout="15000" />
+                    replTimeout="150000000" />
             <hash
-                    numVirtualNodes="100"
+		    factory="org.radargun.cachewrappers.CustomHashingFactory"
                     numOwners="1"
                     >
                     <groups enabled="true" />
