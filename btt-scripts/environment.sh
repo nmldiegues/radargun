@@ -1,5 +1,5 @@
 # ENVIRONMENT VARIABLES
-MASTER=cloudtm.ist.utl.pt # this was modified!!!
+MASTER=10.100.0.1 # this was modified!!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`
@@ -127,7 +127,7 @@ killall -9 java
 
 start_gossip_router() {
 echo "start gossip router in ${MASTER}"
-java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 -bindaddress cloudtm > /dev/null &
+java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 -bindaddress 10.100.0.1 > /dev/null &
 }
 
 wait_until_test_finish() {
