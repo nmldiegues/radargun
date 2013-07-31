@@ -5,17 +5,17 @@ WORKING_DIR=`cd $(dirname $0); pwd`
 echo "loading environment..."
 . ${WORKING_DIR}/environment.sh
 
-EXEC_MODE=$1
-REMOTE_PROB=$2
-OP_PER_TX=$3
+READ_ONLY_PERC=$1
+DURATION=$2
+KEYS_SIZE=$3
+REPLICATION_DEGREES=$4
+COLOCATION=$5
+GHOST_READS=$6
+THREAD_MIGRATION=$7
 NR_NODES_TO_USE=`wc -l /home/ndiegues/machines | awk '{print $1}'`
 EST_DURATION="1"
 
-#ISPN_DEFAULT="-stats -write-skew -versioned -clustering-mode d -extended-stats -num-owner 1"
-#RADARGUN CONFIG
-#BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
-#TPC-C CONFIG
-BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 1 -e $EXEC_MODE -r $REMOTE_PROB -o $OP_PER_TX -k 10000 -d 40"
+BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -k $KEYS_SIZE -d $DURATION -ro $READ_ONLY_PERC -t $THREAD_MIGRATION -r $REPLICATION_DEGREES -l $COLOCATION -g $GHOST_READS"
 
 echo "============ INIT BENCHMARKING ==============="
 
