@@ -82,7 +82,7 @@ public class ColocationThread extends Thread {
 
 		    BPlusTree.wrapper.endTransaction(true);
 		    successful = true;
-		    if (groupFrom != - 1) {
+		    if (groupFrom != - 1 && groupTo != -1) {
 			System.out.println("Async ColocationThread moved Root " + toMove + " from " + this.keys[groupFrom].getGroup() + " to " + this.keys[groupTo].getGroup());
 		    }
 		} catch (Exception e) {
