@@ -39,6 +39,7 @@ case $1 in
   -ro) READ_ONLY_PERC=$2; shift 2;;
   -k) KEYS_SIZE=$2; shift 2;;
   -d) DURATION=$2; shift 2;;
+  -t) THREAD_MIGRATION=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
