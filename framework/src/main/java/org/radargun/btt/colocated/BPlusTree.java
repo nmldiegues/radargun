@@ -115,6 +115,12 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     public static boolean GHOST;
     public static boolean REPL_DEGREES;
     
+    transient ColocationThread colocationThread;
+    
+    public boolean colocate() {
+	return this.colocationThread.colocate();
+    }
+    
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
 	this.group = 1;
 	MEMBERS = clusterSize;
@@ -134,7 +140,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	setRoot(new LeafNode<T>(this.group));
 	
 	if (threadMigration) {
-	    new ColocationThread(this).start();
+	    this.colocationThread = new ColocationThread(this); //.start();
 	}
     }
     
