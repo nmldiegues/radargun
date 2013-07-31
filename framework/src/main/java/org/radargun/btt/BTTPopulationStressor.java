@@ -79,6 +79,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		    }
 		}
 	    }
+	    try { Thread.sleep(10000); } catch (Exception e) {}
 	}
     }
 

@@ -98,7 +98,9 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 		}
 	    } catch (Exception e) {
 		this.aborts++;
-		cache.endTransaction(false);
+		try {
+		    cache.endTransaction(false);
+		} catch (Exception e2) {}
 	    }
 	}
     }
