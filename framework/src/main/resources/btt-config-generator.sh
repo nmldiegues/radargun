@@ -83,7 +83,6 @@ echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 
 echo "      <BTTBenchmark" >> ${DEST_FILE}
-echo "		  clients=\"${CLIENTS}\"" >> ${DEST_FILE}
 echo "            readOnlyPerc=\"${READ_ONLY_PERC}\"" >> ${DEST_FILE}
 echo "            keysSize=\"${KEYS_SIZE}\"" >> ${DEST_FILE}
 echo "            seconds=\"${DURATION}\" />" >> ${DEST_FILE}
