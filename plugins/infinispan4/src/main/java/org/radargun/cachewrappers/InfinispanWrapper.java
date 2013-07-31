@@ -35,6 +35,7 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
+import org.infinispan.transaction.LocalTransaction;
 import org.infinispan.transaction.TransactionCoordinator;
 import org.radargun.CacheWrapper;
 import org.radargun.CallableWrapper;
@@ -548,7 +549,13 @@ public class InfinispanWrapper implements CacheWrapper {
    public void registerKey(Object key) {
        try {
 	   AdvancedCache advCache = cache.getAdvancedCache();
-	   advCache.getTxTable().getLocalTransaction(advCache.getTransactionManager().getTransaction()).addReadKey(key);
+	   javax.transaction.Transaction tx = advCache.getTransactionManager().getTransaction();
+	   if (tx != null) {
+               LocalTransaction localTx = advCache.getTxTable().getLocalTransaction(tx);
+               if (localTx != null) {
+                   localTx.addReadKey(key);
+               }
+           }
        } catch (SystemException e) {
 	   e.printStackTrace();
 	   System.exit(-1);
