@@ -118,7 +118,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     transient ColocationThread colocationThread;
     
     public boolean colocate() {
+	if (colocationThread != null) {
 	return this.colocationThread.colocate();
+	} else { return false; }
     }
     
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
