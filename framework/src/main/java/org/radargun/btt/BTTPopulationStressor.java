@@ -79,7 +79,9 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		    }
 		}
 	    }
-	    while (tree.colocate()) {}
+	    System.out.println("Starting colocation!");
+	    while (tree.colocate()) {System.out.println("Successful colocation!");}
+	    System.out.println("Finished colocation!");
 	    try { Thread.sleep(2000); } catch (Exception e) {}
 	}
     }
