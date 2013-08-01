@@ -90,7 +90,7 @@ public class JGroupsWrapper extends ReceiverAdapter implements CacheWrapper {
             }
          });
 
-         ch.connect("x");
+         ch.connect("asdkaskd");
          local_addr = ch.getAddress();
 
          started = true;

@@ -77,7 +77,7 @@ public class InfinispanWrapper implements CacheWrapper {
    public void setUp(String config, boolean isLocal, int nodeIndex, TypedProperties confAttributes) throws Exception {
       this.config = config;
       String configFile  = confAttributes.containsKey("file") ? confAttributes.getProperty("file") : config;
-      String cacheName = confAttributes.containsKey("cache") ? confAttributes.getProperty("cache") : "x";
+      String cacheName = confAttributes.containsKey("cache") ? confAttributes.getProperty("cache") : "asdkaskd";
 
       log.trace("Using config file: " + configFile + " and cache name: " + cacheName);
 
