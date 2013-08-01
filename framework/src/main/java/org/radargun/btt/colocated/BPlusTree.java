@@ -115,8 +115,16 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     public static boolean GHOST;
     public static boolean REPL_DEGREES;
     
+    transient ColocationThread colocationThread;
+    
+    public boolean colocate() {
+	if (colocationThread != null) {
+	return this.colocationThread.colocate();
+	} else { return false; }
+    }
+    
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
-	this.group = 1;
+	this.group = BPlusTree.myGroup();
 	MEMBERS = clusterSize;
 	COLOCATE = doColocation;
 	GHOST = ghostReads;
@@ -124,7 +132,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	this.rootKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("root-" + UUID.randomUUID(), 0, clusterSize) : wrapper.createGroupingKey("root-" + UUID.randomUUID(), 0);
 	this.localRootsUUID = UUID.randomUUID().toString();
 	this.cutoffKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("cutoff-" + UUID.randomUUID(), group, clusterSize) : wrapper.createGroupingKey("cutoff-" + UUID.randomUUID(), group);
-	int cutoff = (int)Math.floor(Math.log(clusterSize) / Math.log(MAX_NUMBER_OF_ELEMENTS));
+	int cutoff = (int)Math.ceil(Math.log(clusterSize) / Math.log(MAX_NUMBER_OF_ELEMENTS)) + 1;
 	System.out.println("Setting cutoff value: " + cutoff + " due to members: " + clusterSize + " and max number elements: " + MAX_NUMBER_OF_ELEMENTS);
 	if (cutoff < 2) {
 	    cutoff = 2;
@@ -134,7 +142,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	setRoot(new LeafNode<T>(this.group));
 	
 	if (threadMigration) {
-	    new ColocationThread(this).start();
+	    this.colocationThread = new ColocationThread(this); //.start();
 	}
     }
     

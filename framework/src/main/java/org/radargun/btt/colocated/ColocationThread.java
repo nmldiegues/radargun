@@ -31,8 +31,14 @@ public class ColocationThread extends Thread {
     
     @Override
     public void run() {
-	List<InnerNode>[] allRoots = new List[this.keys.length];
 	while (true) {
+	    colocate();
+	}
+    }
+    
+    public boolean colocate() {
+	List<InnerNode>[] allRoots = new List[this.keys.length];
+//	while (true) {
 	    sleep();
 	    
 	    boolean successful = false;
@@ -84,6 +90,7 @@ public class ColocationThread extends Thread {
 		    successful = true;
 		    if (groupFrom != - 1 && groupTo != -1) {
 			System.out.println("Async ColocationThread moved Root " + toMove + " from " + this.keys[groupFrom].getGroup() + " to " + this.keys[groupTo].getGroup());
+			return true;
 		    }
 		} catch (Exception e) {
 		    e.printStackTrace();
@@ -94,7 +101,8 @@ public class ColocationThread extends Thread {
 		    sleep();
 		}
 	    }
-	}
+//	}
+	    return false;
     }
     
     private void sleep() {

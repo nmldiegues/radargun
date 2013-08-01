@@ -79,7 +79,8 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		    }
 		}
 	    }
-	    try { Thread.sleep(10000); } catch (Exception e) {}
+	    while (tree.colocate()) {}
+	    try { Thread.sleep(2000); } catch (Exception e) {}
 	}
     }
 
