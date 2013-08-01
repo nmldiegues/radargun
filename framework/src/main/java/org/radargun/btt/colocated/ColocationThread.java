@@ -71,7 +71,7 @@ public class ColocationThread extends Thread {
 				    roots = new ArrayList<InnerNode>(roots);
 				    toMove = roots.remove(roots.size() - 1);
 				    
-				    toMove.startChangeGroup(this.keys[k].getGroup());
+				    toMove = toMove.startChangeGroup(this.keys[k].getGroup());
 				    otherRoots = new ArrayList<InnerNode>(otherRoots);
 				    otherRoots.add(toMove);
 				    BPlusTree.setLocalRoots(this.keys[i], roots);

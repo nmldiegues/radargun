@@ -9,7 +9,7 @@ import org.radargun.LocatedKey;
 public class InnerNode<T extends Serializable> extends AbstractNode<T> implements Serializable {
 
     // private DoubleArray<AbstractNode> subNodes;
-    private int group;		// this influences the key downwards
+    public int group;		// this influences the key downwards
     private LocatedKey keySubNodes;
     
     // called when a root (both inner or leaf-only) node overflows
@@ -161,8 +161,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             }
 
             if (farFromTop == cutoff) {
-        	final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + BPlusTree.myGroup(), BPlusTree.myGroup());
-        	BPlusTree.updateLocalRoots(localRootsKey, leftNode, rightNode, this);
+        	BPlusTree.updateLocalRoots(localRootsUUID, leftNode, rightNode, this);
             }
             
             InnerNode parent = this.getParent(false);
@@ -190,21 +189,20 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	if ((distanceToTop) == cutoff) {
 	    // fix every child
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
-	    final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + BPlusTree.myGroup(), BPlusTree.myGroup());
 	    
 	    if (treeDepth != cutoff) {
 		for (int i = 0; i < myChildren.values.length; i++) {
 		    InnerNode toRemove = ((InnerNode) myChildren.values[i]);
-		    BPlusTree.removeLocalRoot(localRootsKey, toRemove);
+		    BPlusTree.removeLocalRoot(localRootsUUID, toRemove);
 		}
 	    }
 
 	    if (!this.isPartial()) {
 		InnerNode toRet = this.switchToPartial();
-		BPlusTree.addLocalRoot(localRootsKey, toRet);
+		BPlusTree.addLocalRoot(localRootsUUID, toRet);
 		return toRet;
 	    } else {
-		BPlusTree.addLocalRoot(localRootsKey, this);
+		BPlusTree.addLocalRoot(localRootsUUID, this);
 		return null;
 	    }
 	} else {
@@ -232,14 +230,13 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	if ((distanceToTop + 1) == cutoff) {
 	    // fix every child
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
-	    final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + BPlusTree.myGroup(), BPlusTree.myGroup());
 	    
 	    for (int i = 0; i < myChildren.values.length; i++) {
 		InnerNode toAdd = ((InnerNode) myChildren.values[i]);
-		BPlusTree.addLocalRoot(localRootsKey, toAdd);
+		BPlusTree.addLocalRoot(localRootsUUID, toAdd);
 	    }
 
-	    BPlusTree.removeLocalRoot(localRootsKey, this);
+	    BPlusTree.removeLocalRoot(localRootsUUID, this);
 	    InnerNode toRet = this.switchToFull();
 	    return toRet;
 	} else {
@@ -261,8 +258,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     
     private InnerNode fallbackToPartial(String localRootsUUID, int cutoff, int distanceToTop, int treeDepth) {
 	if ((distanceToTop + 1) == cutoff) {
-	    final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + BPlusTree.myGroup(), BPlusTree.myGroup());
-	    BPlusTree.removeLocalRoot(localRootsKey, this);
+	    BPlusTree.removeLocalRoot(localRootsUUID, this);
 	    return this.switchToPartial();
 	} else {
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
@@ -465,8 +461,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         }
 
         if ((treeDepth - height) == cutoff) {
-            final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + BPlusTree.myGroup(), BPlusTree.myGroup());
-            BPlusTree.removeLocalRoot(localRootsKey, left);
+            BPlusTree.removeLocalRoot(localRootsUUID, left);
         }
         
         DoubleArray<AbstractNode> newArr = subNodes.mergeWith(splitKey, leftSubNodes);
@@ -714,12 +709,13 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         return str.toString();
     }
 
-    public void startChangeGroup(int newGroup) {
+    public InnerNode startChangeGroup(int newGroup) {
 	InnerNode newMe = (InnerNode) this.changeGroup(newGroup);
 	InnerNode parent = this.getParent(false);
 	newMe.setParent(parent);
 	DoubleArray<AbstractNode> parentsChildren = parent.getSubNodes(false);
 	parent.setSubNodes(parentsChildren.replaceChild(this, newMe));
+	return newMe;
     }
     
     public AbstractNode changeGroup(int newGroup) {

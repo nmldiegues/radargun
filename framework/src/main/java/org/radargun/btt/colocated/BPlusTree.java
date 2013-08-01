@@ -266,7 +266,8 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	return wrapper.getLocalGrouping();
     }
     
-    public static void addLocalRoot(LocatedKey localRootsKey, InnerNode localRoot) {
+    public static void addLocalRoot(String localRootsUUID, InnerNode localRoot) {
+	final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + localRoot.group, localRoot.group);
 	List<InnerNode> localRoots = getLocalRoots(localRootsKey);
 	if (localRoots == null) {
 	    localRoots = new ArrayList<InnerNode>();
@@ -277,7 +278,8 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	setLocalRoots(localRootsKey, localRoots);
     }
     
-    public static void removeLocalRoot(LocatedKey localRootsKey, InnerNode localRoot) {
+    public static void removeLocalRoot(String localRootsUUID, InnerNode localRoot) {
+	final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + localRoot.group, localRoot.group);
 	List<InnerNode> localRoots = getLocalRoots(localRootsKey);
 	
 	if (localRoots == null) {
@@ -302,19 +304,23 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	setLocalRoots(localRootsKey, localRoots);
     }
     
-    public static void updateLocalRoots(LocatedKey localRootsKey, InnerNode leftLocalRoot, InnerNode rightLocalRoot, InnerNode removeLocalRoot) {
-	List<InnerNode> localRoots = getLocalRoots(localRootsKey);
+    public static void updateLocalRoots(String localRootsUUID, InnerNode leftLocalRoot, InnerNode rightLocalRoot, InnerNode removeLocalRoot) {
+	int removeGroup = removeLocalRoot.group;
+	int addGroup = leftLocalRoot.group;
+	
+	LocatedKey key = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + removeGroup, removeGroup);
+	List<InnerNode> localRoots = getLocalRoots(key);
 	
 	if (localRoots == null) {
-	    System.out.println(Thread.currentThread().getId() + "] " + "Update: " + Arrays.toString(localRoots.toArray()) + " | remove " + removeLocalRoot + " | left " + leftLocalRoot + " | right " + rightLocalRoot + "\t" + localRootsKey);
-	    System.out.println(Thread.currentThread().getId() + "] " + "Should never try to remove a local root without a local root list: " + localRootsKey);
+	    System.out.println(Thread.currentThread().getId() + "] " + "Update: " + Arrays.toString(localRoots.toArray()) + " | remove " + removeLocalRoot + " | left " + leftLocalRoot + " | right " + rightLocalRoot + "\t" + key);
+	    System.out.println(Thread.currentThread().getId() + "] " + "Should never try to remove a local root without a local root list: " + key);
 	    System.exit(-1);
 	}
 	
 	localRoots = new ArrayList<InnerNode>(localRoots);
 	if (!localRoots.remove(removeLocalRoot)) {
 	    try {
-		System.out.println(Thread.currentThread().getId() + "] " + "Could not find node to remove in list: " + localRootsKey + " " + removeLocalRoot);
+		System.out.println(Thread.currentThread().getId() + "] " + "Could not find node to remove in list: " + key + " " + removeLocalRoot);
 		for (InnerNode lr : localRoots) {
 		    System.out.println(Thread.currentThread().getId() + "] " + lr + " ---> " + Arrays.toString(lr.getSubNodes(true).keys));
 		    System.out.println(Thread.currentThread().getId() + "] " + lr + " ---> " + Arrays.toString(lr.getSubNodes(true).values));
@@ -325,8 +331,16 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 		System.exit(-1);
 	    }
 	}
+	
+	if (removeGroup != addGroup) {
+	    setLocalRoots(key, localRoots);
+	    key = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + addGroup, addGroup);
+	    localRoots = getLocalRoots(key);
+	    localRoots = new ArrayList<InnerNode>(localRoots);
+	}
+	
 	localRoots.add(leftLocalRoot);
 	localRoots.add(rightLocalRoot);
-	setLocalRoots(localRootsKey, localRoots);
+	setLocalRoots(key, localRoots);
     }
 }
