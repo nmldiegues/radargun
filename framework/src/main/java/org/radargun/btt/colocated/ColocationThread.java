@@ -94,6 +94,7 @@ public class ColocationThread extends Thread {
 		BPlusTree.setLocalRoots(this.keys[s], source);
 
 		BPlusTree.wrapper.endTransaction(true);
+		successful = true;
 	    } catch (Exception e) {
 		e.printStackTrace();
 		try { BPlusTree.wrapper.endTransaction(false); } 
