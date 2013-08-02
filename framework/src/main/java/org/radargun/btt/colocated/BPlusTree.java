@@ -119,21 +119,6 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     transient ColocationThread colocationThread;
     
     public boolean colocate() {
-	InnerNode iter = (InnerNode) getRoot(false);
-	while (true) {
-	    System.out.println("Iterating: " + iter + " " + iter.group);
-	    if (iter.group > 0) {
-		System.out.println("Found partial, should have local roots");
-//		break;
-	    }
-	    AbstractNode node = (AbstractNode) iter.getSubNodes(false).values[0];
-	    if (node instanceof LeafNode) {
-		System.out.println("DID NOT find partial, reached leaf node");
-		break;
-	    }
-	    iter = (InnerNode) node;
-	}
-	
 	if (colocationThread != null) {
 	return this.colocationThread.colocate();
 	} else { return false; }
@@ -293,7 +278,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	if (localRoots == null) {
 	    localRoots = new ArrayList<InnerNode>();
 	}
-	System.out.println(Thread.currentThread().getId() + "] " + "Add: " + Arrays.toString(localRoots.toArray()) + " | add " + localRoot + "\t" + localRootsKey);
+//	System.out.println(Thread.currentThread().getId() + "] " + "Add: " + Arrays.toString(localRoots.toArray()) + " | add " + localRoot + "\t" + localRootsKey);
 	localRoots = new ArrayList<InnerNode>(localRoots);
 	localRoots.add(localRoot);
 	setLocalRoots(localRootsKey, localRoots);

@@ -170,11 +170,9 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             // propagate split to parent
             if (parent == null) {
         	// if we have depth 3, we want the cutoff to be on the 3rd level of inner nodes. since we are creating a new root we have +1 and +1 for the leaf level that we exclude from the cutoff
-        	System.out.println("(treeDepth + 1) > cutoff ???? (" + treeDepth + " + 1) > " + cutoff + ")");
         	if ((treeDepth + 1) > cutoff) {
         	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
         	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
-        	    System.out.println("Fixed local roots move up: " + possibleNew);
         	    return (possibleNew != null) ? possibleNew : newRoot;
         	} else {
         	    InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
