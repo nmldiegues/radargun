@@ -124,7 +124,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	    System.out.println("Iterating: " + iter + " " + iter.group);
 	    if (iter.group > 0) {
 		System.out.println("Found partial, should have local roots");
-		break;
+//		break;
 	    }
 	    AbstractNode node = (AbstractNode) iter.getSubNodes(false).values[0];
 	    if (node instanceof LeafNode) {
