@@ -132,6 +132,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	COLOCATE = doColocation;
 	GHOST = ghostReads;
 	REPL_DEGREES = replicationDegrees;
+	
 	this.rootKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("root-" + UUID.randomUUID(), 0, clusterSize) : wrapper.createGroupingKey("root-" + UUID.randomUUID(), 0);
 	this.localRootsUUID = UUID.randomUUID().toString();
 	this.cutoffKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("cutoff-" + UUID.randomUUID(), group, clusterSize) : wrapper.createGroupingKey("cutoff-" + UUID.randomUUID(), group);
