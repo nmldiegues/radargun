@@ -49,7 +49,7 @@ public class ColocationThread extends Thread {
 		List<InnerNode> source = null;
 		for (LocatedKey lrKey : this.keys) {
 		    allRoots[i] = BPlusTree.getLocalRoots(lrKey);
-		    if (allRoots != null && allRoots[i].size() > 0) {
+		    if (allRoots[i] != null && allRoots[i].size() > 0) {
 			source = allRoots[i];
 			s = i;
 		    }
