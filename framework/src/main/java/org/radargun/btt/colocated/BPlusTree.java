@@ -121,6 +121,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     public boolean colocate() {
 	InnerNode iter = (InnerNode) getRoot(false);
 	while (true) {
+	    System.out.println("Iterating: " + iter + " " + iter.group);
 	    if (iter.group > 0) {
 		System.out.println("Found partial, should have local roots");
 		break;
