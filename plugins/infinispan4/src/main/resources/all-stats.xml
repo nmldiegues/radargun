@@ -40,6 +40,10 @@
       <stat displayName="AvgNumNodesCommit" attributeName="AvgNumNodesCommit"/>
       <stat displayName="AvgNumNodesRollback" attributeName="AvgNumNodesRollback"/>
       <stat displayName="AvgNumNodesRemoteGet" attributeName="AvgNumNodesRemoteGet"/>
+      <stat displayName="AvgRemoteGetsPerWrTransaction" attributeName="AvgRemoteGetsPerWrTransaction"/>
+      <stat displayName="AvgRemoteGetsPerROTransaction" attributeName="AvgRemoteGetsPerROTransaction"/>
+      <stat displayName="AvgGetsPerWrTransaction" attributeName="AvgGetsPerWrTransaction"/>
+      <stat displayName="AvgGetsPerROTransaction" attributeName="AvgGetsPerROTransaction"/>
       <!--Local execution times-->
       <stat displayName="ExecNoCont(usec)" attributeName="LocalExecutionTimeWithoutLock"/>
       <stat displayName="AvgReadOnlyTxDuration(usec)" attributeName="AvgReadOnlyTxDuration"/>
