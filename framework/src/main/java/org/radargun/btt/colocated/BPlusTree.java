@@ -135,7 +135,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	this.rootKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("root-" + UUID.randomUUID(), 0, clusterSize) : wrapper.createGroupingKey("root-" + UUID.randomUUID(), 0);
 	this.localRootsUUID = UUID.randomUUID().toString();
 	this.cutoffKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("cutoff-" + UUID.randomUUID(), group, clusterSize) : wrapper.createGroupingKey("cutoff-" + UUID.randomUUID(), group);
-	int cutoff = (int)Math.ceil(Math.log(clusterSize) / Math.log(MAX_NUMBER_OF_ELEMENTS)) + 1;
+	int cutoff = (int)Math.ceil(Math.log(clusterSize) / Math.log(MAX_NUMBER_OF_ELEMENTS)) + 2;
 	System.out.println("Setting cutoff value: " + cutoff + " due to members: " + clusterSize + " and max number elements: " + MAX_NUMBER_OF_ELEMENTS);
 	if (cutoff < 2) {
 	    cutoff = 2;
