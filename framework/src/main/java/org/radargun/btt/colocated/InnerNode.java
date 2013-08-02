@@ -9,14 +9,12 @@ import org.radargun.LocatedKey;
 public class InnerNode<T extends Serializable> extends AbstractNode<T> implements Serializable {
 
     // private DoubleArray<AbstractNode> subNodes;
-    public int group;		// this influences the key downwards
     private LocatedKey keySubNodes;
     
     // called when a root (both inner or leaf-only) node overflows
     // the left and right node are the two nodes created after the split
     InnerNode(int group, AbstractNode leftNode, AbstractNode rightNode, Comparable splitKey) {
 	super(group);
-	this.group = super.group;
 	ensureKey();
 	setSubNodes(new DoubleArray<AbstractNode>(AbstractNode.class, splitKey, leftNode, rightNode));
         leftNode.setParent(this);
@@ -26,7 +24,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     // called when inner node overflows, this is used to create one of the sides of the split
     InnerNode(int group, DoubleArray<AbstractNode> subNodes) {
 	super(group);
-	this.group = super.group;
 	ensureKey();
         setSubNodes(subNodes);
         for (int i = 0; i < subNodes.length(); i++) { // smf: either don't do this or don't setParent when making new
@@ -36,7 +33,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     
     InnerNode(InnerNode toClone, boolean full) {
 	super(full ? -1 : BPlusTree.myGroup());
-	this.group = super.group;
 	ensureKey();
 	setParent(toClone.getParent(false));
 	DoubleArray<AbstractNode> subNodes = toClone.getSubNodes(false);
@@ -48,7 +44,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     
     InnerNode(InnerNode old, int newGroup) {
 	super(newGroup);
-	this.group = super.group;
 	ensureKey();
 	DoubleArray<AbstractNode> doubleArray = old.getSubNodes(false);
 	AbstractNode[] values = new AbstractNode[doubleArray.values.length];
@@ -80,7 +75,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     
     private void ensureKey() {
 	if (this.keySubNodes == null) {
-	    if (this.group == -1) {
+	    if (this.group == -1 || this.group == 0) {
 		this.keySubNodes = BPlusTree.REPL_DEGREES ? BPlusTree.wrapper.createGroupingKeyWithRepl("subNodes-" + UUID.randomUUID().toString(), 0, BPlusTree.MEMBERS) : BPlusTree.wrapper.createGroupingKey("subNodes-" + UUID.randomUUID().toString(), 0);
 		this.group = 0;
 	    } else {

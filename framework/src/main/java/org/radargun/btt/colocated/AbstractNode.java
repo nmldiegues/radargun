@@ -19,7 +19,7 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     }
     
     public AbstractNode(int group) {
-	if (group == -1) {
+	if (group == -1 || group == 0) {
 	    this.group = 0;
 	    this.parentKey = BPlusTree.REPL_DEGREES ? BPlusTree.wrapper.createGroupingKeyWithRepl("parent-" + UUID.randomUUID(), 0, BPlusTree.MEMBERS) : BPlusTree.wrapper.createGroupingKey("parent-" + UUID.randomUUID(), 0);
 	} else {

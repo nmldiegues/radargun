@@ -21,21 +21,18 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     
     protected LeafNode(int group) {
 	super(group);
-	this.group = super.group;
 	ensureKeys();
 	setEntries(new DoubleArray<Serializable>(Serializable.class));
     }
     
     protected LeafNode(int group, DoubleArray<Serializable> entries) {
 	super(group);
-	this.group = super.group;
 	ensureKeys();
 	setEntries(entries);
     }
     
     protected LeafNode(LeafNode old, int newGroup) {
 	super(newGroup);
-	this.group = newGroup;
 	// super.setParent(parent)	// set by the parent
 	ensureKeys();
 	setPrevious(old.getPrevious());
