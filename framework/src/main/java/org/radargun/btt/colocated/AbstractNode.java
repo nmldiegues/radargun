@@ -14,6 +14,10 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     
     public static Random r = new Random();
     
+    public AbstractNode(boolean dummy, int group) {
+	this.group = group;
+    }
+    
     public AbstractNode(int group) {
 	if (group == -1) {
 	    this.group = 0;

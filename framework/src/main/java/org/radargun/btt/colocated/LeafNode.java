@@ -16,7 +16,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     public static final transient int TRUTH = -2;
     
     protected LeafNode(boolean dummy, int truth) {
-	super(truth);
+	super(dummy, truth);
     }
     
     protected LeafNode(int group) {
