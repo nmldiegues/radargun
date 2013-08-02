@@ -63,12 +63,12 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		System.exit(-1);
 	    }
 	    Random r = new Random();
-	    for (int i = 0; i < this.keysSize; i++) {
 		boolean successful = false;
 		while (!successful) {
 		    try {
 			wrapper.startTransaction(false);
 			
+			for (int i = 0; i < this.keysSize; i++) {
 			boolean duplicate = true;
 			while (duplicate) {
 			    long nextValue = Math.abs(r.nextLong());
@@ -82,17 +82,24 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 			if (i % 100 == 0) {
 			    System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
 			}
+			}
 		    } catch (Exception e) {
 			e.printStackTrace();
 			try { wrapper.endTransaction(false); 
 			} catch (Exception e2) { }
 		    }
-		}
 	    }
+	    wrapper.startTransaction(false);
 	    System.out.println("Starting colocation!");
 	    while (tree.colocate()) {System.out.println("Successful colocation!");}
 	    System.out.println("Finished colocation!");
 	    try { Thread.sleep(2000); } catch (Exception e) {}
+	    wrapper.endTransaction(true);
+	    
+	    Map<String, String> stats = wrapper.getAdditionalStats();
+	    System.out.println(stats);
+	    
+	    wrapper.resetAdditionalStats();
 	}
     }
 
