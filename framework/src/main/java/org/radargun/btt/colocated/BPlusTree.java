@@ -65,12 +65,12 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     static final Comparator COMPARATOR_SUPPORTING_LAST_KEY = new ComparatorSupportingLastKey();
 
     // The minimum lower bound is 2 (two).  Only edit this.  The other values are derived.
-    static final int LOWER_BOUND = 2;
+    public transient static int LOWER_BOUND;
     // The LAST_KEY takes an entry but will still maintain the lower bound
-    static final int LOWER_BOUND_WITH_LAST_KEY = LOWER_BOUND + 1;
+    public transient static int LOWER_BOUND_WITH_LAST_KEY;
     // The maximum number of keys in a node NOT COUNTING with the special LAST_KEY. This number should be a multiple of 2.
-    static final int MAX_NUMBER_OF_KEYS = 2 * LOWER_BOUND;
-    static final int MAX_NUMBER_OF_ELEMENTS = MAX_NUMBER_OF_KEYS + 1;
+    public transient static int MAX_NUMBER_OF_KEYS;
+    public transient static int MAX_NUMBER_OF_ELEMENTS;
 
     static StringBuilder spaces(int level) {
         StringBuilder str = new StringBuilder();
@@ -125,6 +125,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
 	this.group = BPlusTree.myGroup();
+	    
 	MEMBERS = clusterSize;
 	COLOCATE = doColocation;
 	GHOST = ghostReads;

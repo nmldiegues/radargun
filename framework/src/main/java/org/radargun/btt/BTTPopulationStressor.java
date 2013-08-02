@@ -19,6 +19,11 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
+    private int lowerBound;
+    
+    public void setLowerBound(int lowerBound) {
+	this.lowerBound = lowerBound;
+    }
     
     public void setKeysSize(int keysSize) {
 	this.keysSize = keysSize;
@@ -43,6 +48,11 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	int clusterSize = wrapper.getNumMembers();
 	wrapper.initDEF();
 	BPlusTree.wrapper = wrapper;
+	BPlusTree.LOWER_BOUND = lowerBound;
+	BPlusTree.LOWER_BOUND_WITH_LAST_KEY = BPlusTree.LOWER_BOUND + 1;
+	    // The maximum number of keys in a node NOT COUNTING with the special LAST_KEY. This number should be a multiple of 2.
+	BPlusTree.MAX_NUMBER_OF_KEYS = 2 * BPlusTree.LOWER_BOUND;
+	BPlusTree.MAX_NUMBER_OF_ELEMENTS = BPlusTree.MAX_NUMBER_OF_KEYS + 1;
 	if (wrapper.isTheMaster()) {
 	    LocatedKey treeKey = wrapper.createGroupingKeyWithRepl("tree", 0, clusterSize);
 	    BPlusTree<Long> tree = new BPlusTree<Long>(clusterSize, threadMigration, colocation, ghostReads, replicationDegrees);

@@ -14,6 +14,7 @@ public class BTTPopulationStage extends AbstractDistStage {
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
+    private int lowerBound;
 
     @Override
     public DistStageAck executeOnSlave() {
@@ -38,6 +39,7 @@ public class BTTPopulationStage extends AbstractDistStage {
 	stressor.setGhostReads(ghostReads);
 	stressor.setReplicationDegrees(replicationDegrees);
 	stressor.setThreadMigration(threadMigration);
+	stressor.setLowerBound(lowerBound);
 	stressor.stress(wrapper);
     }
 
@@ -71,6 +73,10 @@ public class BTTPopulationStage extends AbstractDistStage {
 
     public void setColocation(boolean colocation) {
         this.colocation = colocation;
+    }
+    
+    public void setLowerBound(int lowerBound) {
+	this.lowerBound = lowerBound;
     }
 
     public boolean isReplicationDegrees() {

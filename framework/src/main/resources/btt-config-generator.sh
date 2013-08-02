@@ -15,6 +15,7 @@ REPLICATION_DEGREES=true
 READ_ONLY_PERC=80
 KEYS_SIZE=10000
 DURATION=20
+LOWER_BOUND=2
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -40,6 +41,7 @@ case $1 in
   -k) KEYS_SIZE=$2; shift 2;;
   -d) DURATION=$2; shift 2;;
   -t) THREAD_MIGRATION=$2; shift 2;;
+  -b) LOWER_BOUND=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -53,7 +55,7 @@ echo "<bench-config>" > ${DEST_FILE}
 
 echo "   <master" >> ${DEST_FILE}
 echo "         bindAddress=\"\${127.0.0.1:master.address}\"" >> ${DEST_FILE}
-echo "         port=\"\${21999:master.port}\"/>" >> ${DEST_FILE}
+echo "         port=\"\${21032:master.port}\"/>" >> ${DEST_FILE}
 
 echo "   <benchmark" >> ${DEST_FILE}
 echo "         initSize=\"\${10:Islaves}\"" >> ${DEST_FILE}
@@ -77,6 +79,7 @@ echo "            threadMigration=\"${THREAD_MIGRATION}\"" >> ${DEST_FILE}
 echo "            ghostReads=\"${GHOST_READS}\"" >> ${DEST_FILE}
 echo "            colocation=\"${COLOCATION}\"" >> ${DEST_FILE}
 echo "            replicationDegrees=\"${REPLICATION_DEGREES}\"" >> ${DEST_FILE}
+echo "		  lowerBound=\"${LOWER_BOUND}\"" >> ${DEST_FILE}
 echo "            keysSize=\"${KEYS_SIZE}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
