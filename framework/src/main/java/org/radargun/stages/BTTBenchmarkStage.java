@@ -64,6 +64,7 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	    results.put("TOTAL_THROUGHPUT", ((steps + 0.0) / (seconds + 0.0)) + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    results.put("AVG_LATENCY", ((latency + 0.0) / (steps + 0.0)) + "");
+	    results.putAll(this.cacheWrapper.getAdditionalStats());
 	    log.info(sizeInfo);
 	    result.setPayload(results);
 	    return result;
