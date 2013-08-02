@@ -14,6 +14,7 @@ COLOCATION=true
 REPLICATION_DEGREES=true
 READ_ONLY_PERC=80
 KEYS_SIZE=10000
+KEYS_RANGE=100000
 DURATION=20
 LOWER_BOUND=2
 CACHE_CONFIG_FILE="ispn.xml"
@@ -39,6 +40,7 @@ case $1 in
   -r) REPLICATION_DEGREES=$2; shift 2;;
   -ro) READ_ONLY_PERC=$2; shift 2;;
   -k) KEYS_SIZE=$2; shift 2;;
+  -kr) KEYS_RANGE=$2; shift 2;;
   -d) DURATION=$2; shift 2;;
   -t) THREAD_MIGRATION=$2; shift 2;;
   -b) LOWER_BOUND=$2; shift 2;;
@@ -80,6 +82,7 @@ echo "            ghostReads=\"${GHOST_READS}\"" >> ${DEST_FILE}
 echo "            colocation=\"${COLOCATION}\"" >> ${DEST_FILE}
 echo "            replicationDegrees=\"${REPLICATION_DEGREES}\"" >> ${DEST_FILE}
 echo "		  lowerBound=\"${LOWER_BOUND}\"" >> ${DEST_FILE}
+echo "            keysRange=\"${KEYS_RANGE}\"" >> ${DEST_FILE}
 echo "            keysSize=\"${KEYS_SIZE}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
@@ -88,6 +91,7 @@ echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 echo "      <BTTBenchmark" >> ${DEST_FILE}
 echo "            readOnlyPerc=\"${READ_ONLY_PERC}\"" >> ${DEST_FILE}
 echo "            keysSize=\"${KEYS_SIZE}\"" >> ${DEST_FILE}
+echo "            keysRange=\"${KEYS_RANGE}\"" >> ${DEST_FILE}
 echo "            seconds=\"${DURATION}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
