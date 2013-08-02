@@ -133,7 +133,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     AbstractNode rebase(AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
 	DoubleArray<AbstractNode> newArr = justInsertUpdatingParentRelation(middleKey, subLeftNode, subRightNode);
         if (newArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) { // this node can accommodate the new split
-            return getRoot();
+            return BPlusTree.TRUE_NODE;
         } else { // must split this node
             // find middle position (key to move up amd sub-node to move left)
             Comparable keyToSplit = newArr.keys[BPlusTree.LOWER_BOUND];
@@ -333,14 +333,14 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         } else if (this.getParent(false) != null) {
             return this.getParent(false).replaceDeletedKey(deletedKey, replacementKey);
         } else {
-            return this;
+            return BPlusTree.TRUE_NODE;
         }
     }
 
     // replaces the key for the given sub-node.  The deletedKey is expected to exist in this node
     private AbstractNode replaceDeletedKey(Comparable deletedKey, Comparable replacementKey, AbstractNode subNode) {
         setSubNodes(getSubNodes(false).replaceKey(deletedKey, replacementKey, subNode));
-        return getRoot();
+        return BPlusTree.TRUE_NODE;
     }
 
     /*
@@ -413,7 +413,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             // the LAST_KEY is merely an indirection.  This only occurs in the root node.  We can reduce one depth.
             if (localSubNodes.length() == 1) { // This only occurs in the root node
                 // (size == 1) => (parent == null), but NOT the inverse
-                assert (this.getParent(false) == null);
                 AbstractNode child = localSubNodes.firstValue();
                 child.setParent(null);
                 
@@ -435,7 +434,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 return this.getParent(false).underflowFromInner(this, treeDepth, height, localRootsUUID, cutoff);
             }
         }
-        return getRoot();
+        return BPlusTree.TRUE_NODE;
     }
 
     private void rightLeafMerge(Comparable entryKey, AbstractNode entryValue, AbstractNode nextEntryValue, int treeDepth, int height, String localRootsUUID, int cutoff) {
@@ -681,32 +680,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     @Override
     public Iterator<T> iterator() {
         return this.getSubNodes(false).firstValue().iterator();
-    }
-
-    @Override
-    public String dump(int level, boolean dumpKeysOnly, boolean dumpNodeIds) {
-        StringBuilder str = new StringBuilder();
-        StringBuilder spaces = BPlusTree.spaces(level);
-        str.append(spaces);
-        str.append("[" + (dumpNodeIds ? this : "") + ": ");
-
-        DoubleArray<AbstractNode> subNodes = this.getSubNodes(false);
-        for (int i = 0; i < subNodes.length(); i++) {
-            Comparable key = subNodes.keys[i];
-            AbstractNode value = subNodes.values[i];
-            str.append("\n");
-            str.append(value.dump(level + 4, dumpKeysOnly, dumpNodeIds));
-            str.append(spaces);
-            str.append("(" + key + ") ");
-        }
-        str.append("\n");
-        str.append(spaces);
-        if (dumpNodeIds) {
-            str.append("] ^" + this.getParent(false) + "\n");
-        } else {
-            str.append("]\n");
-        }
-        return str.toString();
     }
 
     public InnerNode startChangeGroup(int newGroup) {

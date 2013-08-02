@@ -177,6 +177,8 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	wrapper.put(this.rootKey, root);
     }
 
+    public static final transient AbstractNode TRUE_NODE = new LeafNode(true, LeafNode.TRUTH);
+    
     /** Inserts the given key-value pair, overwriting any previous entry for the same key */
     public boolean insert(Comparable key, T value) {
         if (value == null) {
@@ -187,7 +189,10 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
         
         if (resultNode == null) {
             return false;
+        } else if (resultNode.group == TRUE_NODE.group) {
+            return true; // and no rebalance ocurred!
         }
+        
         if (!rootNode.equals(resultNode)) {
             this.setRoot(resultNode);
         }
@@ -201,7 +206,10 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 
         if (resultNode == null) {
             return false;
+        } else if (resultNode.group == TRUE_NODE.group) {
+            return true; // and no rebalance ocurred!
         }
+        
         if (!rootNode.equals(resultNode)) {
             this.setRoot(resultNode);
         }
@@ -226,10 +234,6 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     /** Returns the number of key-value mappings in this map */
     public int size() {
         return this.getRoot(false).size();
-    }
-
-    public String dump(int level, boolean dumpKeysOnly, boolean dumpNodeIds) {
-        return this.getRoot(false).dump(level, dumpKeysOnly, dumpNodeIds);
     }
 
     @Override

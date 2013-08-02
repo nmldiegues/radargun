@@ -76,8 +76,6 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     /** Returns the number os key-value mappings in this map */
     abstract int size();
 
-    abstract String dump(int level, boolean dumpKeysOnly, boolean dumpNodeIds);
-
     /* **** Uncomment the following to support pretty printing of nodes **** */
 
     // static final AtomicInteger GLOBAL_COUNTER = new AtomicInteger(0);
@@ -87,11 +85,6 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     // }
 
     /* *********** */
-
-    AbstractNode getRoot() {
-        InnerNode thisParent = this.getParent(false);
-        return thisParent == null ? this : thisParent.getRoot();
-    }
 
     abstract DoubleArray.KeyVal removeBiggestKeyValue();
 

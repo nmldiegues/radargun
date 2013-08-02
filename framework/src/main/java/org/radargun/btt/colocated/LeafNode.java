@@ -13,6 +13,12 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     private LocatedKey keyPrevious;
     private LocatedKey keyNext;
     
+    public static final transient int TRUTH = -2;
+    
+    protected LeafNode(boolean dummy, int truth) {
+	super(truth);
+    }
+    
     protected LeafNode(int group) {
 	super(group);
 	this.group = super.group;
@@ -104,7 +110,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	    return null;
 	}
 	if (localArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
-	    return getRoot();
+	    return BPlusTree.TRUE_NODE;
 	} else {
 	    // find middle position
 	    Comparable keyToSplit = localArr.findRightMiddlePosition();
@@ -189,7 +195,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             } else if (replacementKey != null) {
                 return getParent(false).replaceDeletedKey(key, replacementKey);
             } else {
-                return getParent(false).getRoot(); // maybe a tiny faster than just getRoot() ?!
+        	return BPlusTree.TRUE_NODE;
             }
         }
     }
@@ -333,32 +339,6 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             throw new UnsupportedOperationException("This implementation does not allow element removal via the iterator");
         }
 
-    }
-
-    @Override
-    public String dump(int level, boolean dumpKeysOnly, boolean dumpNodeIds) {
-        StringBuilder str = new StringBuilder();
-        str.append(BPlusTree.spaces(level));
-        if (dumpNodeIds) {
-            str.append(this.getPrevious() + "<-[" + this + ": ");
-        } else {
-            str.append("[: ");
-        }
-
-        DoubleArray<Serializable> subNodes = this.getEntries(false);
-        for (int i = 0; i < subNodes.length(); i++) {
-            Comparable key = subNodes.keys[i];
-            Serializable value = subNodes.values[i];
-            str.append("(" + value);
-            str.append(dumpKeysOnly ? ") " : "," + key + ") ");
-        }
-        if (dumpNodeIds) {
-            str.append("]->" + this.getNext() + " ^" + getParent(false) + "\n");
-        } else {
-            str.append("]\n");
-        }
-
-        return str.toString();
     }
 
     @Override
