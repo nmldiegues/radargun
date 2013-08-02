@@ -114,6 +114,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     public static boolean COLOCATE;
     public static boolean GHOST;
     public static boolean REPL_DEGREES;
+    public static boolean THREAD_MIGRATION;
     
     transient ColocationThread colocationThread;
     
@@ -127,6 +128,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	this.group = BPlusTree.myGroup();
 	    
 	MEMBERS = clusterSize;
+	THREAD_MIGRATION = threadMigration;
 	COLOCATE = doColocation;
 	GHOST = ghostReads;
 	REPL_DEGREES = replicationDegrees;
@@ -268,6 +270,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     }
     
     public static void addLocalRoot(String localRootsUUID, InnerNode localRoot) {
+	if (!BPlusTree.THREAD_MIGRATION) {
+	    return;
+	}
 	final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + localRoot.group, localRoot.group);
 	List<InnerNode> localRoots = getLocalRoots(localRootsKey);
 	if (localRoots == null) {
@@ -280,6 +285,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     }
     
     public static void removeLocalRoot(String localRootsUUID, InnerNode localRoot) {
+	if (!BPlusTree.THREAD_MIGRATION) {
+	    return;
+	}
 	final LocatedKey localRootsKey = BPlusTree.wrapper.createGroupingKey(localRootsUUID + "-localRoots-" + localRoot.group, localRoot.group);
 	List<InnerNode> localRoots = getLocalRoots(localRootsKey);
 	
@@ -306,6 +314,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     }
     
     public static void updateLocalRoots(String localRootsUUID, InnerNode leftLocalRoot, InnerNode rightLocalRoot, InnerNode removeLocalRoot) {
+	if (!BPlusTree.THREAD_MIGRATION) {
+	    return;
+	}
 	int removeGroup = removeLocalRoot.group;
 	int addGroup = leftLocalRoot.group;
 	
