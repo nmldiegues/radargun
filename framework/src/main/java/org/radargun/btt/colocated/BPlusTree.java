@@ -119,6 +119,20 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     transient ColocationThread colocationThread;
     
     public boolean colocate() {
+	InnerNode iter = (InnerNode) getRoot(false);
+	while (true) {
+	    if (iter.group > 0) {
+		System.out.println("Found partial, should have local roots");
+		break;
+	    }
+	    AbstractNode node = (AbstractNode) iter.getSubNodes(false).values[0];
+	    if (node instanceof LeafNode) {
+		System.out.println("DID NOT find partial, reached leaf node");
+		break;
+	    }
+	    iter = (InnerNode) node;
+	}
+	
 	if (colocationThread != null) {
 	return this.colocationThread.colocate();
 	} else { return false; }
