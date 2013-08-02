@@ -15,11 +15,16 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
     private static Log log = LogFactory.getLog(BTTPopulationStressor.class);
 
     private int keysSize;
+    private int keysRange;
     private boolean threadMigration;
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
     private int lowerBound;
+
+    public void setKeysRange(int keysRange) {
+        this.keysRange = keysRange;
+    }
 
     public void setLowerBound(int lowerBound) {
 	this.lowerBound = lowerBound;
@@ -78,7 +83,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		    for (int i = 0; i < this.keysSize; i++) {
 			boolean duplicate = true;
 			while (duplicate) {
-			    long nextValue = Math.abs(r.nextLong());
+			    long nextValue = Math.abs(r.nextLong()) % keysRange;
 			    if (tree.insert(nextValue, nextValue)) {
 				duplicate = false;
 			    }

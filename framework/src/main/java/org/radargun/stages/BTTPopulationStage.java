@@ -10,11 +10,16 @@ public class BTTPopulationStage extends AbstractDistStage {
     private static final long serialVersionUID = -6913577046447056921L;
     
     private int keysSize;
+    private int keysRange;
     private boolean threadMigration;
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
     private int lowerBound;
+
+    public void setKeysRange(int keysRange) {
+        this.keysRange = keysRange;
+    }
 
     @Override
     public DistStageAck executeOnSlave() {
@@ -40,6 +45,7 @@ public class BTTPopulationStage extends AbstractDistStage {
 	stressor.setReplicationDegrees(replicationDegrees);
 	stressor.setThreadMigration(threadMigration);
 	stressor.setLowerBound(lowerBound);
+        stressor.setKeysRange(keysRange);
 	stressor.stress(wrapper);
     }
 

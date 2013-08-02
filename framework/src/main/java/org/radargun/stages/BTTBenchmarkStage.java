@@ -20,9 +20,14 @@ public class BTTBenchmarkStage extends AbstractDistStage {
     private transient BTTStressor bttStressor;
     
     private int readOnlyPerc;
+    private int keysRange;
     private int keysSize;
     private int seconds;
     
+    public void setKeysRange(int keysRange) {
+        this.keysRange = keysRange;
+    }
+
     @Override
     public DistStageAck executeOnSlave() {
 	DefaultDistStageAck result = new DefaultDistStageAck(slaveIndex, slaveState.getLocalAddress());
@@ -38,6 +43,7 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	bttStressor.setCache(cacheWrapper);
 	bttStressor.setReadOnlyPerc(readOnlyPerc);
 	bttStressor.setKeysSize(keysSize);
+        bttStressor.setKeysRange(keysRange);
 	bttStressor.setSeconds(seconds);
 	
 	try {

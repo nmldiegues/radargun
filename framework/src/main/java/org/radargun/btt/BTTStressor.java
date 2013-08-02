@@ -25,8 +25,13 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
     public static CacheWrapper cache;
     private int readOnlyPerc;
     private int keysSize;
+    private int keysRange;
     private int seconds;
     
+    public void setKeysRange(int keysRange) {
+        this.keysRange = keysRange;
+    }
+
     private Random random = new Random();
     
     private BPlusTree<Long> tree;
@@ -71,7 +76,7 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
     
     protected void step(int phase) {
 	boolean successful = false;
-	long value = Math.abs(random.nextLong());
+	long value = Math.abs(random.nextLong()) % keysRange;
 	boolean query = Math.abs(random.nextInt(100)) < this.readOnlyPerc;
 	while (!successful && m_phase == TEST_PHASE) {
 	    try {

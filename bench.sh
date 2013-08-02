@@ -16,10 +16,12 @@ optStr[2]="ran"
 size[1]="1000"
 size[2]="10000"
 size[3]="100000"
+size[4]="100000"
 
 arity[1]="2"
-arity[2]="16"
-arity[3]="128"
+arity[2]="8"
+arity[3]="8"
+arity[4]="16"
 
 mkdir auto-results;
 
@@ -32,7 +34,7 @@ mkdir auto-results;
             do
                 for opt in 1
                 do
-		for sa in 1 2 3
+		for sa in 1 2 3 4
 		do
                 bash btt-scripts/run-test.sh ${readPerc[$ro]} 60 ${size[$sa]} ${options[$opt]} ${arity[$sa]}
                 cp results-radargun/test-result-results2/infinispan4_ispn_$nodes.csv auto-results/$nodes-${readPerc[$ro]}-${optStr[$opt]}-${size[$sa]}-${arity[$sa]}-$attempt.csv
