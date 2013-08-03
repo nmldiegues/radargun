@@ -86,9 +86,9 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 		    this.tree.containsKey(value);
 		} else {
 		    if (lastValue == -1) {
-			this.tree.removeKey(lastValue);
+			this.tree.removeKey(value);
 		    } else {
-			this.tree.insert(value, value);
+			this.tree.insert(lastValue, lastValue);
 		    }
 		}
 		
