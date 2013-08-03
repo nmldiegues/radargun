@@ -251,6 +251,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	}
     }
     
+    // this code is buggy, within the fix method a classcastexception has happened when the tree shrinks, where a leafnode is cast to an innernode
     private InnerNode fallbackToPartial(String localRootsUUID, int cutoff, int distanceToTop, int treeDepth) {
 	if ((distanceToTop + 1) == cutoff) {
 	    BPlusTree.removeLocalRoot(localRootsUUID, this);
