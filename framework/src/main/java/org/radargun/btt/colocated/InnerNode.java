@@ -139,21 +139,10 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             leftSubNodes.keys[leftSubNodes.length() - 1] = BPlusTree.LAST_KEY;
             leftSubNodes.values[leftSubNodes.length() - 1] = subNodeToMoveLeft;
             
-            InnerNode leftNode = null;
+            InnerNode leftNode = new InnerNode<T>(this.group, leftSubNodes);
+            InnerNode rightNode = new InnerNode<T>(this.group, newArr.rightPart(BPlusTree.LOWER_BOUND + 1));
             int farFromTop = treeDepth - height;
-            if (treeDepth > cutoff && farFromTop < cutoff) {
-        	leftNode = new InnerNode<T>(-1, leftSubNodes);
-            } else {
-        	leftNode = new InnerNode<T>(this.group, leftSubNodes);
-            }
             subNodeToMoveLeft.setParent(leftNode); // smf: maybe it is not necessary because of the code in the constructor
-
-            InnerNode rightNode = null;
-            if (treeDepth > cutoff && farFromTop < cutoff) { 
-        	rightNode = new InnerNode<T>(-1, newArr.rightPart(BPlusTree.LOWER_BOUND + 1));
-            } else {
-        	rightNode = new InnerNode<T>(this.group, newArr.rightPart(BPlusTree.LOWER_BOUND + 1));
-            }
 
             if (farFromTop == cutoff) {
         	BPlusTree.updateLocalRoots(localRootsUUID, leftNode, rightNode, this);
@@ -164,7 +153,9 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             
             // propagate split to parent
             if (parent == null) {
-        	// if we have depth 3, we want the cutoff to be on the 3rd level of inner nodes. since we are creating a new root we have +1 and +1 for the leaf level that we exclude from the cutoff
+        	// (treeDepth + 1) is the new actual depth; the +1 will be created in the following lines
+        	// if this value is larger than the cutoff, then we already have partial replication tree nodes
+        	// in that case, we have to move the cutoff point by one level 
         	if ((treeDepth + 1) > cutoff) {
         	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
         	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
@@ -185,39 +176,45 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	    // fix every child
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
 	    
-	    if (treeDepth != cutoff) {
+	    if (treeDepth > cutoff) {
 		for (int i = 0; i < myChildren.values.length; i++) {
+		    // treeDepth is -1 of actual value. if we have cutoff 3, and treeDepth 3, then we just crossed the cutoff and there are no previous roots to remove
 		    InnerNode toRemove = ((InnerNode) myChildren.values[i]);
 		    BPlusTree.removeLocalRoot(localRootsUUID, toRemove);
 		}
 	    }
 
-	    if (!this.isPartial()) {
-		InnerNode toRet = this.switchToPartial();
-		BPlusTree.addLocalRoot(localRootsUUID, toRet);
-		return toRet;
-	    } else {
-		BPlusTree.addLocalRoot(localRootsUUID, this);
-		return null;
+	    if (this.isPartial()) {
+		System.out.println("Should be fully replicated!");
+		System.exit(-1);
 	    }
+	    
+	    InnerNode toRet = this.switchToPartial();
+	    BPlusTree.addLocalRoot(localRootsUUID, toRet);
+	    return toRet;
+	    
 	} else {
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
-	    AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
-	    for (int i = 0; i < myChildren.values.length; i++) {
-		InnerNode myChild = ((InnerNode) myChildren.values[i]);
-		InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
-		newValues[i] = modifiedNode;
-	    }
 	    
-	    if (newValues[0] != null) {
+	    if (distanceToTop + 1 == cutoff) {
+		AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
+		for (int i = 0; i < myChildren.values.length; i++) {
+		    InnerNode myChild = ((InnerNode) myChildren.values[i]);
+		    InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
+		    newValues[i] = modifiedNode;
+		}
+		if (newValues[0] == null) {
+		    System.out.println("Next level should be fully replicated!");
+		    System.exit(-1);
+		}
 		setSubNodes(myChildren.changeReplication(newValues));
+	    } else {
+		for (int i = 0; i < myChildren.values.length; i++) {
+		   ((InnerNode) myChildren.values[i]).fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
+		}
 	    }
 	    
-	    if (distanceToTop < cutoff && this.isPartial()) {
-		return this.switchToFull();
-	    } else {
-		return null;
-	    }
+	    return null;
 	}
     }
     
@@ -232,40 +229,48 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	    }
 
 	    BPlusTree.removeLocalRoot(localRootsUUID, this);
+	    
+	    if (!this.isPartial()) {
+		System.out.println("Should be partially replicated!");
+		System.exit(-1);
+	    }
+	    
 	    InnerNode toRet = this.switchToFull();
 	    return toRet;
 	} else {
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
-	    AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
-	    for (int i = 0; i < myChildren.values.length; i++) {
-		InnerNode myChild = ((InnerNode) myChildren.values[i]);
-		InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
-		newValues[i] = modifiedNode;
-	    }
-	    
-	    if (newValues[0] != null) {
+	    if ((distanceToTop + 2) == cutoff) {
+		AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
+		for (int i = 0; i < myChildren.values.length; i++) {
+		    InnerNode myChild = ((InnerNode) myChildren.values[i]);
+		    InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
+		    newValues[i] = modifiedNode;
+		}
+		if (newValues[0] != null) {
+		    System.out.println("Next level should be partial replicated!");
+		    System.exit(-1);
+		}
 		setSubNodes(myChildren.changeReplication(newValues));
+	    } else {
+		AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
+		for (int i = 0; i < myChildren.values.length; i++) {
+		    ((InnerNode) myChildren.values[i]).fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
+		}
 	    }
-	    
 	    return null;
 	}
     }
     
-    // this code is buggy, within the fix method a classcastexception has happened when the tree shrinks, where a leafnode is cast to an innernode
-    private InnerNode fallbackToPartial(String localRootsUUID, int cutoff, int distanceToTop, int treeDepth) {
+    private void removeAllLocalRoots(String localRootsUUID, int cutoff, int distanceToTop) {
 	if ((distanceToTop + 1) == cutoff) {
 	    BPlusTree.removeLocalRoot(localRootsUUID, this);
-	    return this.switchToPartial();
+	    return;
 	} else {
 	    DoubleArray<AbstractNode> myChildren = getSubNodes(false);
-	    AbstractNode[] newValues = new AbstractNode[myChildren.values.length];
 	    for (int i = 0; i < myChildren.values.length; i++) {
-		InnerNode myChild = ((InnerNode) myChildren.values[i]);
-		InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
-		newValues[i] = modifiedNode;
+		((InnerNode) myChildren.values[i]).removeAllLocalRoots(localRootsUUID, cutoff, distanceToTop + 1);
 	    }
-	    setSubNodes(myChildren.changeReplication(newValues));
-	    return this.switchToPartial();
+	    return;
 	}
     }
     
@@ -414,15 +419,15 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 
                 this.clean();
 
-                if ((treeDepth - 1) > cutoff) {
+                if (treeDepth > cutoff) {
                     InnerNode newRoot = (InnerNode) child;
                     InnerNode possiblyNew = newRoot.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, 1, treeDepth);
                     InnerNode toReturn = possiblyNew != null ? possiblyNew : newRoot;
                     return toReturn;
-                } else if ((treeDepth - 1) == cutoff){
+                } else if (treeDepth == cutoff) {
                     InnerNode newRoot = (InnerNode) child;
-                    InnerNode toReturn = newRoot.fallbackToPartial(localRootsUUID, cutoff, 1, treeDepth);
-                    return toReturn;
+                    newRoot.removeAllLocalRoots(localRootsUUID, cutoff, 1);
+                    return newRoot;
                 }
                 
                 return child;

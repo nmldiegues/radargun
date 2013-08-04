@@ -125,7 +125,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     }
     
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
-	this.group = BPlusTree.myGroup();
+	this.group = 0;
 	    
 	MEMBERS = clusterSize;
 	THREAD_MIGRATION = threadMigration;
@@ -133,9 +133,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	GHOST = ghostReads;
 	REPL_DEGREES = replicationDegrees;
 	
-	this.rootKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("root-" + UUID.randomUUID(), 0, clusterSize) : wrapper.createGroupingKey("root-" + UUID.randomUUID(), 0);
 	this.localRootsUUID = UUID.randomUUID().toString();
-	this.cutoffKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("cutoff-" + UUID.randomUUID(), group, clusterSize) : wrapper.createGroupingKey("cutoff-" + UUID.randomUUID(), group);
+	this.rootKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("root-" + UUID.randomUUID(), this.group, clusterSize) : wrapper.createGroupingKey("root-" + UUID.randomUUID(), 0);
+	this.cutoffKey = REPL_DEGREES ? wrapper.createGroupingKeyWithRepl("cutoff-" + UUID.randomUUID(), this.group, clusterSize) : wrapper.createGroupingKey("cutoff-" + UUID.randomUUID(), group);
 	int cutoff = (int)Math.ceil(Math.log(clusterSize) / Math.log(MAX_NUMBER_OF_ELEMENTS)) + 2;
 	System.out.println("Setting cutoff value: " + cutoff + " due to members: " + clusterSize + " and max number elements: " + MAX_NUMBER_OF_ELEMENTS);
 	if (cutoff < 2) {
@@ -143,15 +143,19 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	    System.out.println("Overriding cutoff to 2");
 	}
 	setCutoff(this.cutoffKey, cutoff);
-	setRoot(new LeafNode<T>(this.group));
+	setRoot(new LeafNode<T>(-1));
 	
 	if (threadMigration) {
 	    this.colocationThread = new ColocationThread(this); //.start();
 	}
     }
     
-    public static Integer getCutoff(LocatedKey key) {
-	return (Integer) wrapper.get(key);
+    public static Integer getCutoff(boolean ghost, LocatedKey key) {
+	if (ghost) {
+	    return (Integer) wrapper.getGhost(key);
+	} else {
+	    return (Integer) wrapper.get(key);
+	}
     }
     
     public static void setCutoff(LocatedKey key, int value) {

@@ -126,7 +126,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 		InnerNode newRoot = new InnerNode<T>(newGroup, leftNode, rightNode, keyToSplit);
 		return newRoot;
 	    } else {
-		return parent.rebase(leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(cutoffKey));
+		return parent.rebase(leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));
 	    }
 	}
     }
@@ -187,7 +187,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             Comparable replacementKey = getReplacementKeyIfNeeded(key);
 
             if (localArr.length() < BPlusTree.LOWER_BOUND) {
-        	Integer cutoff = BPlusTree.getCutoff(cutoffKey);
+        	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
                 return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff);
             } else if (replacementKey != null) {
                 return getParent(false).replaceDeletedKey(key, replacementKey);
