@@ -123,7 +123,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 
 	    // propagate split to parent
 	    if (parent == null) {  // make new root node
-		InnerNode newRoot = new InnerNode<T>(newGroup, leftNode, rightNode, keyToSplit);
+		InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
 		return newRoot;
 	    } else {
 		return parent.rebase(leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));

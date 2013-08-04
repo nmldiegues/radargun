@@ -246,7 +246,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		    InnerNode modifiedNode = myChild.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, distanceToTop + 1, treeDepth);
 		    newValues[i] = modifiedNode;
 		}
-		if (newValues[0] != null) {
+		if (newValues[0] == null) {
 		    System.out.println("Next level should be partial replicated!");
 		    System.exit(-1);
 		}

@@ -143,7 +143,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	    System.out.println("Overriding cutoff to 2");
 	}
 	setCutoff(this.cutoffKey, cutoff);
-	setRoot(new LeafNode<T>(-1));
+	setRoot(new LeafNode<T>(BPlusTree.myGroup()));
 	
 	if (threadMigration) {
 	    this.colocationThread = new ColocationThread(this); //.start();
