@@ -33,6 +33,8 @@ echo "============ STARTING BENCHMARKING ==============="
 
 ${JGRP_GEN} -sequencer -toa -tcp
 
+echo "After generating jgroups"
+
 for owner in 1; do
 #for l1 in -l1-rehash none; do
 #for wrtPx in 0 10; do
@@ -41,7 +43,9 @@ for owner in 1; do
 #for bfFp in 0.01 0.10; do
 
 #${ISPN_GEN} ${ISPN_DEFAULT} -num-owner ${owner}
+echo "============= Before generating benchmark ==========="
 ${BENC_GEN} ${BENC_DEFAULT}
+echo "=============== Going to run TEST ================"
 run_test ${NR_NODES_TO_USE} "results2" ${EST_DURATION} ${CLUSTER}
 killall -9 java
 done

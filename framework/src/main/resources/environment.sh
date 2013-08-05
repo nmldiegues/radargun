@@ -8,7 +8,7 @@ JG_FLAGS="-Dresolve.dns=false -Djgroups.timer.num_threads=4"
 JVM_OPTS="-server"
 #JVM_OPTS="$JVM_OPTS -Xmx1G -Xms1G"
 #allocate more memory if needed
-JVM_OPTS="$JVM_OPTS -Xmx3G -Xms3G"
+JVM_OPTS="$JVM_OPTS -Xmx4G -Xms3G"
 #JVM_OPTS="$JVM_OPTS -Xmx16G -Xms16G"
 #choose on of the GC types (or none if you want to use the default)
 JVM_OPTS="$JVM_OPTS -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode"
