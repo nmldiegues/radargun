@@ -80,11 +80,9 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		doPopulation(wrapper, tree, i, batch);
 		System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
 	    }
-	    try { wrapper.endTransaction(true); } catch (Exception e) { }
-
+	    
 	    System.out.println("Starting colocation!");
 	    while (tree.colocate()) {System.out.println("Successful colocation!");}
-	    try { wrapper.endTransaction(true); } catch (Exception e) { }
 	    System.out.println("Finished colocation!");
 	    try { Thread.sleep(2000); } catch (Exception e) {}
 
