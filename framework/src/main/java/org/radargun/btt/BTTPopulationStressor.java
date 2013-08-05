@@ -90,10 +90,11 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 				duplicate = false;
 			    }
 			}
-			if (i % 1000 == 0) {
+			if (i % 1000 == 999) {
 			    wrapper.endTransaction(true);
 			    successful = true;
 			    System.out.println("Coordinator committed: " + i + " / " + this.keysSize);
+			    wrapper.startTransaction(false);
 			} else if (i % 100 == 0) {
 			    System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
 			}
@@ -106,6 +107,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		}
 
 	    }
+	    wrapper.endTransaction(true);
 	    System.out.println("Starting colocation!");
 	    while (tree.colocate()) {System.out.println("Successful colocation!");}
 	    System.out.println("Finished colocation!");
