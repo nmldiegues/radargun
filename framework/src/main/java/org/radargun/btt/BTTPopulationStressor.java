@@ -105,6 +105,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		}
 		
 		wrapper.endTransaction(true);
+		successful = true;
 	    } catch (Exception e) {
 		e.printStackTrace();
 		try { wrapper.endTransaction(false); 
