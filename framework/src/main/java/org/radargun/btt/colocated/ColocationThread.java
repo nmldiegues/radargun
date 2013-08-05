@@ -87,7 +87,9 @@ public class ColocationThread extends Thread {
 			toMove = toMove.startChangeGroup(this.keys[k].getGroup());
 			otherRoots.add(toMove);
 			
+			BPlusTree.wrapper.endTransaction(true);
 			System.out.println("Async ColocationThread moved Root " + toMove + " from " + this.keys[groupFrom].getGroup() + " to " + this.keys[groupTo].getGroup());
+			BPlusTree.wrapper.startTransaction(false);
 		    }
 		    BPlusTree.setLocalRoots(this.keys[k], otherRoots);
 		}

@@ -76,11 +76,13 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    }
 	    Random r = new Random();
 	    boolean successful = false;
-	    while (!successful) {
-		try {
-		    wrapper.startTransaction(false);
 
-		    for (int i = 0; i < this.keysSize; i++) {
+	    for (int i = 0; i < this.keysSize; i++) {
+		while (!successful) {
+		    try {
+			if (i % 1000 == 0) {
+			    wrapper.startTransaction(false);
+			}
 			boolean duplicate = true;
 			while (duplicate) {
 			    long nextValue = Math.abs(r.nextLong()) % keysRange;
@@ -88,18 +90,21 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 				duplicate = false;
 			    }
 			}
-			if (i % 100 == 0) {
+			if (i % 1000 == 0) {
+			    wrapper.endTransaction(true);
+			    successful = true;
+			    System.out.println("Coordinator committed: " + i + " / " + this.keysSize);
+			} else if (i % 100 == 0) {
 			    System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
 			}
+		    } catch (Exception e) {
+			e.printStackTrace();
+			try { wrapper.endTransaction(false); 
+			} catch (Exception e2) { }
+			System.exit(-1);
 		    }
-
-		    wrapper.endTransaction(true);
-		    successful = true;
-		} catch (Exception e) {
-		    e.printStackTrace();
-		    try { wrapper.endTransaction(false); 
-		    } catch (Exception e2) { }
 		}
+
 	    }
 	    System.out.println("Starting colocation!");
 	    while (tree.colocate()) {System.out.println("Successful colocation!");}
