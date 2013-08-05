@@ -74,40 +74,13 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		e.printStackTrace();
 		System.exit(-1);
 	    }
-	    Random r = new Random();
-	    boolean successful = false;
 
-	    for (int i = 0; i < this.keysSize; i++) {
-		while (!successful) {
-		    try {
-			if (i % 1000 == 0) {
-			    wrapper.startTransaction(false);
-			}
-			boolean duplicate = true;
-			while (duplicate) {
-			    long nextValue = Math.abs(r.nextLong()) % keysRange;
-			    if (tree.insert(nextValue, nextValue)) {
-				duplicate = false;
-			    }
-			}
-			if (i % 1000 == 999) {
-			    wrapper.endTransaction(true);
-			    successful = true;
-			    System.out.println("Coordinator committed: " + i + " / " + this.keysSize);
-			    wrapper.startTransaction(false);
-			} else if (i % 100 == 0) {
-			    System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
-			}
-		    } catch (Exception e) {
-			e.printStackTrace();
-			try { wrapper.endTransaction(false); 
-			} catch (Exception e2) { }
-			System.exit(-1);
-		    }
-		}
-
+	    int batch = 1000;
+	    for (int i = 0; i < this.keysSize; i += batch) {
+		doPopulation(wrapper, tree, i, batch);
+		System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
 	    }
-	    wrapper.endTransaction(true);
+
 	    System.out.println("Starting colocation!");
 	    while (tree.colocate()) {System.out.println("Successful colocation!");}
 	    System.out.println("Finished colocation!");
@@ -117,6 +90,26 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    System.out.println(stats);
 
 	    wrapper.resetAdditionalStats();
+	}
+    }
+    
+    private void doPopulation(CacheWrapper wrapper, BPlusTree<Long> tree, int start, int batch) {
+	boolean successful = false;
+	while (!successful) {
+	    try {
+		wrapper.startTransaction(false);
+		
+		for (int i = start; i < (start + batch); i++) {
+		    long nextVal = i;
+		    tree.insert(nextVal, nextVal);
+		}
+		
+		wrapper.endTransaction(true);
+	    } catch (Exception e) {
+		e.printStackTrace();
+		try { wrapper.endTransaction(false); 
+		} catch (Exception e2) { }
+	    }
 	}
     }
 
