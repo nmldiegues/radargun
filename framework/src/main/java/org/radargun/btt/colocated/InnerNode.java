@@ -185,6 +185,11 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	    }
 
 	    if (this.isPartial()) {
+		try {
+		    throw new RuntimeException();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 		System.out.println("Should be fully replicated!");
 		System.exit(-1);
 	    }
@@ -204,6 +209,11 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		    newValues[i] = modifiedNode;
 		}
 		if (newValues[0] == null) {
+		    try {
+			throw new RuntimeException();
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
 		    System.out.println("Next level should be fully replicated!");
 		    System.exit(-1);
 		}
@@ -231,6 +241,11 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	    BPlusTree.removeLocalRoot(localRootsUUID, this);
 	    
 	    if (!this.isPartial()) {
+		try {
+		    throw new RuntimeException();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 		System.out.println("Should be partially replicated!");
 		System.exit(-1);
 	    }
@@ -247,6 +262,11 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		    newValues[i] = modifiedNode;
 		}
 		if (newValues[0] == null) {
+		    try {
+			throw new RuntimeException();
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
 		    System.out.println("Next level should be partial replicated!");
 		    System.exit(-1);
 		}
