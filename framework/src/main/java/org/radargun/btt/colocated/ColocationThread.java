@@ -99,11 +99,13 @@ public class ColocationThread extends Thread {
 		successful = true;
 	    } catch (Exception e) {
 		e.printStackTrace();
-		try { BPlusTree.wrapper.endTransaction(false); } 
-		catch (Exception e2) {
-
-		}
-		sleep();
+		System.out.println("Colocation should not have exceptions");
+		System.exit(-1);
+//		try { BPlusTree.wrapper.endTransaction(false); } 
+//		catch (Exception e2) {
+//
+//		}
+//		sleep();
 	    }
 	}
 	return false;

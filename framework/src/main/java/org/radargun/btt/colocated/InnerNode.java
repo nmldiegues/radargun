@@ -448,6 +448,14 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                     InnerNode toReturn = possiblyNew != null ? possiblyNew : newRoot;
                     return toReturn;
                 } else if ((treeDepth - 1) == cutoff) {
+                    System.out.println("Shrinking tree, should not happen!: " + treeDepth + " " + height + " " + cutoff);
+                    try {
+                	throw new RuntimeException();
+                    } catch (Exception e) {
+                	e.printStackTrace();
+                	System.out.println("Shrinking tree, should not happen!: " + treeDepth + " " + height + " " + cutoff);
+                	System.exit(-1);
+                    }
                     InnerNode newRoot = (InnerNode) child;
                     newRoot.removeAllLocalRoots(localRootsUUID, cutoff, 1);
                     return newRoot;
