@@ -419,12 +419,12 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 
                 this.clean();
 
-                if (treeDepth > cutoff) {
+                if ((treeDepth - 1) > cutoff) {
                     InnerNode newRoot = (InnerNode) child;
                     InnerNode possiblyNew = newRoot.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, 1, treeDepth);
                     InnerNode toReturn = possiblyNew != null ? possiblyNew : newRoot;
                     return toReturn;
-                } else if (treeDepth == cutoff) {
+                } else if ((treeDepth - 1) == cutoff) {
                     InnerNode newRoot = (InnerNode) child;
                     newRoot.removeAllLocalRoots(localRootsUUID, cutoff, 1);
                     return newRoot;
