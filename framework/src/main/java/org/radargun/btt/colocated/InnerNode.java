@@ -184,17 +184,20 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		}
 	    }
 
+	    InnerNode toRet = this;
 	    if (this.isPartial()) {
-		try {
-		    throw new RuntimeException();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		System.out.println("Should be fully replicated!");
-		System.exit(-1);
+		// Note: following a growth, a shrink and a new growth, this last one will have the last LR as partial, and thus this check does not apply
+//		try {
+//		    throw new RuntimeException();
+//		} catch (Exception e) {
+//		    e.printStackTrace();
+//		}
+//		System.out.println("Should be fully replicated!");
+//		System.exit(-1);
+	    } else {
+		toRet = this.switchToPartial();
 	    }
 	    
-	    InnerNode toRet = this.switchToPartial();
 	    BPlusTree.addLocalRoot(localRootsUUID, toRet);
 	    return toRet;
 	    
