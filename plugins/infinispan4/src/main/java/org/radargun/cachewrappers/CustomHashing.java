@@ -133,6 +133,10 @@ public class CustomHashing implements ConsistentHash, Serializable {
 	    String trimmed = keyStr.split(":::")[0];
 	    int numOwners = Integer.parseInt(keyStr.split(":::")[1]);
 	    
+	    if (numOwners == members.size()) {
+		return new ArrayList<Address>(members);
+	    }
+	    
 	    int segment = getSegment(trimmed);
 
 	    List<Address> result = new ArrayList<Address>(numOwners);
