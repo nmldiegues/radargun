@@ -48,7 +48,7 @@
          />
    <FD_SOCK/>
    <BARRIER/>
-   <pbcast.NAKACK2i
+   <pbcast.NAKACK2
          use_mcast_xmit="true"
          discard_delivered_msgs="true"
          />
