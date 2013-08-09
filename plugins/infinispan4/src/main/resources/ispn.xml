@@ -43,7 +43,7 @@
                 enabled="false"/>
         <clustering mode="d">
             <sync
-                    replTimeout="15000" />
+                    replTimeout="60000" />
             <hash
 		    factory="org.radargun.cachewrappers.CustomHashingFactory"
 		    numSegments="256"
