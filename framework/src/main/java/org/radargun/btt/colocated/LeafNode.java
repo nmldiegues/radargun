@@ -340,7 +340,12 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 
     @Override
     public AbstractNode changeGroup(int newGroup) {
-	return new LeafNode(this, newGroup);
+	BPlusTree.wrapper.endTransaction(true);
+	BPlusTree.wrapper.startTransaction(false);
+	AbstractNode result = new LeafNode(this, newGroup);
+	BPlusTree.wrapper.endTransaction(true);
+	BPlusTree.wrapper.startTransaction(false);
+	return result;
     }
 
 }

@@ -724,7 +724,12 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     }
     
     public AbstractNode changeGroup(int newGroup) {
-	return new InnerNode(this, newGroup);
+	BPlusTree.wrapper.endTransaction(true);
+	BPlusTree.wrapper.startTransaction(false);
+	AbstractNode result = new InnerNode(this, newGroup);
+	BPlusTree.wrapper.endTransaction(true);
+	BPlusTree.wrapper.startTransaction(false);
+	return result;
     }
     
 }
