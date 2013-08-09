@@ -75,7 +75,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		System.exit(-1);
 	    }
 
-	    int batch = 10;
+	    int batch = 1000;
 	    for (int i = 0; i < this.keysSize; i += batch) {
 		doPopulation(wrapper, tree, i, batch);
 		System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
