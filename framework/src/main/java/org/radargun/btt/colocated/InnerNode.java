@@ -187,6 +187,12 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     // was split and now needs to pass a new key to its parent (this)
     RebalanceBoolean rebase(boolean dummy, AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
 	DoubleArray<AbstractNode> newArr = justInsertUpdatingParentRelation(middleKey, subLeftNode, subRightNode);
+	
+        if (this.isFullyReplicated()) {
+            BPlusTree.wrapper.endTransaction(true);
+            BPlusTree.wrapper.startTransaction(false);
+        }
+	
         if (newArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) { // this node can accommodate the new split
             return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
         } else { // must split this node
