@@ -31,6 +31,11 @@ public class ShutDownHook extends Thread {
    }
 
    public static void exit(int code) {
+       try {
+	   throw new RuntimeException();
+       } catch (Exception e) {
+	   e.printStackTrace();
+       }
       controlled = true;
       System.exit(code);
    }

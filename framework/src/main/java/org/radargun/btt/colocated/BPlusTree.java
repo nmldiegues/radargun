@@ -204,6 +204,24 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
         return true;
     }
     
+    // hack to try to partition better the transactions when expensive rebalances occur
+    public boolean insert(Comparable key) {
+        AbstractNode rootNode = this.getRoot(true);
+        AbstractNode resultNode = rootNode.insert(false, key, (T) key, 1, this.localRootsUUID, this.cutoffKey);
+        
+        if (resultNode == null) {
+            return false;
+        } else if (resultNode.group == TRUE_NODE.group) {
+            return false; // and no rebalance ocurred!
+        }
+        
+        if (!rootNode.equals(resultNode)) {
+            this.setRoot(resultNode);
+            return true;
+        }
+        return false;
+    }
+    
     /** Removes the element with the given key */
     public boolean removeKey(Comparable key) {
         AbstractNode rootNode = this.getRoot(true);
