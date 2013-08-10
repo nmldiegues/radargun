@@ -103,6 +103,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		    long nextVal = i;
 		    if (tree.insert(nextVal)) {
 			wrapper.endTransaction(true);
+			System.out.println("\tinserted: " + i + " of range " + start + " <-> " + batch);
 			wrapper.startTransaction(false);
 		    }
 		}
