@@ -65,6 +65,8 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
 	BPlusTree.putCache(this.parentKey, null);
     }
     
+    abstract RebalanceBoolean insert(Comparable key, T value, int height, String localRootsUUID, LocatedKey cutoffKey);
+    
     /** Inserts the given key-value pair and returns the (possibly new) root node */
     abstract AbstractNode insert(boolean remote, Comparable key, T value, int height, String localRootsUUID, LocatedKey cutoffKey);
 

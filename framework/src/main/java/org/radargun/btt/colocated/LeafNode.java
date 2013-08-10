@@ -131,6 +131,39 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	}
     }
     
+    @Override
+    public RebalanceBoolean insert(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	DoubleArray<Serializable> localEntries = this.getEntries(false);
+	DoubleArray<Serializable> localArr = justInsert(localEntries, key, value);
+
+	if (localArr == null) {
+	    return new RebalanceBoolean(false, null);
+	}
+	if (localArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+	    return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
+	} else {
+	    // find middle position
+	    Comparable keyToSplit = localArr.findRightMiddlePosition();
+
+	    // split node in two
+	    int newGroup = this.group;
+	    LeafNode leftNode = new LeafNode<T>(newGroup, localArr.leftPart(BPlusTree.LOWER_BOUND + 1));
+	    LeafNode rightNode = new LeafNode<T>(newGroup, localArr.rightPart(BPlusTree.LOWER_BOUND + 1));
+	    fixLeafNodeArraysListAfterSplit(leftNode, rightNode);
+
+	    InnerNode parent = this.getParent(true);
+	    this.clean();
+
+	    // propagate split to parent
+	    if (parent == null) {  // make new root node
+		InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
+		return new RebalanceBoolean(true, newRoot);
+	    } else {
+		return parent.rebase(false, leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));
+	    }
+	}
+    }
+    
     private DoubleArray<Serializable> justInsert(DoubleArray<Serializable> localEntries, Comparable key, Serializable value) {
         // this test is performed because we need to return a new structure in
         // case an update occurs.  Value types must be immutable.

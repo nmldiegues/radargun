@@ -207,19 +207,20 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     // hack to try to partition better the transactions when expensive rebalances occur
     public boolean insert(Comparable key) {
         AbstractNode rootNode = this.getRoot(true);
-        AbstractNode resultNode = rootNode.insert(false, key, (T) key, 1, this.localRootsUUID, this.cutoffKey);
+        RebalanceBoolean result = rootNode.insert(key, (T) key, 1, this.localRootsUUID, this.cutoffKey);
+        AbstractNode resultNode = result.node;
         
         if (resultNode == null) {
-            return false;
+            return result.rebalance;
         } else if (resultNode.group == TRUE_NODE.group) {
-            return false; // and no rebalance ocurred!
+            return result.rebalance; // and no rebalance ocurred!
         }
         
         if (!rootNode.equals(resultNode)) {
             this.setRoot(resultNode);
-            return true;
+            return result.rebalance;
         }
-        return false;
+        return result.rebalance;
     }
     
     /** Removes the element with the given key */
