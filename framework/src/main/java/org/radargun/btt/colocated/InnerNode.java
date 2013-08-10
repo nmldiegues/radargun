@@ -188,7 +188,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     RebalanceBoolean rebase(boolean dummy, AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
 	DoubleArray<AbstractNode> newArr = justInsertUpdatingParentRelation(middleKey, subLeftNode, subRightNode);
         if (newArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) { // this node can accommodate the new split
-            return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
+            return new RebalanceBoolean(true, BPlusTree.TRUE_NODE);
         } else { // must split this node
             // find middle position (key to move up amd sub-node to move left)
             Comparable keyToSplit = newArr.keys[BPlusTree.LOWER_BOUND];

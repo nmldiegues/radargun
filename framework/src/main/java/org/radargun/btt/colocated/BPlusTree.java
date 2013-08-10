@@ -218,6 +218,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
         
         if (!rootNode.equals(resultNode)) {
             this.setRoot(resultNode);
+System.out.println("Should be true: " + result.rebalance);
             return result.rebalance;
         }
         return result.rebalance;

@@ -78,7 +78,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    int batch = 1000;
 	    for (int i = 0; i < this.keysSize; i += batch) {
 		doPopulation(wrapper, tree, i, batch);
-		System.out.println("Coordinator inserted: " + i + " / " + this.keysSize);
+		System.out.println("Coordinator inserted: " + i + " // " + this.keysSize);
 	    }
 	    
 	    System.out.println("Starting colocation!");
