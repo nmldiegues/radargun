@@ -480,7 +480,7 @@ public class InfinispanWrapper implements CacheWrapper {
 	    ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
 	    for (Address addr : members) {
 		for (int i = 1; ; i++) {
-		    if (ch.isKeyLocalToNode(addr, "" + i)) {
+		    if (ch.locatePrimaryOwner("" + i).equals(addr)) {
 			mapping.put(addr, i);
 			break;
 		    }

@@ -14,7 +14,7 @@ public class GroupingKey implements LocatedKey, Serializable {
     public GroupingKey(String key, int group) {
 	this.key = key;
 	this.group = group;
-	this.replicationDegree = 1;
+	this.replicationDegree = -1;
     }
     
     public GroupingKey(String key, int group, int replicationDegree) {
@@ -52,7 +52,7 @@ public class GroupingKey implements LocatedKey, Serializable {
     
     @Group
     public String group() {
-	return "" + group + ":::" + this.replicationDegree;
+	return "" + group + ((this.replicationDegree != -1) ? (":::" + this.replicationDegree) : "");
     }
 
     public int getGroup() {
