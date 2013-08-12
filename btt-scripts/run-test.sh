@@ -15,7 +15,7 @@ GHOST_READS=$7
 THREAD_MIGRATION=$6
 INTRA_NODE_CONC=$8
 LOWER_BOUND=$9
-NR_NODES_TO_USE=`wc -l /home/ubuntu/machines | awk '{print $1}'`
+NR_NODES_TO_USE=`wc -l /home/ndiegues/machines | awk '{print $1}'`
 EST_DURATION="1"
 
 BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -k $KEYS_SIZE -kr $KEYS_RANGE -d $DURATION -ro $READ_ONLY_PERC -t $THREAD_MIGRATION -r $REPLICATION_DEGREES -l $COLOCATION -g $GHOST_READS -i $INTRA_NODE_CONC -b $LOWER_BOUND"
