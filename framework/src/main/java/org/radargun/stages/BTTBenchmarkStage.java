@@ -23,7 +23,7 @@ public class BTTBenchmarkStage extends AbstractDistStage {
     private int keysRange;
     private int keysSize;
     private int seconds;
-    private boolean emulation;
+    private String emulation;
 
     public void setEmulation(String emulation) {
         this.emulation = emulation;
