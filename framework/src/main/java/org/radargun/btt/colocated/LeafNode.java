@@ -1,7 +1,9 @@
 package org.radargun.btt.colocated;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -12,6 +14,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     private LocatedKey keyEntries;
     private LocatedKey keyPrevious;
     private LocatedKey keyNext;
+    private LinkedList<Serializable> entriesList;
     
     public static final transient int TRUTH = -2;
     
@@ -22,7 +25,11 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     protected LeafNode(int group) {
 	super(group);
 	ensureKeys();
-	setEntries(new DoubleArray<Serializable>(Serializable.class));
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    this.entriesList = new LinkedList<Serializable>(super.group);
+	} else {
+	    setEntries(new DoubleArray<Serializable>(Serializable.class));
+	}
     }
     
     protected LeafNode(int group, DoubleArray<Serializable> entries) {
@@ -31,13 +38,23 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	setEntries(entries);
     }
     
+    protected LeafNode(int group, LinkedList<Serializable> entries) {
+	super(group);
+	ensureKeys();
+	this.entriesList = entries;
+    }
+    
     protected LeafNode(LeafNode old, int newGroup) {
 	super(newGroup);
 	// super.setParent(parent)	// set by the parent
 	ensureKeys();
 	setPrevious(old.getPrevious());
 	setNext(old.getNext());
-	setEntries(old.getEntries(false));
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    this.entriesList = old.entriesList.changeGroup(newGroup);
+	} else {
+	    setEntries(old.getEntries(false));
+	}
     }
     
     @Override
@@ -52,7 +69,11 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     @Override
     void clean() {
         super.clean();
-        BPlusTree.putCache(this.keyEntries, null);
+        if (BPlusTree.INTRA_NODE_CONC) {
+            this.entriesList.clean();
+        } else {
+            BPlusTree.putCache(this.keyEntries, null);
+        }
         BPlusTree.putCache(this.keyPrevious, null);
         BPlusTree.putCache(this.keyNext, null);
     }
@@ -97,9 +118,56 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	BPlusTree.putCache(keyNext, next);
     }
     
-    
     @Override
     public AbstractNode insert(boolean remote, Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return insertWithList(key, value, height, localRootsUUID, cutoffKey);
+	} else {
+	    return insertWithArray(key, value, height, localRootsUUID, cutoffKey);
+	}
+    }
+
+    private AbstractNode insertWithList(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	boolean inserted = this.entriesList.insert(key, (T) value);
+	if (!inserted) {
+	    return null;
+	}
+	
+	int size = this.entriesList.getSizeWithRule() + (BPlusTree.INTRA_NODE_CONC && !BPlusTree.POPULATING ? 1 : 0);
+	if (size <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+	    return BPlusTree.TRUE_NODE;
+	} else {
+	    List<Comparable> keys = new ArrayList<Comparable>(size);
+	    List<Serializable> values = new ArrayList<Serializable>(size);
+	    this.entriesList.getAllElements(keys, values);
+	    
+	    if (keys.size() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+		return BPlusTree.TRUE_NODE;
+	    }
+	    
+	    // find middle position
+	    Comparable keyToSplit = keys.get(BPlusTree.LOWER_BOUND + 1);
+
+	    // split node in two
+	    int newGroup = this.group;
+	    LeafNode leftNode = new LeafNode<T>(newGroup, new LinkedList<Serializable>(newGroup, keys, values, 0, BPlusTree.LOWER_BOUND));
+	    LeafNode rightNode = new LeafNode<T>(newGroup, new LinkedList<Serializable>(newGroup, keys, values, BPlusTree.LOWER_BOUND + 1, keys.size() - 1));
+	    fixLeafNodeArraysListAfterSplit(leftNode, rightNode);
+
+	    InnerNode parent = this.getParent(true);
+	    this.clean();
+
+	    // propagate split to parent
+	    if (parent == null) {  // make new root node
+		InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
+		return newRoot;
+	    } else {
+		return parent.rebase(leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));
+	    }
+	}
+    }
+    
+    public AbstractNode insertWithArray(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	DoubleArray<Serializable> localEntries = this.getEntries(false);
 	DoubleArray<Serializable> localArr = justInsert(localEntries, key, value);
 
@@ -133,6 +201,55 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     
     @Override
     public RebalanceBoolean insert(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return insertWithListWithRebalance(key, value, height, localRootsUUID, cutoffKey);
+	} else {
+	    return insertWithArrayWithRebalance(key, value, height, localRootsUUID, cutoffKey);
+	}
+    }
+
+
+    private RebalanceBoolean insertWithListWithRebalance(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	boolean inserted = this.entriesList.insert(key, (T) value);
+	if (!inserted) {
+	    return new RebalanceBoolean(false, null);
+	}
+	
+	int size = this.entriesList.getSizeWithRule() + (BPlusTree.INTRA_NODE_CONC && !BPlusTree.POPULATING ? 1 : 0);
+	if (size <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+	    return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
+	} else {
+	    List<Comparable> keys = new ArrayList<Comparable>(size);
+	    List<Serializable> values = new ArrayList<Serializable>(size);
+	    this.entriesList.getAllElements(keys, values);
+	    
+	    if (keys.size() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+		return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
+	    }
+	    
+	    // find middle position
+	    Comparable keyToSplit = keys.get(BPlusTree.LOWER_BOUND + 1);
+
+	    // split node in two
+	    int newGroup = this.group;
+	    LeafNode leftNode = new LeafNode<T>(newGroup, new LinkedList<Serializable>(newGroup, keys, values, 0, BPlusTree.LOWER_BOUND));
+	    LeafNode rightNode = new LeafNode<T>(newGroup, new LinkedList<Serializable>(newGroup, keys, values, BPlusTree.LOWER_BOUND + 1, keys.size() - 1));
+	    fixLeafNodeArraysListAfterSplit(leftNode, rightNode);
+
+	    InnerNode parent = this.getParent(true);
+	    this.clean();
+
+	    // propagate split to parent
+	    if (parent == null) {  // make new root node
+		InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
+		return new RebalanceBoolean(true, newRoot);
+	    } else {
+		return parent.rebase(false, leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));
+	    }
+	}
+    }
+    
+    public RebalanceBoolean insertWithArrayWithRebalance(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	DoubleArray<Serializable> localEntries = this.getEntries(false);
 	DoubleArray<Serializable> localArr = justInsert(localEntries, key, value);
 
@@ -163,17 +280,11 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	    }
 	}
     }
-    
+	
     private DoubleArray<Serializable> justInsert(DoubleArray<Serializable> localEntries, Comparable key, Serializable value) {
         // this test is performed because we need to return a new structure in
         // case an update occurs.  Value types must be immutable.
-	Serializable currentValue;
-	try {
-	    currentValue = localEntries.get(key);
-	} catch (NullPointerException npe) {
-	    npe.printStackTrace();
-	    throw npe;
-	}
+	Serializable currentValue = localEntries.get(key);
         // this check suffices because we do not allow null values
         if (currentValue != null && currentValue.equals(value)) {
             return null;
@@ -207,6 +318,47 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 
     @Override
     public AbstractNode remove(boolean remote, Comparable key, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return removeWithList(key, height, localRootsUUID, cutoffKey);
+	} else {
+	    return removeWithArray(key, height, localRootsUUID, cutoffKey);
+	}
+    }
+    
+    private AbstractNode removeWithList(Comparable key, int height, String localRootsUUID, LocatedKey cutoffKey) {
+	boolean removed = this.entriesList.remove(key);
+	
+        if (!removed) {
+            return null;	// remove will return false
+        }
+        
+        if (getParent(false) == null) {
+            return this;
+        } else {
+            
+            if (this.entriesList.isEmpty()) {
+        	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
+        	return getParent(false).underflowFromLeaf(key, null, height, 0, localRootsUUID, cutoff, true);
+            }
+            
+            int size = this.entriesList.getSizeWithRule() - (BPlusTree.INTRA_NODE_CONC && !BPlusTree.POPULATING? 1 : 0);
+            
+            // if the removed key was the first we need to replace it in some parent's index
+            Comparable replacementKey = null;
+
+            if (size < BPlusTree.LOWER_BOUND) {
+        	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
+        	replacementKey = getReplacementKeyIfNeededWithList(key);
+                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff, false);
+            } else if ((replacementKey = getReplacementKeyIfNeededWithList(key)) != null) {
+                return getParent(false).replaceDeletedKey(key, replacementKey);
+            } else {
+                return BPlusTree.TRUE_NODE; // maybe a tiny faster than just getRoot() ?!
+            }
+        }
+    }
+    
+    public AbstractNode removeWithArray(Comparable key, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	DoubleArray<Serializable> localEntries = this.getEntries(false);
 	DoubleArray<Serializable> localArr = justRemove(localEntries, key);
 	
@@ -221,7 +373,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 
             if (localArr.length() < BPlusTree.LOWER_BOUND) {
         	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
-                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff);
+                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff, false);
             } else if (replacementKey != null) {
                 return getParent(false).replaceDeletedKey(key, replacementKey);
             } else {
@@ -253,36 +405,47 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
         }
     }
 
+    private Comparable getReplacementKeyIfNeededWithList(Comparable deletedKey) {
+        Comparable firstKey = this.entriesList.getFirstKey();
+        if (BPlusTree.COMPARATOR_SUPPORTING_LAST_KEY.compare(deletedKey, firstKey) < 0) {
+            return firstKey;
+        } else {
+            return null; // null means that key does not need replacement
+        }
+    }
+    
     @Override
     DoubleArray<Serializable>.KeyVal removeBiggestKeyValue() {
-        DoubleArray<Serializable> entries = this.getEntries(false);
-        DoubleArray<Serializable>.KeyVal lastEntry = entries.getBiggestKeyValue();
-        setEntries(entries.removeBiggestKeyValue());
-        return lastEntry;
+	throw new RuntimeException("Not implemented");
     }
 
     @Override
     DoubleArray<Serializable>.KeyVal removeSmallestKeyValue() {
-        DoubleArray<Serializable> entries = this.getEntries(false);
-        DoubleArray<Serializable>.KeyVal firstEntry = entries.getSmallestKeyValue();
-        setEntries(entries.removeSmallestKeyValue());
-        return firstEntry;
+	throw new RuntimeException("Not implemented");
     }
 
     @Override
     Comparable getSmallestKey() {
-        return this.getEntries(false).firstKey();
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return this.entriesList.getFirstKey();
+	} else {
+	    return this.getEntries(false).firstKey();
+	}
     }
 
     @Override
     void addKeyValue(DoubleArray.KeyVal keyValue) {
-        setEntries(this.getEntries(false).addKeyValue(keyValue));
+	throw new RuntimeException("Not implemented");
     }
 
     @Override
     void mergeWithLeftNode(AbstractNode leftNode, Comparable splitKey, int treeDepth, int height, String localRootsUUID, int cutoff) {
         LeafNode left = (LeafNode) leftNode; // this node does not know how to merge with another kind
-        setEntries(getEntries(false).mergeWith(left.getEntries(false)));
+        if (BPlusTree.INTRA_NODE_CONC) {
+            this.entriesList.mergeWith(left.entriesList);
+        } else {
+            setEntries(getEntries(false).mergeWith(left.getEntries(false)));
+        }
 
         LeafNode nodeBefore = left.getPrevious();
         if (nodeBefore != null) {
@@ -290,42 +453,57 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             nodeBefore.setNext(this);
         }
 
-        // no need to update parents, because they are always the same for the two merging leaf nodes
-        assert (this.getParent(false).equals(leftNode.getParent(false)));
-        
         left.clean();
     }
 
     @Override
     public T get(Comparable key) {
-	DoubleArray<Serializable> localEntries = this.getEntries(false);
-	return (T) localEntries.get(key);
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    System.out.println("Not implemented yet!");
+	    System.exit(-1);
+	    return null;
+	} else {
+	    DoubleArray<Serializable> localEntries = this.getEntries(false);
+	    return (T) localEntries.get(key);
+	}
     }
 
     @Override
     public boolean containsKey(boolean remote, Comparable key) {
-	DoubleArray<Serializable> localEntries = this.getEntries(false);
-	try {
-	    return localEntries.containsKey(key);
-	} catch (NullPointerException npe) {
-	    npe.printStackTrace();
-	    throw npe;
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return this.entriesList.contains(key);
+	} else {
+	    return this.getEntries(false).containsKey(key);
 	}
     }
 
     @Override
     int shallowSize() {
-        return this.getEntries(false).length();
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return this.entriesList.getSizeWithRule();
+	} else {
+	    return this.getEntries(false).length();
+	}
     }
 
     @Override
     public int size() {
-        return this.getEntries(false).length();
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    return this.entriesList.getSize(false);
+	} else {
+	    return this.getEntries(false).length();
+	}
     }
 
     @Override
     public Iterator<T> iterator() {
-        return new LeafNodeArrayIterator(this);
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    System.out.println("Not implemented yet");
+	    System.exit(-1);
+	    return null;
+	} else {
+	    return new LeafNodeArrayIterator(this);
+	}
     }
 
     private class LeafNodeArrayIterator implements Iterator<T> {

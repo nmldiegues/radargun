@@ -115,6 +115,8 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     public static boolean GHOST;
     public static boolean REPL_DEGREES;
     public static boolean THREAD_MIGRATION;
+    public static boolean INTRA_NODE_CONC;
+    public static boolean POPULATING;
     
     transient ColocationThread colocationThread;
     

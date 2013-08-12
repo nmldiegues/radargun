@@ -440,7 +440,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     // null in replacement key means that deletedKey does not have to be
     // replaced. Corollary: the deleted key was not the first key in its leaf
     // node
-    AbstractNode underflowFromLeaf(Comparable deletedKey, Comparable replacementKey, int treeDepth, int height, String localRootsUUID, int cutoff) {
+    AbstractNode underflowFromLeaf(Comparable deletedKey, Comparable replacementKey, int treeDepth, int height, String localRootsUUID, int cutoff, boolean leafEmpty) {
         DoubleArray<AbstractNode> subNodes = this.getSubNodes(false);
         int iter = 0;
         // first, identify the deletion point
@@ -470,28 +470,55 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             nextEntryKey = subNodes.keys[iter + 1]; // always exists because of LAST_KEY
             nextEntryValue = subNodes.values[iter + 1];
 
-            if (nextEntryValue.shallowSize() == BPlusTree.LOWER_BOUND) { // can we merge with the right?
+            // Flexible: if first, always merge right, possibly exceeding upper bound
+            // if (nextEntryValue.shallowSize() == BPlusTree.LOWER_BOUND) { // can we merge with the right?
+            if (!leafEmpty) {
                 rightLeafMerge(entryKey, entryValue, nextEntryValue, treeDepth, height, localRootsUUID, cutoff);
-            } else { // cannot merge with the right. We have to move an element from the right to here
-                moveChildFromRightToLeft(entryKey, entryValue, nextEntryValue);
+            } else {
+        	replacementKey = nextEntryValue.getSmallestKey();
+        	setSubNodes(getSubNodes(false).removeKey(entryKey));
             }
+            //} 
+            // else { // cannot merge with the right. We have to move an element from the right to here
+            //    moveChildFromRightToLeft(entryKey, entryValue, nextEntryValue);
+            //}
             if (replacementKey != null && this.getParent(false) != null) { // the deletedKey occurs somewhere atop only
                 this.getParent(false).replaceDeletedKey(deletedKey, replacementKey);
             }
-        } else if (previousEntryValue.shallowSize() == BPlusTree.LOWER_BOUND) { // can we merge with the left?
+        } else if (iter >= (subNodes.length() - 1)) {
+            // Flexible: if deleted the last one then cannot merge with right
             leftLeafMerge(previousEntryKey, previousEntryValue, entryValue, treeDepth, height, localRootsUUID, cutoff);
-        } else {  // cannot merge with the left
-            if (iter >= (subNodes.length() - 1)
-                    || (nextEntryValue = subNodes.values[iter + 1]).shallowSize() > BPlusTree.LOWER_BOUND) { // caution: tricky test!!
-                // either there is no next or the next is above the lower bound
-                moveChildFromLeftToRight(previousEntryKey, previousEntryValue, entryValue);
+        } else {
+            // Flexible: in the other cases, toss coin
+            if (ThreadLocalRandom.current().nextBoolean()) {
+        	leftLeafMerge(previousEntryKey, previousEntryValue, entryValue, treeDepth, height, localRootsUUID, cutoff);
             } else {
-                rightLeafMerge(entryKey, entryValue, nextEntryValue, treeDepth, height, localRootsUUID, cutoff);
-                if (replacementKey != null) { // the deletedKey occurs anywhere (or at this level ONLY?)
-                    this.replaceDeletedKey(deletedKey, replacementKey, previousEntryValue);
-                }
+        	nextEntryValue = subNodes.values[iter + 1];
+        	if (!leafEmpty) {
+        	    rightLeafMerge(entryKey, entryValue, nextEntryValue, treeDepth, height, localRootsUUID, cutoff);
+        	} else {
+        	    replacementKey = nextEntryValue.getSmallestKey();
+        	    setSubNodes(getSubNodes(false).removeKey(entryKey));
+        	}
+        	if (replacementKey != null) {
+        	    this.replaceDeletedKey(deletedKey, replacementKey, previousEntryValue);
+        	}
             }
-        }
+        } 
+//        else if (previousEntryValue.shallowSize() == BPlusTree.LOWER_BOUND) { // can we merge with the left?
+//            leftLeafMerge(previousEntryKey, previousEntryValue, entryValue, treeDepth, height, localRootsUUID, cutoff);
+//        } else {  // cannot merge with the left
+//            if (iter >= (subNodes.length() - 1)
+//                    || (nextEntryValue = subNodes.values[iter + 1]).shallowSize() > BPlusTree.LOWER_BOUND) { // caution: tricky test!!
+//                // either there is no next or the next is above the lower bound
+//                moveChildFromLeftToRight(previousEntryKey, previousEntryValue, entryValue);
+//            } else {
+//                rightLeafMerge(entryKey, entryValue, nextEntryValue, treeDepth, height, localRootsUUID, cutoff);
+//                if (replacementKey != null) { // the deletedKey occurs anywhere (or at this level ONLY?)
+//                    this.replaceDeletedKey(deletedKey, replacementKey, previousEntryValue);
+//                }
+//            }
+//        }
         return checkForUnderflow(treeDepth, height + 1, localRootsUUID, cutoff);
     }
 
@@ -566,27 +593,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         
         
         left.clean();
-    }
-
-    // Get the rightmost key-value pair from the left sub-node and move it to the given sub-node.  Update the split key
-    private void moveChildFromLeftToRight(Comparable leftEntryKey, AbstractNode leftEntryValue,
-            AbstractNode rightEntryValue) {
-        DoubleArray<Serializable>.KeyVal leftBiggestKeyValue = leftEntryValue.removeBiggestKeyValue();
-        rightEntryValue.addKeyValue(leftBiggestKeyValue);
-
-        // update the split key to be the key we just moved
-        setSubNodes(this.getSubNodes(false).replaceKey(leftEntryKey, leftBiggestKeyValue.key, leftEntryValue));
-    }
-
-    // Get the leftmost key-value pair from the right sub-node and move it to the given sub-node.  Update the split key
-    private void moveChildFromRightToLeft(Comparable leftEntryKey, AbstractNode leftValue, AbstractNode rightValue) {
-        DoubleArray<Serializable>.KeyVal rightSmallestKeyValue = rightValue.removeSmallestKeyValue();
-        leftValue.addKeyValue(rightSmallestKeyValue);
-
-        // update the split key to be the key after the one we just moved
-        Comparable rightNextSmallestKey = rightValue.getSmallestKey();
-        DoubleArray<AbstractNode> entries = this.getSubNodes(false);
-        setSubNodes(entries.replaceKey(leftEntryKey, rightNextSmallestKey, leftValue));
     }
 
     /*
