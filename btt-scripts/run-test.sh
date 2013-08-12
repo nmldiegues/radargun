@@ -14,7 +14,7 @@ COLOCATION=$6
 GHOST_READS=$7
 THREAD_MIGRATION=$8
 LOWER_BOUND=$9
-NR_NODES_TO_USE=`wc -l /home/ndiegues/machines | awk '{print $1}'`
+NR_NODES_TO_USE=`wc -l /home/ubuntu/machines | awk '{print $1}'`
 EST_DURATION="1"
 
 BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -k $KEYS_SIZE -kr $KEYS_RANGE -d $DURATION -ro $READ_ONLY_PERC -t $THREAD_MIGRATION -r $REPLICATION_DEGREES -l $COLOCATION -g $GHOST_READS -b $LOWER_BOUND"
@@ -31,7 +31,9 @@ echo "============ STARTING BENCHMARKING ==============="
 #wrtPx => write percentage== 0 10
 #rdg => replication degree== 1 2 3
 
-${JGRP_GEN} -sequencer -toa -tcp
+#${JGRP_GEN} -sequencer -toa -tcp
+#cp ${RADARGUN_DIR}/plugins/infinispan4/bin/jgroups/jgroups.xml ${WORKING_DIR}/conf/jgroups/jgroups.xml
+
 
 echo "After generating jgroups"
 
