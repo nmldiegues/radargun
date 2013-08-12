@@ -23,6 +23,11 @@ public class BTTBenchmarkStage extends AbstractDistStage {
     private int keysRange;
     private int keysSize;
     private int seconds;
+    private boolean emulation;
+
+    public void setEmulation(String emulation) {
+        this.emulation = emulation;
+    }
     
     public void setKeysRange(int keysRange) {
         this.keysRange = keysRange;
@@ -45,6 +50,7 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	bttStressor.setKeysSize(keysSize);
         bttStressor.setKeysRange(keysRange);
 	bttStressor.setSeconds(seconds);
+        bttStressor.setEmulation(emulation);
 	
 	try {
 	    Thread worker = new Thread(bttStressor);
