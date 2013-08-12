@@ -18,6 +18,7 @@ KEYS_RANGE=100000
 DURATION=20
 LOWER_BOUND=2
 INTRA_NOD_CONC=true
+EMULATION="none"
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -46,6 +47,7 @@ case $1 in
   -d) DURATION=$2; shift 2;;
   -t) THREAD_MIGRATION=$2; shift 2;;
   -b) LOWER_BOUND=$2; shift 2;;
+  -e) EMULATION=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -93,6 +95,7 @@ echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 
 echo "      <BTTBenchmark" >> ${DEST_FILE}
 echo "            readOnlyPerc=\"${READ_ONLY_PERC}\"" >> ${DEST_FILE}
+echo "		  emulation=\"${EMULATION}\"" >> ${DEST_FILE}
 echo "            keysSize=\"${KEYS_SIZE}\"" >> ${DEST_FILE}
 echo "            keysRange=\"${KEYS_RANGE}\"" >> ${DEST_FILE}
 echo "            seconds=\"${DURATION}\" />" >> ${DEST_FILE}

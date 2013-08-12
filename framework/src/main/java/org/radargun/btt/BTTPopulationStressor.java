@@ -97,6 +97,9 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    System.out.println(stats);
 
 	    wrapper.resetAdditionalStats();
+	    
+	    wrapper.put(wrapper.createGroupingKeyWithRepl("minuetFull-snapshot-id", 0, clusterSize), 0L);
+	    wrapper.put(wrapper.createGroupingKey("minuetFull-snapshot-id", 0), 0L);
 	}
 	BPlusTree.POPULATING = false;
     }

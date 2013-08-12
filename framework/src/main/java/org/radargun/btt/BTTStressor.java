@@ -20,6 +20,11 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
     private int keysSize;
     private int keysRange;
     private int seconds;
+    private String emulation;
+    
+    public void setEmulation(String emulation) {
+	this.emulation = emulation;
+    }
     
     public void setKeysRange(int keysRange) {
         this.keysRange = keysRange;
@@ -73,6 +78,30 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 	boolean query = Math.abs(random.nextInt(100)) < this.readOnlyPerc;
 	while (!successful && m_phase == TEST_PHASE) {
 	    try {
+		
+		if (query && emulation.equals("minuetFull")) {
+		    try {
+			cache.startTransaction(false);
+			LocatedKey fullKey = cache.createGroupingKeyWithRepl("minuetFull-snapshot-id", 0, cache.getNumMembers());
+			Long snapshotId = (Long) cache.get(fullKey);
+			cache.put(fullKey, snapshotId + 1);
+			cache.endTransaction(true);
+		    } catch (Exception e) {
+			cache.endTransaction(false);
+		    }
+		} else if (query && emulation.equals("minuetPartial")) {
+		    try {
+			cache.startTransaction(false);
+			LocatedKey partialKey = cache.createGroupingKey("minuetFull-snapshot-id", cache.getNumMembers());
+			Long snapshotId = (Long) cache.get(partialKey);
+			cache.put(partialKey, snapshotId + 1);
+			cache.endTransaction(true);
+		    } catch (Exception e) {
+			cache.endTransaction(false);
+		    }
+		}
+		
+		
 		cache.startTransaction(false);
 		
 		if (query) {
