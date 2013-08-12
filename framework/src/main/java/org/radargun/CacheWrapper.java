@@ -163,4 +163,6 @@ public interface CacheWrapper
    public <T> T execDEF(CallableWrapper<T> callable, Object key) throws Exception;
    
    public void initDEF();
+   
+   public void addDelayed(Object key, int count);
 }

@@ -1,17 +1,10 @@
 package org.radargun.btt;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import org.radargun.CacheWrapper;
-import org.radargun.DEF;
-import org.radargun.DEFTask;
 import org.radargun.LocatedKey;
 import org.radargun.btt.colocated.BPlusTree;
 import org.radargun.stressors.AbstractCacheWrapperStressor;

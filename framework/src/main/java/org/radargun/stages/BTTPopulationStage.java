@@ -2,7 +2,6 @@ package org.radargun.stages;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.btree.BTreePopulationStressor;
 import org.radargun.btt.BTTPopulationStressor;
 
 public class BTTPopulationStage extends AbstractDistStage {
@@ -15,8 +14,13 @@ public class BTTPopulationStage extends AbstractDistStage {
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
+    private boolean intraNodeConc;
     private int lowerBound;
 
+    public void setIntraNodeConc(boolean intraNodeConc) {
+	this.intraNodeConc = intraNodeConc;
+    }
+    
     public void setKeysRange(int keysRange) {
         this.keysRange = keysRange;
     }
@@ -46,6 +50,7 @@ public class BTTPopulationStage extends AbstractDistStage {
 	stressor.setThreadMigration(threadMigration);
 	stressor.setLowerBound(lowerBound);
         stressor.setKeysRange(keysRange);
+        stressor.setIntraNodeConc(intraNodeConc);
 	stressor.stress(wrapper);
     }
 

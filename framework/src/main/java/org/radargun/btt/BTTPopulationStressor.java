@@ -20,8 +20,13 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
     private boolean ghostReads;
     private boolean colocation;
     private boolean replicationDegrees;
+    private boolean intraNodeConc;
     private int lowerBound;
 
+    public void setIntraNodeConc(boolean intraNodeConc) {
+	this.intraNodeConc = intraNodeConc;
+    }
+    
     public void setKeysRange(int keysRange) {
         this.keysRange = keysRange;
     }
@@ -64,6 +69,8 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	BPlusTree.COLOCATE = colocation;
 	BPlusTree.GHOST = ghostReads;
 	BPlusTree.REPL_DEGREES = replicationDegrees;
+	BPlusTree.INTRA_NODE_CONC = intraNodeConc;
+	BPlusTree.POPULATING = true;
 	
 	if (wrapper.isTheMaster()) {
 	    LocatedKey treeKey = wrapper.createGroupingKeyWithRepl("tree", 0, clusterSize);
@@ -91,6 +98,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 
 	    wrapper.resetAdditionalStats();
 	}
+	BPlusTree.POPULATING = false;
     }
     
     private void doPopulation(CacheWrapper wrapper, BPlusTree<Long> tree, int start, int batch) {

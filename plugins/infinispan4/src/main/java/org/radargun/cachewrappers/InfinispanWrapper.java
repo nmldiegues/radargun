@@ -63,6 +63,7 @@ public class InfinispanWrapper implements CacheWrapper {
    private static Log log = LogFactory.getLog(InfinispanWrapper.class);
    DefaultCacheManager cacheManager;
    private Cache<Object, Object> cache;
+   public static transient Cache STATIC_CACHE;
    private Cache<Object, Object> cacheNoRead;
    private Cache<Object, Object> cacheGhost;
    TransactionManager tm;
@@ -88,6 +89,7 @@ public class InfinispanWrapper implements CacheWrapper {
             throw new IllegalStateException("The requested cache(" + cacheName + ") is not defined. Defined cache " +
                                                   "names are " + cacheNames);
          cache = cacheManager.getCache(cacheName);
+         STATIC_CACHE = cache;
          cacheNoRead = cache.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
          cacheGhost = cache.getAdvancedCache().withFlags(Flag.READ_WITHOUT_REGISTERING);
          started = true;
@@ -570,5 +572,10 @@ public class InfinispanWrapper implements CacheWrapper {
    @Override
    public void initDEF() {
        TransactionCoordinator.des = new DefaultExecutorService(this.cache);
+   }
+   
+   @Override
+   public void addDelayed(Object key, int count) {
+       this.cache.delayedComputation(new ChangeSizeComputation((GroupingKey) key, count));
    }
 }
