@@ -124,10 +124,6 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 		if (reqPerSes == null) {
 		    throw new IllegalStateException("This should be there! TOTAL_RESTARTS");
 		}
-		Object latency = benchResult.get("AVG_LATENCY");
-		if (reqPerSes == null) {
-		    throw new IllegalStateException("This should be there! AVG_LATENCY");
-		}
 		log.info("Received " +  benchResult.remove(SIZE_INFO));
 	    } else {
 		log.trace("No report received from slave: " + ack.getSlaveIndex());
