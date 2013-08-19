@@ -82,7 +82,7 @@ public class CsvReportGenerationStage extends AbstractMasterStage {
 
         List<Integer> slaveIndexes = new ArrayList<Integer>(results.keySet());
         Collections.sort(slaveIndexes);
-
+try {
         List<String> dataRow = new ArrayList<String>();
         for (Integer i : slaveIndexes) {
             Map<String, Object> reportPerSlave = results.get(i);
@@ -103,7 +103,9 @@ public class CsvReportGenerationStage extends AbstractMasterStage {
             writeRowToFile(dataRow);
             dataRow.clear();
         }
-
+} catch (Exception e) {
+	e.printStackTrace();
+}
         closeFile();
     }
 
