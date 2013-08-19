@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -92,8 +93,10 @@ public class CsvReportGenerationStage extends AbstractMasterStage {
             for (int j = 1; j < headerRow.size(); j++) {
                 String header = headerRow.get(j);
                 Object data = reportPerSlave.get(header);
-                if (data == null)
-                    throw new IllegalStateException("Missing data for header: " + header + " from slave " + i + ". Report for this slave is: " + reportPerSlave);
+                if (data == null) {
+                    // throw new IllegalStateException("Missing data for header: " + header + " from slave " + i + ". Report for this slave is: " + reportPerSlave);
+                    data = new ArrayList<Object>(reportPerSlave.values()).get(j);
+                }
                 dataRow.add(String.valueOf(data));
             }
             writeRowToFile(dataRow);
