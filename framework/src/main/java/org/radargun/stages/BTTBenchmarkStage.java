@@ -81,10 +81,10 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	    for (Long count : latencies.values()) {
 		totalCount += count;
 	    }
-	    int summedPerc = 0;
+            double summedPerc = 0;
 	    for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
 		int latency = entry.getKey();
-		int perc = (int) (((entry.getValue() + 0.0) / (totalCount + 0.0)) * 100.0) + summedPerc;
+		double perc = (((entry.getValue() + 0.0) / (totalCount + 0.0)) * 100.0) + (summedPerc + 0.0);
 		results.put("LATENCY_" + latency, perc + "");
 	    }
 	    
