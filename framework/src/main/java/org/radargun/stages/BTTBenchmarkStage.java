@@ -128,7 +128,6 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 		if (reqPerSes == null) {
 		    throw new IllegalStateException("This should be there! AVG_LATENCY");
 		}
-		log.info("On slave " + ack.getSlaveIndex() + " had throughput " + Double.parseDouble(reqPerSes.toString()) + " ops/seconds | aborts: " + Long.parseLong(aborts.toString()) + " | latency: " + Double.parseDouble(latency.toString()));
 		log.info("Received " +  benchResult.remove(SIZE_INFO));
 	    } else {
 		log.trace("No report received from slave: " + ack.getSlaveIndex());
