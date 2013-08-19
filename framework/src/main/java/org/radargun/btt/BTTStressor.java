@@ -1,5 +1,6 @@
 package org.radargun.btt;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -35,7 +36,7 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
     private BPlusTree<Long> tree;
     public long lastValue = -1L;
     public long steps;
-    public long totalLatency;
+    public Map<Integer, Long> latencies = new HashMap<Integer, Long>(1000);
     public long aborts;
     
     volatile protected int m_phase = TEST_PHASE;
@@ -65,7 +66,14 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
         while (m_phase == TEST_PHASE) {
             long start = System.nanoTime();
             step(TEST_PHASE);
-            totalLatency += System.nanoTime() - start;
+            long latency = System.nanoTime() - start;
+            int latencyMs = (int) (latency / 1000000L);
+            Long count = latencies.get(latencyMs);
+            if (count == null) {
+        	count = 0L;
+            }
+            count++;
+            latencies.put(latencyMs, count);
             steps++;
         }
         
