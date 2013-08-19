@@ -95,7 +95,9 @@ public class CsvReportGenerationStage extends AbstractMasterStage {
                 Object data = reportPerSlave.get(header);
                 if (data == null) {
                     // throw new IllegalStateException("Missing data for header: " + header + " from slave " + i + ". Report for this slave is: " + reportPerSlave);
+		    try {
                     data = new ArrayList<Object>(reportPerSlave.values()).get(j);
+		    } catch (Exception e) { data = 0L; }
                 }
                 dataRow.add(String.valueOf(data));
             }

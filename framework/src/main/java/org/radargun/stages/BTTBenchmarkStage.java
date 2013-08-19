@@ -81,12 +81,14 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	    for (Long count : latencies.values()) {
 		totalCount += count;
 	    }
-	    int summedPerc = 0;
+            double summedPerc = 0;
+            String str = "";
 	    for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
 		int latency = entry.getKey();
-		int perc = (int) (((entry.getValue() + 0.0) / (totalCount + 0.0)) * 100.0) + summedPerc;
-		results.put("LATENCY_" + latency, perc + "");
+		double val = entry.getValue();
+		str += latency + ":" + val + ";";
 	    }
+	    results.put("LATENCY", str);
 	    
 	    log.info(sizeInfo);
 	    result.setPayload(results);
@@ -124,11 +126,6 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 		if (reqPerSes == null) {
 		    throw new IllegalStateException("This should be there! TOTAL_RESTARTS");
 		}
-		Object latency = benchResult.get("AVG_LATENCY");
-		if (reqPerSes == null) {
-		    throw new IllegalStateException("This should be there! AVG_LATENCY");
-		}
-		log.info("On slave " + ack.getSlaveIndex() + " had throughput " + Double.parseDouble(reqPerSes.toString()) + " ops/seconds | aborts: " + Long.parseLong(aborts.toString()) + " | latency: " + Double.parseDouble(latency.toString()));
 		log.info("Received " +  benchResult.remove(SIZE_INFO));
 	    } else {
 		log.trace("No report received from slave: " + ack.getSlaveIndex());
