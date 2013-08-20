@@ -80,6 +80,17 @@ public class VacationBenchmarkStage extends AbstractDistStage {
 		throughput += vacationStressor.getThroughput();
 	    results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / transactions) + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
+	    results.putAll(this.cacheWrapper.getAdditionalStats());
+	    
+	    Map<Integer, Long> latencies = vacationStressor.latencies;
+            String str = "";
+	    for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
+		int latency = entry.getKey();
+		double val = entry.getValue();
+		str += latency + ":" + val + ";";
+	    }
+	    results.put("LATENCY", str);
+	    
 	    log.info(sizeInfo);
 	    result.setPayload(results);
 	    return result;

@@ -77,11 +77,6 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 	    results.putAll(this.cacheWrapper.getAdditionalStats());
 	    
 	    Map<Integer, Long> latencies = bttStressor.latencies;
-	    long totalCount = 0L;
-	    for (Long count : latencies.values()) {
-		totalCount += count;
-	    }
-            double summedPerc = 0;
             String str = "";
 	    for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
 		int latency = entry.getKey();

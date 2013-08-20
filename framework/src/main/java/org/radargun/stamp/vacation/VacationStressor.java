@@ -1,5 +1,6 @@
 package org.radargun.stamp.vacation;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,6 +27,9 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
     private CacheWrapper cacheWrapper;
     private long restarts = 0;
     private long throughput = 0;
+    
+    public Map<Integer, Long> latencies = new HashMap<Integer, Long>(1000);
+    
     private Random randomPtr;
     private int queryPerTx;
     private int queryRange;
@@ -87,7 +91,16 @@ public class VacationStressor extends AbstractCacheWrapperStressor implements Ru
 	this.cacheWrapper = wrapper;
 
 	while (m_phase == TEST_PHASE) {
+	    long start = System.nanoTime();
 	    processTransaction(wrapper, generateNextTransaction());
+	    long latency = System.nanoTime() - start;
+            int latencyMs = (int) (latency / 1000000L);
+            Long count = latencies.get(latencyMs);
+            if (count == null) {
+        	count = 0L;
+            }
+            count++;
+            latencies.put(latencyMs, count);
 	    this.throughput++;
 	}
 
