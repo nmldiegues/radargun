@@ -257,6 +257,10 @@ System.out.println("Should be true: " + result.rebalance);
 	// System.out.println(Thread.currentThread().getId() + "] " + "root from btree: " + root);
         return root.containsKey(false, key);
     }
+    
+    public void scan(Comparable key, int length) {
+	this.getRoot(true).scan(false, key, length);
+    }
 
     /** Returns the number of key-value mappings in this map */
     public int size() {

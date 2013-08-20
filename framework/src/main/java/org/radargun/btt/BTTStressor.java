@@ -84,6 +84,28 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 	boolean successful = false;
 	long value = Math.abs(random.nextLong()) % keysRange;
 	boolean query = Math.abs(random.nextInt(100)) < this.readOnlyPerc;
+	boolean scan = false;
+	boolean rmw = false;
+	int scanSize = -1;
+	
+	if (BTTPopulationStressor.w != null) {
+	    String op = BTTPopulationStressor.w.doTransaction();
+	    if (op.equals("READ")) {
+		query = true;
+	    } else {
+		query = false;
+		if (op.equals("INSERT") || op.equals("UPDATE")) {
+		    scan = false;
+		} else if (op.equals("SCAN")){
+		    scan = true;
+		    scanSize = BTTPopulationStressor.w.doTransactionScan();
+		} else {
+		    rmw = true;
+		}
+	    }
+	    value = BTTPopulationStressor.w.doTransactionRead();
+	}
+	
 	while (!successful && m_phase == TEST_PHASE) {
 	    try {
 		
@@ -112,13 +134,31 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 		
 		cache.startTransaction(false);
 		
-		if (query) {
-		    this.tree.containsKey(value);
-		} else {
-		    if (lastValue == -1) {
-			this.tree.removeKey(value);
+		if (BTTPopulationStressor.w != null) {
+		    if (!query && !scan && !rmw) {
+			if (lastValue == -1) {
+			    this.tree.removeKey(value);
+			} else {
+			    this.tree.insert(lastValue, lastValue);
+			}
+		    } else if (query) {
+			this.tree.containsKey(value);
+		    } else if (scan) {
+			
 		    } else {
-			this.tree.insert(lastValue, lastValue);
+			this.tree.containsKey(value);
+			LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(100)), BPlusTree.myGroup());
+			BPlusTree.wrapper.put(ranKey, 0);
+		    }
+		} else {
+		    if (query) {
+			this.tree.containsKey(value);
+		    } else {
+			if (lastValue == -1) {
+			    this.tree.removeKey(value);
+			} else {
+			    this.tree.insert(lastValue, lastValue);
+			}
 		    }
 		}
 		

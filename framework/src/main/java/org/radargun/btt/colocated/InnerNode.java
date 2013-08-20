@@ -740,6 +740,40 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         throw new RuntimeException("findSubNode() didn't find a suitable sub-node!?");
     }
 
+    public void scan(boolean remote, Comparable key, int length) {
+	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {
+	    try {
+		AbstractNode.executeDEF(BPlusTree.wrapper.createCacheCallable(new ScanRemoteTask(this, key, length)), super.parentKey);
+		return;
+	    } catch (Exception e) {
+		if (e instanceof RuntimeException) {
+		    throw (RuntimeException) e;
+		}
+		e.printStackTrace();
+		System.exit(-1);
+		return;
+	    }
+	} else {
+	    DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
+
+	    if (subNodes.values[0] instanceof LeafNode) {
+		for (int i = 0; i < subNodes.length(); i++) {
+		    subNodes.values[i].scan(remote, key, length);
+		}
+		return;
+	    } else {
+		for (int i = 0; i < subNodes.length(); i++) {
+		    Comparable splitKey = subNodes.keys[i];
+		    if (BPlusTree.COMPARATOR_SUPPORTING_LAST_KEY.compare(splitKey, key) > 0) { // this will eventually be true because the LAST_KEY is greater than all
+			subNodes.values[i].scan(remote, key, length);
+			return;
+		    }
+		}
+	    }
+	    throw new RuntimeException("findSubNode() didn't find a suitable sub-node!?");
+	}
+    }
+    
     @Override
     public boolean containsKey(boolean remote, Comparable key) {
 	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {

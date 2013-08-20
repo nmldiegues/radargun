@@ -1,6 +1,7 @@
 package org.radargun.btt;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -8,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.LocatedKey;
 import org.radargun.btt.colocated.BPlusTree;
+import org.radargun.btt.generators.CoreWorkload;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 
 public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
@@ -16,6 +18,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 
     private int keysSize;
     private int keysRange;
+    private String workload;
     private boolean threadMigration;
     private boolean ghostReads;
     private boolean colocation;
@@ -23,6 +26,10 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
     private boolean intraNodeConc;
     private int lowerBound;
 
+    public void setWorkload(String workload) {
+	this.workload = workload;
+    }
+    
     public void setIntraNodeConc(boolean intraNodeConc) {
 	this.intraNodeConc = intraNodeConc;
     }
@@ -54,6 +61,78 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	return null;
     }
 
+    public Properties generateProperties(String workload) {
+	Properties p = new Properties();
+	if (workload.equals("a")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "0.5");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0.5");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "zipfian");
+	} else if (workload.equals("b")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "0.95");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0.05");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "zipfian");
+	} else if (workload.equals("c")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "1");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "zipfian");
+	} else if (workload.equals("d")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "0.95");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0.05");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "latest");
+	} else if (workload.equals("e")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0.95");
+	    p.setProperty(CoreWorkload.SCAN_LENGTH_DISTRIBUTION_PROPERTY, "uniform");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0.05");
+	    p.setProperty(CoreWorkload.MAX_SCAN_LENGTH_PROPERTY, "100");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "zipfian");
+	} else if (workload.equals("f")) {
+	    p.setProperty(CoreWorkload.RECORD_COUNT_PROPERTY, keysSize + "");
+	    p.setProperty(CoreWorkload.OPERATION_COUNT_PROPERTY, "1000");
+	    p.setProperty(CoreWorkload.WORKLOAD_PROPERTY, "org.radargun.btt.generators.CoreWorkload");
+	    p.setProperty(CoreWorkload.READ_ALL_FIELDS_PROPERTY, "true");
+	    p.setProperty(CoreWorkload.READ_PROPORTION_PROPERTY, "0.5");
+	    p.setProperty(CoreWorkload.UPDATE_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.SCAN_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.INSERT_PROPORTION_PROPERTY, "0");
+	    p.setProperty(CoreWorkload.READMODIFYWRITE_PROPORTION_PROPERTY, "0.5");
+	    p.setProperty(CoreWorkload.REQUEST_DISTRIBUTION_PROPERTY, "zipfian");
+	}
+	
+	return p;
+    }
+    
+    public static transient CoreWorkload w;
+    
     private void populate(CacheWrapper wrapper) {
 	int clusterSize = wrapper.getNumMembers();
 	wrapper.initDEF();
@@ -71,6 +150,12 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	BPlusTree.REPL_DEGREES = replicationDegrees;
 	BPlusTree.INTRA_NODE_CONC = intraNodeConc;
 	BPlusTree.POPULATING = true;
+	
+	if (!workload.equals("X")) {
+	    Properties p = generateProperties(workload);
+	    w = new CoreWorkload();
+	    w.init(p);
+	}
 	
 	if (wrapper.isTheMaster()) {
 	    LocatedKey treeKey = wrapper.createGroupingKeyWithRepl("tree", 0, clusterSize);
@@ -112,6 +197,9 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		
 		for (int i = start; i < (start + batch); i++) {
 		    long nextVal = i;
+		    if (w != null) {
+			nextVal = w.getIntForInsert();
+		    }
 		    if (tree.insert(nextVal)) {
 			wrapper.endTransaction(true);
 			System.out.println("\tinserted: " + i + " of range " + start + " <-> " + batch);

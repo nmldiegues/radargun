@@ -476,6 +476,10 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	    return this.getEntries(false).containsKey(key);
 	}
     }
+    
+    public void scan(boolean remote, Comparable key, int length) {
+	this.getEntries(false);
+    }
 
     @Override
     int shallowSize() {

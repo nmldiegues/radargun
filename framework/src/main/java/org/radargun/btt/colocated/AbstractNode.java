@@ -79,6 +79,8 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     /** Returns <code>true</code> if this map contains a mapping for the specified key. */
     abstract boolean containsKey(boolean remote, Comparable key);
 
+    abstract void scan(boolean remote, Comparable key, int length);
+    
     /** Returns the number os key-value mappings in this map */
     abstract int size();
 

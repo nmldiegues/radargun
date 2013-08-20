@@ -10,6 +10,7 @@ public class BTTPopulationStage extends AbstractDistStage {
     
     private int keysSize;
     private int keysRange;
+    private String workload;
     private boolean threadMigration;
     private boolean ghostReads;
     private boolean colocation;
@@ -17,6 +18,10 @@ public class BTTPopulationStage extends AbstractDistStage {
     private boolean intraNodeConc;
     private int lowerBound;
 
+    public void setWorkload(String workload) {
+	this.workload = workload;
+    }
+    
     public void setIntraNodeConc(boolean intraNodeConc) {
 	this.intraNodeConc = intraNodeConc;
     }
@@ -51,6 +56,7 @@ public class BTTPopulationStage extends AbstractDistStage {
 	stressor.setLowerBound(lowerBound);
         stressor.setKeysRange(keysRange);
         stressor.setIntraNodeConc(intraNodeConc);
+        stressor.setWorkload(workload);
 	stressor.stress(wrapper);
     }
 
