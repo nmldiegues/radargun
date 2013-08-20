@@ -41,7 +41,8 @@ case $1 in
   -n) NUMBER=$2; shift 2;;
   -q) QUERIES=$2; shift 2;;
   -r) RELATIONS=$2; shift 2;;
-  -t) TRANSACTIONS=$2; shift 2;;
+  -time) TRANSACTIONS=$2; shift 2;;
+  -t) THREAD_MIGRATION=$2; shift 2;;
   -ro) RO=$2; shift 2;;
   -g) GHOST_READS=$2; shift 2;;
   -l) COLOCATION=$2; shift 2;;
@@ -61,7 +62,7 @@ echo "<bench-config>" > ${DEST_FILE}
 
 echo "   <master" >> ${DEST_FILE}
 echo "         bindAddress=\"\${127.0.0.1:master.address}\"" >> ${DEST_FILE}
-echo "         port=\"\${21032:master.port}\"/>" >> ${DEST_FILE}
+echo "         port=\"\${17523:master.port}\"/>" >> ${DEST_FILE}
 
 echo "   <benchmark" >> ${DEST_FILE}
 echo "         initSize=\"\${10:Islaves}\"" >> ${DEST_FILE}

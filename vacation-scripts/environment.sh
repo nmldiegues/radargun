@@ -127,7 +127,7 @@ killall -9 java
 
 start_gossip_router() {
 echo "start gossip router in ${MASTER}"
-java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter > /dev/null &
+java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 > /dev/null &
 }
 
 wait_until_test_finish() {
