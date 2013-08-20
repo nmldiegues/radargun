@@ -177,6 +177,25 @@ public class LinkedList<U extends Serializable> implements Serializable {
 	
 	return result;
     }
+    
+    public U get(Comparable key) {
+	U result = null;
+
+	Node previous = this.headNode;
+	Node next = previous.getNext(true);
+	Comparable currentKey;
+	while ((currentKey = next.key).compareTo(key) < 0) {
+	    previous = next;
+	    next = previous.getNext(true);
+	}
+	
+	if (currentKey.compareTo(key) == 0) {
+	    result = (U) next.value;
+	}
+	BPlusTree.registerGet(previous.nextKey);
+	
+	return result;
+    }
 
     public void getAllElements(List<Comparable> keys, List<Serializable> values) {
 	Node iter = this.headNode.getNext(false);
