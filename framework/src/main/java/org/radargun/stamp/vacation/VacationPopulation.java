@@ -135,6 +135,9 @@ public class VacationPopulation {
 		LocatedKey key = wrapper.createGroupingKeyWithRepl("MANAGER", 0, wrapper.getNumMembers());
 		wrapper.put(null, key, managerPtr);
 		
+		wrapper.endTransaction(true);
+		successful = true;
+		
 		managerPtr.colocate();
 		
 		Map<String, String> stats = wrapper.getAdditionalStats();
@@ -142,8 +145,6 @@ public class VacationPopulation {
 
 		wrapper.resetAdditionalStats();
 		
-		wrapper.endTransaction(true);
-		successful = true;
 	    }  catch (Throwable e) {
 		System.out.println("Exception during population, going to rollback after this");
 		e.printStackTrace();
