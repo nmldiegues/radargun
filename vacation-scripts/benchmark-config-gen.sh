@@ -6,14 +6,18 @@ if [ -n "${BENCH_XML_FILEPATH}" ]; then
 else
   DEST_FILE=./benchmark.xml
 fi
-CLIENTS=1
-LOCAL_THREADS=1
+
+LOWER_BOUND=2
+INTRA_NOD_CONC=true
+THREAD_MIGRATION=true
+GHOST_READS=true
+COLOCATION=true
+REPLICATION_DEGREES=true
+
 NUMBER=4
 QUERIES=60
 RELATIONS=1024
 TRANSACTIONS=2000
-USER=98
-TO="false"
 RO=50
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
@@ -28,44 +32,22 @@ fi
 help_and_exit(){
 echo "usage: ${0} <options>"
 echo "options:"
-echo "  -c <value>               number of clients (also means number of nodes used)"
-echo "                           default: ${CLIENTS}"
-echo ""
-echo "  -l <value>               number of threads per node"
-echo "                           default: ${LOCAL_THREADS}"
-echo ""
-echo "  -n <value>               number of operations per transaction"
-echo "                           default: ${NUMBER}"
-echo ""
-echo "  -q <value>               the range of data to touch"
-echo "                           default: ${QUERIES}"
-echo ""
-echo "  -r <value>               the size of the tables"
-echo "                           default: ${RELATIONS}"
-echo ""
-echo "  -t <value>        	 the number of transactions"
-echo "                           default: ${TRANSACTIONS}"
-echo ""
-echo "  -u <value>               the percentage of reservations"
-echo "                           default: ${USER}"
-echo ""
-echo ""
-echo "  -h                       show this message and exit"
 exit 0
 }
 
 while [ -n $1 ]; do
 case $1 in
   -h) help_and_exit;;
-  -c) CLIENTS=$2; shift 2;;
-  -l) LOCAL_THREADS=$2; shift 2;;
   -n) NUMBER=$2; shift 2;;
   -q) QUERIES=$2; shift 2;;
   -r) RELATIONS=$2; shift 2;;
   -t) TRANSACTIONS=$2; shift 2;;
-  -u) USER=$2; shift 2;;
-  -to) TO=$2; shift 2;;
   -ro) RO=$2; shift 2;;
+  -g) GHOST_READS=$2; shift 2;;
+  -l) COLOCATION=$2; shift 2;;
+  -repl) REPLICATION_DEGREES=$2; shift 2;;
+  -i) INTRA_NODE_CONC=$2; shift 2;;
+  -b) LOWER_BOUND=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
@@ -99,22 +81,23 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <VacationPopulation" >> ${DEST_FILE}
-echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
+echo "            threadMigration=\"${THREAD_MIGRATION}\"" >> ${DEST_FILE}
+echo "            ghostReads=\"${GHOST_READS}\"" >> ${DEST_FILE}
+echo "            colocation=\"${COLOCATION}\"" >> ${DEST_FILE}
+echo "            replicationDegrees=\"${REPLICATION_DEGREES}\"" >> ${DEST_FILE}
+echo "            intraNodeConc=\"${INTRA_NODE_CONC}\"" >> ${DEST_FILE}
+echo "		      lowerBound=\"${LOWER_BOUND}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_BEFORE_BENCH\" />" >> ${DEST_FILE}
 
 echo "      <VacationBenchmark" >> ${DEST_FILE}
-echo "            clients=\"${CLIENTS}\"" >> ${DEST_FILE}
-echo "            localThreads=\"${LOCAL_THREADS}\"" >> ${DEST_FILE}
 echo "            number=\"${NUMBER}\"" >> ${DEST_FILE}
 echo "            queries=\"${QUERIES}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\"" >> ${DEST_FILE}
 echo "            transactions=\"${TRANSACTIONS}\"" >> ${DEST_FILE}
-echo "            readOnly=\"${RO}\"" >> ${DEST_FILE}
-echo "            totalOrder=\"${TO}\"" >> ${DEST_FILE}
-echo "            user=\"${USER}\"/>" >> ${DEST_FILE}
+echo "            readOnly=\"${RO}\"/>" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}
 echo "            statName=\"CACHE_SIZE_AFTER_BENCH\" />" >> ${DEST_FILE}

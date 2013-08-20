@@ -138,8 +138,6 @@ public interface CacheWrapper
    
    int getMyNode();
    
-   void setupTotalOrder();
-   
    LocatedKey createKey(String key, int node);
    
    LocatedKey createGroupingKey(String key, int group);

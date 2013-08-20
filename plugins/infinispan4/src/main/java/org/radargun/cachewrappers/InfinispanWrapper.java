@@ -456,9 +456,6 @@ public class InfinispanWrapper implements CacheWrapper {
       return "Not_Available";
    }
    
-   public void setupTotalOrder() {
-   }
-
    @Override
    public LocatedKey createGroupingKey(String key, int group) {
        return new GroupingKey(key, group);

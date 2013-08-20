@@ -8,15 +8,16 @@ echo "loading environment..."
 READONLY=$1
 REMOTE=$2
 COUNT=$3
-TO=$4
+REPLICATION_DEGREES=$5
+COLOCATION=$6
+GHOST_READS=$7
+THREAD_MIGRATION=$6
+INTRA_NODE_CONC=$8
+LOWER_BOUND=$9
 NR_NODES_TO_USE="`wc -l /home/ndiegues/machines | awk '{print $1}'`"
 EST_DURATION="1"
 
-#ISPN_DEFAULT="-stats -write-skew -versioned -clustering-mode d -extended-stats -num-owner 1"
-#RADARGUN CONFIG
-#BENC_DEFAULT="-nr-thread 2 -nr-keys 1000000 -simul-time 60000 -distributed -write-tx-percentage 50 -write-tx-workload 10,20:10,20 -read-tx-workload 20,40"
-#TPC-C CONFIG
-BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -l 1 -n $COUNT -q $REMOTE -r $COUNT -t 40000 -u 100 -ro $READONLY -to $TO"
+BENC_DEFAULT="-distributed -n $COUNT -q $REMOTE -r $COUNT -t 60000 -ro $READONLY -t $THREAD_MIGRATION -repl $REPLICATION_DEGREES -l $COLOCATION -g $GHOST_READS -i $INTRA_NODE_CONC -b $LOWER_BOUND"
 
 echo "============ INIT BENCHMARKING ==============="
 
@@ -30,7 +31,8 @@ echo "============ STARTING BENCHMARKING ==============="
 #wrtPx => write percentage== 0 10
 #rdg => replication degree== 1 2 3
 
-${JGRP_GEN} -sequencer -toa -tcp
+#${JGRP_GEN} -sequencer -toa -tcp
+#cp ${RADARGUN_DIR}/plugins/infinispan4/bin/jgroups/jgroups.xml ${WORKING_DIR}/conf/jgroups/jgroups.xml
 
 for owner in 1; do
 #for l1 in -l1-rehash none; do
