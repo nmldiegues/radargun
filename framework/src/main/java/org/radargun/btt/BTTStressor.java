@@ -144,7 +144,7 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 		    } else if (query) {
 			this.tree.containsKey(value);
 		    } else if (scan) {
-			
+			this.tree.scan(value, scanSize);
 		    } else {
 			this.tree.containsKey(value);
 			LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(100)), BPlusTree.myGroup());
