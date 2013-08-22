@@ -459,9 +459,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
     @Override
     public T get(Comparable key) {
 	if (BPlusTree.INTRA_NODE_CONC) {
-	    System.out.println("Not implemented yet!");
-	    System.exit(-1);
-	    return null;
+	    return (T) this.entriesList.get(key);
 	} else {
 	    DoubleArray<Serializable> localEntries = this.getEntries(false);
 	    return (T) localEntries.get(key);
