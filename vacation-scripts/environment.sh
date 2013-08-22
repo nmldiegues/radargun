@@ -1,13 +1,13 @@
 # ENVIRONMENT VARIABLES
-MASTER=cloudtm.ist.utl.pt # this was modified!!!
+MASTER=10.1.2.36 # this was modified!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`
-CLUSTER=`cat /home/ndiegues/machines` # `echo node{01..10}`
-MONITOR_OUT=/home/ndiegues/radargun/www/files/report.csv
-RADARGUN_DIR=/home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
-RESULTS_DIR=/home/ndiegues/radargun/results-radargun
-MONITOR_PATH=/home/ndiegues/radargun/csv-reporter
+CLUSTER=`cat /home/ubuntu/machines` # `echo node{01..10}`
+MONITOR_OUT=/home/ubuntu/radargun/www/files/report.csv
+RADARGUN_DIR=/home/ubuntu/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT
+RESULTS_DIR=/home/ubuntu/radargun/results-radargun
+MONITOR_PATH=/home/ubuntu/radargun/csv-reporter
 
 #uncoment to start gossip router (used in futuregrid)
 GOSSIP_ROUTER=1
@@ -42,8 +42,9 @@ copy_to_all() {
 #if [ "${MASTER}" == "${node}" ]; then
 #echo "not copying... is the master!"
 #else
-parallel-scp -r -h /home/ndiegues/machines /home/ndiegues/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT/ /home/ndiegues/radargun/target/distribution/
-#scp -r ${RADARGUN_DIR}/* ${node}:${RADARGUN_DIR} > /dev/null
+cat ../machines | xargs -n1 -P 1024 -iserver scp -r /home/ubuntu/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT/ server:/home/ubuntu/radargun/target/distribution/ > /dev/null 2>&1
+#parallel-scp -r -h /home/ubuntu/machines /home/ubuntu/radargun/target/distribution/RadarGun-1.1.0-SNAPSHOT/ /home/ubuntu/radargun/target/distribution/
+#scp -r -i ~/nmldkey.pem ${RADARGUN_DIR}/* ubuntu@${node}:${RADARGUN_DIR} > /dev/null
 #fi
 #done
 }
@@ -51,7 +52,7 @@ parallel-scp -r -h /home/ndiegues/machines /home/ndiegues/radargun/target/distri
 kill_java() {
 for node in $@; do
 echo "killing java process from ${node}"
-ssh ${node} "killall -9 java"
+ssh -i ~/nmldkey.pem ubuntu@${node} "killall -9 java"
 done
 }
 
@@ -62,7 +63,7 @@ shift
 mkdir -p ${LOGS_DIR}/${nr_nodes}nodes
 for node in $@; do
 echo "save logs from ${node}"
-scp ${node}:${RADARGUN_DIR}/*.out ${LOGS_DIR}/${nr_nodes}nodes/ > /dev/null
+scp -i ~/nmldkey.pem ubuntu@${node}:${RADARGUN_DIR}/*.out ${LOGS_DIR}/${nr_nodes}nodes/ > /dev/null
 done
 fi
 }
@@ -74,7 +75,7 @@ shift
 mkdir -p ${DATA_PLACEMENT_DIR}/${nr_nodes}nodes
 for node in $@; do
 echo "save data placement stats from ${node}"
-scp ${node}:${RADARGUN_DIR}/stats.csv ${DATA_PLACEMENT_DIR}/${nr_nodes}nodes/${node}.csv > /dev/null
+scp -i ~/nmldkey.pem ubuntu@${node}:${RADARGUN_DIR}/stats.csv ${DATA_PLACEMENT_DIR}/${nr_nodes}nodes/${node}.csv > /dev/null
 done
 fi
 }
@@ -86,10 +87,10 @@ shift
 mkdir -p ${KEYS_DIR}/${nr_nodes}nodes
 for node in $@; do
 echo "save key from ${node}"
-scp "${node}:${RADARGUN_DIR}/keys-*" ${KEYS_DIR}/${nr_nodes}-nodes/ > /dev/null
+scp -i ~/nmldkey.pem ubuntu@"${node}:${RADARGUN_DIR}/keys-*" ${KEYS_DIR}/${nr_nodes}-nodes/ > /dev/null
 done
 for node in $@; do
-ssh ${node} "rm ${RADARGUN_DIR}/keys-*"
+ssh -i ~/nmldkey.pem ubuntu@${node} "rm ${RADARGUN_DIR}/keys-*"
 done
 fi
 }
@@ -110,7 +111,7 @@ echo "cleaning slave ${node}"
 if [ "${MASTER}" == "${node}" ]; then
 echo "not cleaning... is the master!"
 else
-ssh ${node} "rm -r ${RADARGUN_DIR}/*" > /dev/null
+ssh -i ~/nmldkey.pem ubuntu@${node} "rm -r ${RADARGUN_DIR}/*" > /dev/null
 fi
 done
 }
@@ -127,14 +128,14 @@ killall -9 java
 
 start_gossip_router() {
 echo "start gossip router in ${MASTER}"
-java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 > /dev/null &
+java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 -bindaddress 10.1.2.36 > /dev/null &
 }
 
 wait_until_test_finish() {
 local MASTER_PID="";
 #30 minutes max waiting time (+ estimated test duration)
-for ((j = 0; j < 60; ++j)); do
-MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | grep "ndiegues" | awk '{print $2}'`
+for ((j = 0; j < 120; ++j)); do
+MASTER_PID=`ps -ef | grep "org.radargun.LaunchMaster" | grep -v "grep" | grep "ubuntu" | awk '{print $2}'`
 echo "Checking if the master finished..."
 if [ -z "${MASTER_PID}" ]; then
 echo "Master finished! No PID found! returning... @" `date`

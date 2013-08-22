@@ -125,7 +125,7 @@ D_VARS="${D_VARS} -Dcom.sun.management.jmxremote.port=$JMX_MASTER_PORT"
 D_VARS="${D_VARS} -Dcom.sun.management.jmxremote.authenticate=false"
 D_VARS="${D_VARS} -Dcom.sun.management.jmxremote.ssl=false"
 
-java ${JVM_OPTS} -classpath $CP ${D_VARS} $SLAVE_COUNT_ARG $SLAVE_COUNT_ARG_I org.radargun.LaunchMaster -config ${CONFIG} > stdout_master.out 2>&1 &
+java -classpath $CP ${D_VARS} $SLAVE_COUNT_ARG $SLAVE_COUNT_ARG_I org.radargun.LaunchMaster -config ${CONFIG} > stdout_master.out 2>&1 &
 export RADARGUN_MASTER_PID=$!
 HOST_NAME=`hostname`
 echo "Master's PID is $RADARGUN_MASTER_PID running on ${HOST_NAME}"

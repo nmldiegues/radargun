@@ -9,7 +9,7 @@ if [ "x$RADARGUN_HOME" = "x" ]; then DIRNAME=`dirname $0`; RADARGUN_HOME=`cd $DI
 SSH_USER=$USER
 WORKING_DIR=`pwd`
 VERBOSE=false
-REMOTE_CMD='ssh -q -o "StrictHostKeyChecking false"'
+REMOTE_CMD='ssh -i ~/nmldkey.pem -q -o "StrictHostKeyChecking false"'
 MASTER=`hostname`
 SLAVES=""
 SLAVE_COUNT=0
@@ -101,10 +101,23 @@ sleep 5s
 CMD="source ~/.bash_profile ; cd $WORKING_DIR"
 CMD="$CMD ; bin/slave.sh -m ${MASTER} -g ${MASTER}"
 
+CMDCOORD="source ~/.bash_profile ; cd $WORKING_DIR"
+CMDCOORD="$CMDCOORD ; bin/slave-coord.sh -m ${MASTER} -g ${MASTER}"
+
+
+FLAGOFF=1
 for slave in $SLAVES; do
-  TOEXEC="$REMOTE_CMD -l $SSH_USER $slave '$CMD'"
-  echo "$TOEXEC"
-  eval $TOEXEC
+  if [[ $FLAGOFF != 0 ]] ; then
+    TOEXEC="$REMOTE_CMD -l $SSH_USER $slave '$CMDCOORD'"
+    echo "$TOEXEC"
+    eval $TOEXEC
+    FLAGOFF=0
+    sleep 10
+  else
+    TOEXEC="$REMOTE_CMD -l $SSH_USER $slave '$CMD'"
+    echo "$TOEXEC"
+    eval $TOEXEC
+  fi
 done
 
 echo "Slaves started in $SLAVES"
