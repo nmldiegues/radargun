@@ -147,12 +147,12 @@ public class BTTStressor extends AbstractCacheWrapperStressor implements Runnabl
 			this.tree.scan(value, scanSize);
 		    } else {
 			this.tree.containsKey(value);
-			for (int i = 0; i < 15; i++) {
+			for (int i = 0; i < 60; i++) {
 			    if (i % 3 == 0) {
-				LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(100)), BPlusTree.myGroup());
+				LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(1000)), BPlusTree.myGroup());
 				BPlusTree.wrapper.put(ranKey, 0);
 			    } else {
-				LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(100)), BPlusTree.myGroup());
+				LocatedKey ranKey = BPlusTree.wrapper.createGroupingKey("ranKey" + Math.abs(random.nextInt(1000)), BPlusTree.myGroup());
 				BPlusTree.wrapper.get(ranKey);
 			    }
 			}
