@@ -157,9 +157,6 @@ public class InfinispanWrapper implements CacheWrapper {
       assertTm();
       try {
          tm.begin();
-         if (!isReadOnly) {
-             cache.markAsWriteTransaction();
-         }
          
          Transaction transaction = tm.getTransaction();
          if (enlistExtraXAResource) {
