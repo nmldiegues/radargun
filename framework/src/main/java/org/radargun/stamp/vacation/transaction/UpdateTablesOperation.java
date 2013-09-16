@@ -3,6 +3,7 @@ package org.radargun.stamp.vacation.transaction;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
+import org.radargun.stamp.vacation.VacationPopulationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class UpdateTablesOperation extends VacationTransaction {
@@ -12,6 +13,7 @@ public class UpdateTablesOperation extends VacationTransaction {
     final private int[] ops;
     final private int[] prices;
     final private int numUpdate;
+    final private int shop;
 
     public UpdateTablesOperation(Random randomPtr, int numQueryPerTransaction, int queryRange, int relations) {
 	this.types = new int[numQueryPerTransaction];
@@ -30,11 +32,12 @@ public class UpdateTablesOperation extends VacationTransaction {
 	        prices[n] = ((randomPtr.posrandom_generate() % 5) * 10) + 50;
 	    }
 	}
+	this.shop = randomPtr.posrandom_generate() % VacationPopulationStressor.shops;
     }
 
     @Override
     public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
-	Manager managerPtr = (Manager) cacheWrapper.get(null, "MANAGER");
+	Manager managerPtr = (Manager) cacheWrapper.get(null, "MANAGER-" + shop);
 	int n;
 	for (n = 0; n < numUpdate; n++) {
 	    int t = types[n];

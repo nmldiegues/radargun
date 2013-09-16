@@ -3,6 +3,7 @@ package org.radargun.stamp.vacation.transaction;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.Definitions;
 import org.radargun.stamp.vacation.Random;
+import org.radargun.stamp.vacation.VacationPopulationStressor;
 import org.radargun.stamp.vacation.domain.Manager;
 
 public class MakeReservationOperation extends VacationTransaction {
@@ -14,6 +15,7 @@ public class MakeReservationOperation extends VacationTransaction {
     final private int customerId;
     final private int numQuery;
     final private boolean readOnly;
+    final private int shop;
 
     public MakeReservationOperation(Random random, int numQueryPerTx, int queryRange, int relations, int readOnly) {
 	this.types = new int[numQueryPerTx];
@@ -36,12 +38,14 @@ public class MakeReservationOperation extends VacationTransaction {
        ids[n] = (random.random_generate() % relations);
     }
 
-	this.readOnly = (random.random_generate() % 100) <= readOnly;
+	this.readOnly = (random.random_generate() % 100) < readOnly;
+	
+	this.shop = random.posrandom_generate() % VacationPopulationStressor.shops;
     }
 
     @Override
     public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
-	Manager manager = (Manager) cacheWrapper.get(null, "MANAGER");
+    	Manager manager = (Manager) cacheWrapper.get(null, "MANAGER-" + shop);
 	boolean isFound = false;
 	int n;
 	for (n = 0; n < numQuery; n++) {

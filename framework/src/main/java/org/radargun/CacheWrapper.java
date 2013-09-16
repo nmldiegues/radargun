@@ -125,5 +125,7 @@ public interface CacheWrapper
     * it resets the additional stats
     */
    void resetAdditionalStats();
+   
+   int getNodeIdentifier();
 
 }

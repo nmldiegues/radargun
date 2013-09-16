@@ -281,6 +281,11 @@ public class InfinispanWrapper implements CacheWrapper {
    public boolean isTheMaster() {
       return !isPassiveReplication() || transport.isCoordinator();
    }
+   
+   @Override
+	public int getNodeIdentifier() {
+		return transport.getMembers().indexOf(transport.getAddress());
+	}
 
    private boolean isPassiveReplicationWithSwitch() {
       MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();

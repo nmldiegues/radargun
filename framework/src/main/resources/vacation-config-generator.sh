@@ -13,6 +13,7 @@ RELATIONS=1024
 TIME=2000
 USER=98
 READONLY=50
+SHOPS=4
 CACHE_CONFIG_FILE="ispn.xml"
 PARTIAL_REPLICATION="false"
 PASSIVE_REPLICATION="false"
@@ -44,6 +45,9 @@ echo ""
 echo "  -u <value>               the percentage of reservations"
 echo "                           default: ${USER}"
 echo ""
+echo " -s <value>		the number of vacation instances"
+echo "				default: ${SHOPS}"
+echo ""
 echo ""
 echo "  -h                       show this message and exit"
 exit 0
@@ -57,6 +61,7 @@ case $1 in
   -n) NUMBER=$2; shift 2;;
   -r) RELATIONS=$2; shift 2;;
   -t) TIME=$2; shift 2;;
+  -s) SHOPS=$2; shift 2;;
   -u) USER=$2; shift 2;;
   -ro) READONLY=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
@@ -92,6 +97,7 @@ echo "            passiveReplication=\"${PASSIVE_REPLICATION}\"" >> ${DEST_FILE}
 echo "            partialReplication=\"${PARTIAL_REPLICATION}\"/>" >> ${DEST_FILE}
 
 echo "      <VacationPopulation" >> ${DEST_FILE}
+echo "            shops=\"${SHOPS}\"" >> ${DEST_FILE}
 echo "            relations=\"${RELATIONS}\" />" >> ${DEST_FILE}
 
 echo "      <CacheSize" >> ${DEST_FILE}

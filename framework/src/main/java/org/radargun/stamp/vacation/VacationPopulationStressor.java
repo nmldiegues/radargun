@@ -12,6 +12,11 @@ public class VacationPopulationStressor extends AbstractCacheWrapperStressor {
     private static Log log = LogFactory.getLog(VacationPopulationStressor.class);
     
     private int RELATIONS;
+    public static int shops;
+
+    public void setShops(int shops) {
+    	this.shops = shops;
+    }
     
     public void setRelations(int RELATIONS) {
 	this.RELATIONS = RELATIONS;
@@ -27,7 +32,7 @@ public class VacationPopulationStressor extends AbstractCacheWrapperStressor {
 	} else {
 	    try {
 	        log.info("Performing Population Operations");
-	        new VacationPopulation(wrapper, RELATIONS).performPopulation();
+	        new VacationPopulation(wrapper, RELATIONS, shops).performPopulation();
 	    } catch (Exception e) {
 	        log.warn("Received exception during cache population" + e.getMessage());
 	        e.printStackTrace();

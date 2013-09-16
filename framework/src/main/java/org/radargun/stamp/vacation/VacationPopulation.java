@@ -11,16 +11,26 @@ public class VacationPopulation {
 
     private final CacheWrapper wrapper;
     private int relations;
+    private int shops;
 
-    public VacationPopulation(CacheWrapper wrapper, int relations) {
+    public VacationPopulation(CacheWrapper wrapper, int relations, int shops) {
 	this.wrapper = wrapper;
 	this.relations = relations;
+	this.shops = shops;
     }
 
     public void performPopulation(){
 	int i;
 	int t;
 
+	int myId = wrapper.getNodeIdentifier();
+	if (myId < shops) {
+		System.out.println("Populating shop " + myId);
+	} else {
+		System.out.println("Not populating in this node " + myId);
+		return;
+	}
+	
 	int numRelation = relations;
 	int ids[] = new int[numRelation];
 	for (i = 0; i < numRelation; i++) {
@@ -67,7 +77,7 @@ public class VacationPopulation {
 		    }
 
 		} /* for t */
-		wrapper.put(null, "MANAGER", managerPtr);
+		wrapper.put(null, "MANAGER-" + myId, managerPtr);
 		
 		wrapper.endTransaction(true);
 		successful = true;

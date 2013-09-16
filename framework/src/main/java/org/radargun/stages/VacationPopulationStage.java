@@ -7,9 +7,14 @@ import org.radargun.stamp.vacation.VacationPopulationStressor;
 public class VacationPopulationStage extends AbstractDistStage {
 
     private int relations;
+    private int shops;
     
     public void setRelations(int relations) {
 	this.relations = relations;
+    }
+    
+    public void setShops(int shops) {
+    	this.shops = shops;
     }
     
     @Override
@@ -32,6 +37,7 @@ public class VacationPopulationStage extends AbstractDistStage {
     private void populate(CacheWrapper wrapper) {
 	VacationPopulationStressor vacationStressor = new VacationPopulationStressor();
 	vacationStressor.setRelations(relations);
+	vacationStressor.setShops(shops);
 	vacationStressor.stress(wrapper);
     }
 
