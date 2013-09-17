@@ -2,6 +2,7 @@ package org.radargun.stamp.vacation.domain;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.Definitions;
@@ -9,27 +10,31 @@ import org.radargun.stamp.vacation.OpacityException;
 import org.radargun.stamp.vacation.Vacation;
 
 public class Manager implements Serializable {
+	public String PREFIX;
+	
     public static final String CARS = "carTable";
     public static final String ROOMS = "roomsTable";
     public static final String FLIGHTS = "flightsTable";
     public static final String CUSTOMERS = "customersTable";
 
-    public Manager() { }
+    public Manager() { 
+    	this.PREFIX = UUID.randomUUID().toString() + ":" + "MANAGER:" + ":";	
+    }
     
     void putCustomer(CacheWrapper cache, int id, Customer val) {
-	Vacation.put(cache, CUSTOMERS + ":" + id, val);
+	Vacation.put(cache, PREFIX + CUSTOMERS + ":" + id, val);
     }
     
     Customer getCustomer(CacheWrapper cache, int id) {
-	return (Customer) Vacation.get(cache, CUSTOMERS + ":" + id);
+	return (Customer) Vacation.get(cache, PREFIX + CUSTOMERS + ":" + id);
     }
     
     void putReservation(CacheWrapper cache, String table, int id, Reservation val) {
-	Vacation.put(cache, table + ":" + id, val);
+	Vacation.put(cache, PREFIX +  table + ":" + id, val);
     }
     
     Reservation getReservation(CacheWrapper cache, String table, int id) {
-	return (Reservation) Vacation.get(cache, table + ":" + id);
+	return (Reservation) Vacation.get(cache, PREFIX + table + ":" + id);
     }
     
     boolean addReservation(CacheWrapper cache, String table, String type, int id, int num, int price) {
