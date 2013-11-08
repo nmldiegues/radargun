@@ -172,6 +172,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         	if ((treeDepth + 1) > cutoff) {
         	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
         	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
+        	    BPlusTree.setCutoff(cutoffKey, cutoff - 1);
         	    return (possibleNew != null) ? possibleNew : newRoot;
         	} else {
         	    InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
@@ -225,6 +226,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         	if ((treeDepth + 1) > cutoff) {
         	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
         	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
+        	    BPlusTree.setCutoff(cutoffKey, cutoff - 1);
         	    return new RebalanceBoolean(true, (possibleNew != null) ? possibleNew : newRoot);
         	} else {
         	    InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
@@ -440,7 +442,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     // null in replacement key means that deletedKey does not have to be
     // replaced. Corollary: the deleted key was not the first key in its leaf
     // node
-    AbstractNode underflowFromLeaf(Comparable deletedKey, Comparable replacementKey, int treeDepth, int height, String localRootsUUID, int cutoff, boolean leafEmpty) {
+    AbstractNode underflowFromLeaf(Comparable deletedKey, Comparable replacementKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff, boolean leafEmpty) {
         DoubleArray<AbstractNode> subNodes = this.getSubNodes(false);
         int iter = 0;
         // first, identify the deletion point
@@ -519,10 +521,10 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 //                }
 //            }
 //        }
-        return checkForUnderflow(treeDepth, height + 1, localRootsUUID, cutoff);
+        return checkForUnderflow(treeDepth, height + 1, localRootsUUID, cutoffKey, cutoff);
     }
 
-    private AbstractNode checkForUnderflow(int treeDepth, int height, String localRootsUUID, int cutoff) {
+    private AbstractNode checkForUnderflow(int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
         DoubleArray<AbstractNode> localSubNodes = this.getSubNodes(false);
 
         // Now, just check for underflow in this node.   The LAST_KEY is fake, so it does not count for the total.
@@ -538,6 +540,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 if ((treeDepth - 1) > cutoff) {
                     InnerNode newRoot = (InnerNode) child;
                     InnerNode possiblyNew = newRoot.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, 1, treeDepth);
+                    BPlusTree.setCutoff(cutoffKey, cutoff + 1);
                     InnerNode toReturn = possiblyNew != null ? possiblyNew : newRoot;
                     return toReturn;
                 } else if ((treeDepth - 1) == cutoff) {
@@ -556,7 +559,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 
                 return child;
             } else if (this.getParent(false) != null) {
-                return this.getParent(false).underflowFromInner(this, treeDepth, height, localRootsUUID, cutoff);
+                return this.getParent(false).underflowFromInner(this, treeDepth, height, localRootsUUID, cutoffKey, cutoff);
             }
         }
         return BPlusTree.TRUE_NODE;
@@ -599,7 +602,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
      * Deal with underflow from InnerNodeArray
      */
 
-    AbstractNode underflowFromInner(InnerNode deletedNode, int treeDepth, int height, String localRootsUUID, int cutoff) {
+    AbstractNode underflowFromInner(InnerNode deletedNode, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
         DoubleArray<AbstractNode> subNodes = this.getSubNodes(false);
         int iter = 0;
 
@@ -645,7 +648,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             }
         }
 
-        return checkForUnderflow(treeDepth, height + 1, localRootsUUID, cutoff);
+        return checkForUnderflow(treeDepth, height + 1, localRootsUUID, cutoffKey, cutoff);
     }
 
     private void rightInnerMerge(Comparable entryKey, AbstractNode entryValue, AbstractNode nextEntryValue, int treeDepth, int height, String localRootsUUID, int cutoff) {
