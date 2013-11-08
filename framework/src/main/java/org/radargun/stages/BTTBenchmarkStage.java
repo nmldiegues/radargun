@@ -17,13 +17,18 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 
     private transient CacheWrapper cacheWrapper;
     
-    private transient BTTStressor bttStressor;
+    private transient BTTStressor[] bttStressors;
     
     private int readOnlyPerc;
     private int keysRange;
     private int keysSize;
     private int seconds;
     private String emulation;
+    private int threads;
+    
+    public void setThreads(int threads) {
+	this.threads = threads;
+    }
 
     public void setEmulation(String emulation) {
         this.emulation = emulation;
@@ -44,23 +49,35 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 
 	log.info("Starting BTTBenchmarkStage: " + this.toString());
 
-	bttStressor = new BTTStressor();
-	bttStressor.setCache(cacheWrapper);
-	bttStressor.setReadOnlyPerc(readOnlyPerc);
-	bttStressor.setKeysSize(keysSize);
-        bttStressor.setKeysRange(keysRange);
-	bttStressor.setSeconds(seconds);
-        bttStressor.setEmulation(emulation);
 	
 	try {
-	    Thread worker = new Thread(bttStressor);
-	    worker.start();
+	    Thread[] workers = new Thread[threads];
+	    bttStressors = new BTTStressor[threads];
+	    
+	    for (int i = 0; i < threads; i++) {
+		bttStressors[i] = new BTTStressor();
+		bttStressors[i].setCache(cacheWrapper);
+		bttStressors[i].setReadOnlyPerc(readOnlyPerc);
+		bttStressors[i].setKeysSize(keysSize);
+		bttStressors[i].setKeysRange(keysRange);
+		bttStressors[i].setSeconds(seconds);
+		bttStressors[i].setEmulation(emulation);
+		workers[i] = new Thread(bttStressors[i]); 
+	    }
+	    
+	    for (int i = 0; i < threads; i++) {
+		workers[i].start();
+	    }
 	    try {
 		Thread.sleep(seconds * 1000);
 	    } catch (InterruptedException e) {
 	    }
-	    bttStressor.setM_phase(BTreeStressor.SHUTDOWN_PHASE);
-	    worker.join();
+	    for (int i = 0; i < threads; i++) {
+		bttStressors[i].setM_phase(BTreeStressor.SHUTDOWN_PHASE);
+	    }
+	    for (int i = 0; i < threads; i++) {
+		workers[i].join();
+	    }
 	    
 	    Map<String, String> results = new LinkedHashMap<String, String>();
 	    String sizeInfo = "size info: " + cacheWrapper.getInfo() +
@@ -69,19 +86,26 @@ public class BTTBenchmarkStage extends AbstractDistStage {
 		    ", cacheSize: " + cacheWrapper.getCacheSize();
 	    results.put(SIZE_INFO, sizeInfo);
 	    
-	    long steps = bttStressor.steps;
-	    long aborts = bttStressor.aborts;
+	    long steps = 0; 
+	    long aborts = 0; 
+	    
+	    for (int i = 0; i < threads; i++) {
+		steps += bttStressors[i].steps;
+		aborts += bttStressors[i].aborts;
+	    }
 	    
 	    results.put("TOTAL_THROUGHPUT", ((steps + 0.0) / (seconds + 0.0)) + "");
 	    results.put("TOTAL_RESTARTS", aborts + "");
 	    results.putAll(this.cacheWrapper.getAdditionalStats());
 	    
-	    Map<Integer, Long> latencies = bttStressor.latencies;
-            String str = "";
-	    for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
-		int latency = entry.getKey();
-		double val = entry.getValue();
-		str += latency + ":" + val + ";";
+	    String str = "";
+	    for (int i = 0; i < threads; i++) {
+		Map<Integer, Long> latencies = bttStressors[i].latencies;
+		for (Map.Entry<Integer, Long> entry : latencies.entrySet()) {
+		    int latency = entry.getKey();
+		    double val = entry.getValue();
+		    str += latency + ":" + val + ";";
+		}
 	    }
 	    results.put("LATENCY", str);
 	    

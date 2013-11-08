@@ -86,7 +86,7 @@ ro=1
                 for opt in 1 #2 6 7 8
                 do
                 echo "going for opt $opt"
-                for sa in 4
+                for sa in 4 5 6 7
                 do
                 echo "going for sa $sa"
                 echo "bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}"
@@ -101,3 +101,4 @@ ro=1
             done
         done
     done
+

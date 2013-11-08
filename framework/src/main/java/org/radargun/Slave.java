@@ -36,7 +36,7 @@ public class Slave {
    private boolean exitOnMasterShutdown = true;
    private int masterPort;
    private SocketChannel socketChannel;
-   private ByteBuffer byteBuffer = ByteBuffer.allocate(8192);
+   private ByteBuffer byteBuffer = ByteBuffer.allocate(181920);
    private SlaveState state = new SlaveState();
    private final JmxRegistration jmxRegistration = JmxRegistration.getInstance();
 
