@@ -90,7 +90,7 @@ ro=1
                 do
                 echo "going for sa $sa"
                 echo "bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}"
-                bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}
+                bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]} 1
                 mv results-radargun/test-result-results2/infinispan4_ispn_$nodes.csv auto-results/$nodes-${readPerc[$ro]}-${optStr[$opt]}-${emulation[$opt]}-${size[$sa]}-${keyRange[$sa]}-${arity[$sa]}-${workload[$work]}-$attempt.csv
                 rc=$?
                 if [[ $rc != 0 ]] ; then

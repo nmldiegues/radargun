@@ -32,7 +32,7 @@
          oob_thread_pool.rejection_policy="discard"
          />
    <TCPGOSSIP
-         initial_hosts="${jgroups.gossip_host:10.100.0.1}[13248]"
+         initial_hosts="${jgroups.gossip_host:10.100.0.1}[12483]"
          num_initial_members="5"
          break_on_coord_rsp="true"
          stagger_timeout="500"
