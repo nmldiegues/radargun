@@ -1,5 +1,5 @@
 # ENVIRONMENT VARIABLES
-MASTER=10.1.2.36 # this was modified!!
+MASTER=10.1.2.182 # this was modified!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`
@@ -128,7 +128,7 @@ killall -9 java
 
 start_gossip_router() {
 echo "start gossip router in ${MASTER}"
-java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 -bindaddress 10.1.2.36 > /dev/null &
+java -cp ${RADARGUN_DIR}/plugins/infinispan4/lib/jgroups*.jar org.jgroups.stack.GossipRouter -port 13248 -bindaddress ${MASTER} > /dev/null &
 }
 
 wait_until_test_finish() {
