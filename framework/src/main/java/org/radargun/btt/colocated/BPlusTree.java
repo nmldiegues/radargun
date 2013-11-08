@@ -228,12 +228,10 @@ System.out.println("Should be true: " + result.rebalance);
     
     public void insertPopulation(Comparable key) {
         AbstractNode rootNode = this.getRoot(true);
-        RebalanceBoolean result = rootNode.insert(key, (T) key, 1, this.localRootsUUID, this.cutoffKey);
-        AbstractNode resultNode = result.node;
+        AbstractNode result = rootNode.insertPopulation(key, (T) key);
         
-        if (!rootNode.equals(resultNode)) {
-            this.setRoot(resultNode);
-System.out.println("Should be true: " + result.rebalance);
+        if (!rootNode.equals(result)) {
+            this.setRoot(result);
         }
     }
     
