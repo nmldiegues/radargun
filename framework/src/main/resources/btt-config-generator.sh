@@ -51,7 +51,7 @@ case $1 in
   -b) LOWER_BOUND=$2; shift 2;;
   -e) EMULATION=$2; shift 2;;
   -w) WORKLOAD=$2; shift 2;;
-  -t) THREADS=$2; shift 2;;
+  -th) THREADS=$2; shift 2;;
   -passive-replication) PASSIVE_REPLICATION="true"; shift 1;;
   -distributed) PARTIAL_REPLICATION="true"; shift 1;;
   -*) echo "unknown option $1"; exit 1;;
