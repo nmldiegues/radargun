@@ -193,21 +193,22 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	boolean successful = false;
 	while (!successful) {
 	    try {
-		wrapper.startTransaction(false);
+//		wrapper.startTransaction(false);
 		
 		for (int i = start; i < (start + batch); i++) {
 		    long nextVal = i;
 		    if (w != null) {
 			nextVal = w.getIntForInsert();
 		    }
-		    if (tree.insert(nextVal)) {
-			wrapper.endTransaction(true);
-			System.out.println("\tinserted: " + i + " of range " + start + " <-> " + batch);
-			wrapper.startTransaction(false);
-		    }
+//		    if (tree.insert(nextVal)) {
+//			wrapper.endTransaction(true);
+//			System.out.println("\tinserted: " + i + " of range " + start + " <-> " + batch);
+//			wrapper.startTransaction(false);
+//		    }
+		    tree.insertPopulation(nextVal);
 		}
 		
-		wrapper.endTransaction(true);
+//		wrapper.endTransaction(true);
 		successful = true;
 	    } catch (Exception e) {
 		e.printStackTrace();

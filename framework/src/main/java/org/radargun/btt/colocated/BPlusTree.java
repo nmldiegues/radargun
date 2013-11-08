@@ -226,6 +226,17 @@ System.out.println("Should be true: " + result.rebalance);
         return result.rebalance;
     }
     
+    public void insertPopulation(Comparable key) {
+        AbstractNode rootNode = this.getRoot(true);
+        RebalanceBoolean result = rootNode.insert(key, (T) key, 1, this.localRootsUUID, this.cutoffKey);
+        AbstractNode resultNode = result.node;
+        
+        if (!rootNode.equals(resultNode)) {
+            this.setRoot(resultNode);
+System.out.println("Should be true: " + result.rebalance);
+        }
+    }
+    
     /** Removes the element with the given key */
     public boolean removeKey(Comparable key) {
         AbstractNode rootNode = this.getRoot(true);

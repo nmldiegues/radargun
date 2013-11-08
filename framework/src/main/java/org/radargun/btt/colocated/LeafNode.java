@@ -126,7 +126,17 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	    return insertWithArray(key, value, height, localRootsUUID, cutoffKey);
 	}
     }
+    
+    @Override
+    public AbstractNode insertPopulation(Comparable key, T value) {
+	if (BPlusTree.INTRA_NODE_CONC) {
+	    throw new RuntimeException("Not implemented LIST concurrency with Population batch");
+	} else {
+	    return insertWithArrayPopulation(key, value);
+	}	
+    }
 
+    
     private AbstractNode insertWithList(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	boolean inserted = this.entriesList.insert(key, (T) value);
 	if (!inserted) {
@@ -163,6 +173,38 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 		return newRoot;
 	    } else {
 		return parent.rebase(leftNode, rightNode, keyToSplit, height, 1, localRootsUUID, cutoffKey, BPlusTree.getCutoff(true, cutoffKey));
+	    }
+	}
+    }
+    
+    public AbstractNode insertWithArrayPopulation(Comparable key, Serializable value) {
+	DoubleArray<Serializable> localEntries = this.getEntries(false);
+	DoubleArray<Serializable> localArr = justInsert(localEntries, key, value);
+
+	if (localArr == null) {
+	    return null;
+	}
+	if (localArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) {
+	    return BPlusTree.TRUE_NODE;
+	} else {
+	    // find middle position
+	    Comparable keyToSplit = localArr.findRightMiddlePosition();
+
+	    // split node in two
+	    int newGroup = this.group;
+	    LeafNode leftNode = new LeafNode<T>(newGroup, localArr.leftPart(BPlusTree.LOWER_BOUND + 1));
+	    LeafNode rightNode = new LeafNode<T>(newGroup, localArr.rightPart(BPlusTree.LOWER_BOUND + 1));
+	    fixLeafNodeArraysListAfterSplit(leftNode, rightNode);
+
+	    InnerNode parent = this.getParent(true);
+	    this.clean();
+
+	    // propagate split to parent
+	    if (parent == null) {  // make new root node
+		InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
+		return newRoot;
+	    } else {
+		return parent.rebasePopulation(leftNode, rightNode, keyToSplit);
 	    }
 	}
     }

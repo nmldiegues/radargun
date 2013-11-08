@@ -123,6 +123,18 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	}
     }
     
+    AbstractNode insertPopulation(Comparable key, T value) {
+	DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
+
+	for (int i = 0; i < subNodes.length(); i++) {
+	    Comparable splitKey = subNodes.keys[i];
+	    if (BPlusTree.COMPARATOR_SUPPORTING_LAST_KEY.compare(splitKey, key) > 0) { // this will eventually be true because the LAST_KEY is greater than all
+		return subNodes.values[i].insertPopulation(key, value);
+	    }
+	}
+	throw new RuntimeException("findSubNode() didn't find a suitable sub-node!?");
+    }
+    
     @Override
     public RebalanceBoolean insert(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
@@ -180,6 +192,40 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         	}
             } else {
                 return parent.rebase(leftNode, rightNode, keyToSplit, treeDepth, height + 1, localRootsUUID, cutoffKey, cutoff);
+            }
+        }
+    }
+    
+    AbstractNode rebasePopulation(AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey) {
+	DoubleArray<AbstractNode> newArr = justInsertUpdatingParentRelation(middleKey, subLeftNode, subRightNode);
+        if (newArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) { // this node can accommodate the new split
+            return BPlusTree.TRUE_NODE;
+        } else { // must split this node
+            // find middle position (key to move up amd sub-node to move left)
+            Comparable keyToSplit = newArr.keys[BPlusTree.LOWER_BOUND];
+            AbstractNode subNodeToMoveLeft = newArr.values[BPlusTree.LOWER_BOUND];
+
+            // Split node in two.  Notice that the 'keyToSplit' is left out of this level.  It will be moved up.
+            DoubleArray<AbstractNode> leftSubNodes = newArr.leftPart(BPlusTree.LOWER_BOUND, 1);
+            leftSubNodes.keys[leftSubNodes.length() - 1] = BPlusTree.LAST_KEY;
+            leftSubNodes.values[leftSubNodes.length() - 1] = subNodeToMoveLeft;
+            
+            InnerNode leftNode = new InnerNode<T>(this.group, leftSubNodes);
+            InnerNode rightNode = new InnerNode<T>(this.group, newArr.rightPart(BPlusTree.LOWER_BOUND + 1));
+            subNodeToMoveLeft.setParent(leftNode); // smf: maybe it is not necessary because of the code in the constructor
+
+            InnerNode parent = this.getParent(false);
+            this.clean();
+            
+            // propagate split to parent
+            if (parent == null) {
+        	// (treeDepth + 1) is the new actual depth; the +1 will be created in the following lines
+        	// if this value is larger than the cutoff, then we already have partial replication tree nodes
+        	// in that case, we have to move the cutoff point by one level 
+        	InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
+        	return newRoot;
+            } else {
+                return parent.rebasePopulation(leftNode, rightNode, keyToSplit);
             }
         }
     }
