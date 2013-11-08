@@ -338,7 +338,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             
             if (this.entriesList.isEmpty()) {
         	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
-        	return getParent(false).underflowFromLeaf(key, null, height, 0, localRootsUUID, cutoff, cutoffKey, true);
+        	return getParent(false).underflowFromLeaf(key, null, height, 0, localRootsUUID, cutoffKey, cutoff, true);
             }
             
             int size = this.entriesList.getSizeWithRule() - (BPlusTree.INTRA_NODE_CONC && !BPlusTree.POPULATING? 1 : 0);
@@ -349,7 +349,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
             if (size < BPlusTree.LOWER_BOUND) {
         	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
         	replacementKey = getReplacementKeyIfNeededWithList(key);
-                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff, cutoffKey, false);
+                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoffKey, cutoff, false);
             } else if ((replacementKey = getReplacementKeyIfNeededWithList(key)) != null) {
                 return getParent(false).replaceDeletedKey(key, replacementKey);
             } else {
@@ -373,7 +373,7 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 
             if (localArr.length() < BPlusTree.LOWER_BOUND) {
         	Integer cutoff = BPlusTree.getCutoff(true, cutoffKey);
-                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoff, false);
+                return getParent(false).underflowFromLeaf(key, replacementKey, height, 0, localRootsUUID, cutoffKey, cutoff, false);
             } else if (replacementKey != null) {
                 return getParent(false).replaceDeletedKey(key, replacementKey);
             } else {
