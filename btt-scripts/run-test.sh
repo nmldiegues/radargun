@@ -22,6 +22,7 @@ EST_DURATION="1"
 BENC_DEFAULT="-distributed -c $NR_NODES_TO_USE -k $KEYS_SIZE -kr $KEYS_RANGE -d 60 -ro $READ_ONLY_PERC -t $THREAD_MIGRATION -r $REPLICATION_DEGREES -l $COLOCATION -g $GHOST_READS -i $INTRA_NODE_CONC -b $LOWER_BOUND -e $EMULATION -w $WORKLOAD"
 
 echo "============ INIT BENCHMARKING ==============="
+echo ${BENC_DEFAULT}
 
 clean_master
 # kill_java ${CLUSTER}
