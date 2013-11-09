@@ -32,17 +32,17 @@ public class ColocationThread extends Thread {
     @Override
     public void run() {
 	while (true) {
-	    colocate();
+	    colocate(null);
 	}
     }
     
-    public boolean colocate() {
+    public boolean colocate(LocatedKey treeKey) {
 	List<InnerNode>[] allRoots = new List[this.keys.length];
 	sleep();
 
 	int cutoff = tree.getCutoff(true, tree.cutoffKey);
 	BPlusTree.wrapper.startTransaction(false);
-	tree.applyCutoff(cutoff);
+	tree.applyCutoff(treeKey, cutoff);
 	BPlusTree.wrapper.endTransaction(true);
 	
 	boolean successful = false;

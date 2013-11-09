@@ -172,7 +172,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         	if ((treeDepth + 1) > cutoff) {
         	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
         	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
-        	    BPlusTree.setCutoff(cutoffKey, cutoff - 1);
         	    return (possibleNew != null) ? possibleNew : newRoot;
         	} else {
         	    InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
@@ -558,7 +557,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
                 if ((treeDepth - 1) > cutoff) {
                     InnerNode newRoot = (InnerNode) child;
                     InnerNode possiblyNew = newRoot.fixLocalRootsMoveCutoffDown(localRootsUUID, cutoff, 1, treeDepth);
-                    BPlusTree.setCutoff(cutoffKey, cutoff + 1);
                     InnerNode toReturn = possiblyNew != null ? possiblyNew : newRoot;
                     return toReturn;
                 } else if ((treeDepth - 1) == cutoff) {

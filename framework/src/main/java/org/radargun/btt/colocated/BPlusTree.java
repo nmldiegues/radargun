@@ -120,9 +120,9 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     
     transient ColocationThread colocationThread;
     
-    public boolean colocate() {
+    public boolean colocate(LocatedKey treeKey) {
 	if (colocationThread != null) {
-	return this.colocationThread.colocate();
+	return this.colocationThread.colocate(treeKey);
 	} else { return false; }
     }
     
@@ -152,9 +152,20 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	}
     }
     
-    public void applyCutoff(int cutoff) {
+    public void applyCutoff(LocatedKey treeKey, int cutoff) {
 	AbstractNode root = this.getRoot(true);
 	setRoot(root.applyCutoff(localRootsUUID, cutoff, 0));
+	this.group = 0;
+	
+	wrapper.endTransaction(true);
+	wrapper.startTransaction(false);
+	AbstractNode newRoot = this.getRoot(true);
+	int cutoffVal = getCutoff(true, this.cutoffKey);
+	this.rootKey = wrapper.createGroupingKeyWithRepl(this.rootKey.getKey(), 0, this.rootKey.getReplicationDegree());
+	this.cutoffKey = wrapper.createGroupingKeyWithRepl(this.cutoffKey.getKey(), 0, this.cutoffKey.getReplicationDegree());
+	setRoot(newRoot);
+	setCutoff(this.cutoffKey, cutoffVal);
+	wrapper.put(treeKey, this);
     }
     
     public static Integer getCutoff(boolean ghost, LocatedKey key) {
