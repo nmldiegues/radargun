@@ -279,7 +279,9 @@ throw new RuntimeException(e);
 		double dmax = (double) max;
 		double di = (double) i;
 		int perc = (int)((di - dmin) / (dmax - dmin) * 100.0);
-		System.out.println(Thread.currentThread().getId() + "] Coordinator inserted: " + i + " " + max + " -- " + perc + " %");
+		if (i % 50000 == 0) {
+		    System.out.println(Thread.currentThread().getId() + "] Coordinator inserted: " + i + " " + max + " -- " + perc + " %");
+		}
 		timeout = 10;
 	    }
 	}
