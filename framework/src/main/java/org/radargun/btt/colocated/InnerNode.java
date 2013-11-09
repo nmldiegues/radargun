@@ -57,6 +57,21 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	
 	setSubNodes(doubleArray.changeReplication(values));
     }
+    
+    InnerNode(boolean applyCutoff, InnerNode old, int newGroup) {
+	super(newGroup);
+	ensureKey();
+	DoubleArray<AbstractNode> doubleArray = old.getSubNodes(false);
+	AbstractNode[] values = new AbstractNode[doubleArray.values.length];
+	
+	int i = 0;
+	for (AbstractNode oldChild : doubleArray.values) {
+	    values[i].setParent(this);
+	    i++;
+	}
+	
+	setSubNodes(doubleArray.changeReplication(values));
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -196,13 +211,19 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		AbstractNode myChild = subNodes.values[i];
 		newValues[i] = myChild.applyCutoff(localRootsUUID, cutoff, currentDepth);
 	    }
+	    
 	    if (newValues[0] != null) {
 		setSubNodes(subNodes.changeReplication(newValues));
-	    } else {
-		BPlusTree.wrapper.endTransaction(true);
-		BPlusTree.wrapper.startTransaction(false);
 	    }
-	    return this.changeGroup(0);
+	    
+	    InnerNode newMe = new InnerNode(this, 0);
+	    
+	    if (newValues[0] == null) {
+		BPlusTree.wrapper.endTransaction(true);
+	    	BPlusTree.wrapper.startTransaction(false);
+	    }
+	    
+	    return newMe;
 	}
     }
     
