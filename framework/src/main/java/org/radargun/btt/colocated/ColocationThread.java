@@ -36,6 +36,10 @@ public class ColocationThread extends Thread {
 	}
     }
     
+    public boolean colocate() {
+	return colocate(null);
+    }
+    
     public boolean colocate(LocatedKey treeKey) {
 	List<InnerNode>[] allRoots = new List[this.keys.length];
 	sleep();
