@@ -249,6 +249,10 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	}
     }
     
+    protected AbstractNode applyCutoff(String localRootsUUID, int cutoff, int currentDepth) {
+	throw new RuntimeException("Should not apply cutoff to Leaf " + cutoff + " currentDepth");
+    }
+    
     public RebalanceBoolean insertWithArrayWithRebalance(Comparable key, Serializable value, int height, String localRootsUUID, LocatedKey cutoffKey) {
 	DoubleArray<Serializable> localEntries = this.getEntries(false);
 	DoubleArray<Serializable> localArr = justInsert(localEntries, key, value);

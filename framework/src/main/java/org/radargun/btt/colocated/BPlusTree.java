@@ -108,7 +108,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     private int group;
     private LocatedKey rootKey;
     public String localRootsUUID;
-    private LocatedKey cutoffKey;
+    public LocatedKey cutoffKey;
 
     public static int MEMBERS;
     public static boolean COLOCATE;
@@ -150,6 +150,11 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	if (threadMigration) {
 	    this.colocationThread = new ColocationThread(this); //.start();
 	}
+    }
+    
+    public void applyCutoff(int cutoff) {
+	AbstractNode root = this.getRoot(true);
+	setRoot(root.applyCutoff(localRootsUUID, cutoff, 0));
     }
     
     public static Integer getCutoff(boolean ghost, LocatedKey key) {

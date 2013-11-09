@@ -184,6 +184,29 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         }
     }
     
+    protected AbstractNode applyCutoff(String localRootsUUID, int cutoff, int currentDepth) {
+	cutoff = cutoff + 1;
+	
+	if (cutoff == currentDepth) {
+	    BPlusTree.addLocalRoot(localRootsUUID, this);
+	    return null;
+	} else {
+	    DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
+	    AbstractNode[] newValues = new AbstractNode[subNodes.values.length];
+	    for (int i = 0; i < subNodes.values.length; i++) {
+		AbstractNode myChild = subNodes.values[i];
+		newValues[i] = myChild.applyCutoff(localRootsUUID, cutoff, currentDepth);
+	    }
+	    if (newValues[0] != null) {
+		setSubNodes(subNodes.changeReplication(newValues));
+	    } else {
+		BPlusTree.wrapper.endTransaction(true);
+		BPlusTree.wrapper.startTransaction(false);
+	    }
+	    return this.changeGroup(0);
+	}
+    }
+    
     // this method is invoked when a node in the next depth level got full, it
     // was split and now needs to pass a new key to its parent (this)
     RebalanceBoolean rebase(boolean dummy, AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {

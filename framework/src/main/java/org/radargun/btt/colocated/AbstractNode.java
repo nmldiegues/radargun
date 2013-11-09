@@ -49,6 +49,8 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
 	return this.group;
     }
     
+    protected abstract AbstractNode applyCutoff(String localRootsUUID, int cutoff, int currentDepth);
+    
     protected InnerNode getParent(boolean ghostRead) {
 	if (ghostRead) {
 	    return (InnerNode) BPlusTree.cacheGetShadow(this.parentKey);

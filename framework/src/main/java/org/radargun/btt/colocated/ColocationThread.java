@@ -40,6 +40,11 @@ public class ColocationThread extends Thread {
 	List<InnerNode>[] allRoots = new List[this.keys.length];
 	sleep();
 
+	int cutoff = tree.getCutoff(true, tree.cutoffKey);
+	BPlusTree.wrapper.startTransaction(false);
+	tree.applyCutoff(cutoff);
+	BPlusTree.wrapper.endTransaction(true);
+	
 	boolean successful = false;
 	while (!successful) {
 	    try {
