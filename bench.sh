@@ -45,13 +45,13 @@ emulation[6]="none"
 emulation[7]="none"
 emulation[8]="none"
 
-size[1]="100000"
-size[2]="100000"
-size[3]="100000"
-size[4]="100000"
-size[5]="100000"
-size[6]="100000"
-size[7]="100000"
+size[1]="1000000"
+size[2]="1000000"
+size[3]="1000000"
+size[4]="1000000"
+size[5]="1000000"
+size[6]="1000000"
+size[7]="1000000"
 
 arity[1]="2"
 arity[2]="4"
@@ -62,31 +62,31 @@ arity[6]="64"
 arity[7]="128"
 
 
-keyRange[1]="100000"
-keyRange[2]="100000"
-keyRange[3]="100000"
-keyRange[4]="100000"
-keyRange[5]="100000"
-keyRange[6]="100000"
-keyRange[7]="100000"
+keyRange[1]="1000000"
+keyRange[2]="1000000"
+keyRange[3]="1000000"
+keyRange[4]="1000000"
+keyRange[5]="1000000"
+keyRange[6]="1000000"
+keyRange[7]="1000000"
 
 ro=1
 
     for attempt in 1
     do
         echo "going for attempt $attempt"
-        for nodes in 60 #8 16 24 32 40 48 56 64 80 100
+        for nodes in 50 #8 16 24 32 40 48 56 64 80 100
         do
         head -$nodes all_machines > /home/$USER/machines
 
                 echo "going for nodes $nodes"
-            for work in 1 #2 3 4
+            for work in 1 2 3 4 5 6 7 8
             do
                 echo "going for ro $ro"
                 for opt in 1 #2 6 7 8
                 do
                 echo "going for opt $opt"
-                for sa in 4 5 6 7
+                for sa in 1 2 3 4 5 #6 7
                 do
                 echo "going for sa $sa"
                 echo "bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}"

@@ -213,6 +213,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		e.printStackTrace();
 		try { wrapper.endTransaction(false); 
 		} catch (Exception e2) { }
+throw new RuntimeException(e);
 	    }
 	}
     }

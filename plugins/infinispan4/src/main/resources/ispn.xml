@@ -47,7 +47,7 @@
             <hash
 		    factory="org.radargun.cachewrappers.CustomHashingFactory"
 		    numSegments="256"
-                    numOwners="4"
+                    numOwners="1"
                     >
                     <groups enabled="true" />
             </hash>
