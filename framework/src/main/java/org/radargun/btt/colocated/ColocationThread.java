@@ -61,6 +61,7 @@ public class ColocationThread extends Thread {
 		    if (allRoots[i] != null && allRoots[i].size() > 0) {
 			source = allRoots[i];
 			s = i;
+System.out.println("Found source for local roots with length: " + source.size());
 		    }
 		    i++;
 		}
@@ -70,6 +71,7 @@ public class ColocationThread extends Thread {
 		int division = (int) Math.floor((localRoots + 0.0) / (members + 0.0));
 		if (division == 0) {
 		    BPlusTree.wrapper.endTransaction(true);
+System.out.println("Division is zero, not co-locating! Had members: " + members );
 		    return false;
 		}
 		
