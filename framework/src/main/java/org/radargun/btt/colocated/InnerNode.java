@@ -189,11 +189,6 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     RebalanceBoolean rebase(boolean dummy, AbstractNode subLeftNode, AbstractNode subRightNode, Comparable middleKey, int treeDepth, int height, String localRootsUUID, LocatedKey cutoffKey, int cutoff) {
 	DoubleArray<AbstractNode> newArr = justInsertUpdatingParentRelation(middleKey, subLeftNode, subRightNode);
 	
-/*        if (this.isFullyReplicated()) {
-            BPlusTree.wrapper.endTransaction(true);
-            BPlusTree.wrapper.startTransaction(false);
-        }*/
-	
         if (newArr.length() <= BPlusTree.MAX_NUMBER_OF_ELEMENTS) { // this node can accommodate the new split
             return new RebalanceBoolean(false, BPlusTree.TRUE_NODE);
         } else { // must split this node
@@ -208,12 +203,12 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
             
             InnerNode leftNode = new InnerNode<T>(this.group, leftSubNodes);
             InnerNode rightNode = new InnerNode<T>(this.group, newArr.rightPart(BPlusTree.LOWER_BOUND + 1));
-            int farFromTop = treeDepth - height;
+//            int farFromTop = treeDepth - height;
             subNodeToMoveLeft.setParent(leftNode); // smf: maybe it is not necessary because of the code in the constructor
 
-            if (farFromTop == cutoff) {
-        	BPlusTree.updateLocalRoots(localRootsUUID, leftNode, rightNode, this);
-            }
+//            if (farFromTop == cutoff) {
+//        	BPlusTree.updateLocalRoots(localRootsUUID, leftNode, rightNode, this);
+//            }
             
             InnerNode parent = this.getParent(false);
             this.clean();
@@ -223,15 +218,15 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
         	// (treeDepth + 1) is the new actual depth; the +1 will be created in the following lines
         	// if this value is larger than the cutoff, then we already have partial replication tree nodes
         	// in that case, we have to move the cutoff point by one level 
-        	if ((treeDepth + 1) > cutoff) {
-        	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
-        	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
-        	    BPlusTree.setCutoff(cutoffKey, cutoff - 1);
-        	    return new RebalanceBoolean(true, (possibleNew != null) ? possibleNew : newRoot);
-        	} else {
+//        	if ((treeDepth + 1) > cutoff) {
+//        	    InnerNode newRoot = new InnerNode<T>(-1, leftNode, rightNode, keyToSplit);
+//        	    InnerNode possibleNew = newRoot.fixLocalRootsMoveCutoffUp(localRootsUUID, cutoff, 1, treeDepth);
+//        	    BPlusTree.setCutoff(cutoffKey, cutoff - 1);
+//        	    return new RebalanceBoolean(true, (possibleNew != null) ? possibleNew : newRoot);
+//        	} else {
         	    InnerNode newRoot = new InnerNode<T>(this.group, leftNode, rightNode, keyToSplit);
         	    return new RebalanceBoolean(true, newRoot);
-        	}
+//        	}
             } else {
                 return parent.rebase(false, leftNode, rightNode, keyToSplit, treeDepth, height + 1, localRootsUUID, cutoffKey, cutoff);
             }

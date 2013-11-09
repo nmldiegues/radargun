@@ -127,7 +127,7 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
     }
     
     public BPlusTree(int clusterSize, boolean threadMigration, boolean doColocation, boolean ghostReads, boolean replicationDegrees) {
-	this.group = 0;
+	this.group = BPlusTree.myGroup(); //0;
 	    
 	MEMBERS = clusterSize;
 	THREAD_MIGRATION = threadMigration;
