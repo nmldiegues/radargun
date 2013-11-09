@@ -167,10 +167,43 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		System.exit(-1);
 	    }
 
-	    int batch = 1000;
-	    for (int i = 0; i < this.keysSize; i += batch) {
-		doPopulation(wrapper, tree, i, batch);
-		System.out.println("Coordinator inserted: " + i + " // " + this.keysSize);
+//	    int batch = 1000;
+//	    for (int i = 0; i < this.keysSize; i += batch) {
+//		doPopulation(wrapper, tree, i, batch);
+//		System.out.println("Coordinator inserted: " + i + " // " + this.keysSize);
+//	    }
+	    
+	    int threads = Runtime.getRuntime().availableProcessors();
+	    
+	    long[] arr = new long[this.keysRange];
+	    for (int i = 0; i < this.keysRange; i ++) {
+		arr[i] = w.getIntForInsert();
+	    }
+	    
+	    Worker[] workers = new Worker[threads];
+	    int division = this.keysRange / threads;
+	    int batch = 0;
+	    for (int i = 0; i < workers.length; i++) {
+		workers[i] = new Worker(tree, batch, division, arr, wrapper);
+		System.out.println("Setup worker " + i + "th with min " + batch + " and max " + division);
+		batch += division;
+	    }
+	    
+	    workers[0].start();
+	    
+	    try {
+		Thread.sleep(10000);
+	    } catch (InterruptedException e1) {
+	    }
+	    
+	    for (int i = 1; i < this.keysRange; i++) {
+		workers[i].start();
+	    }
+	    for (int i = 0; i < this.keysRange; i++) {
+		try {
+		    workers[i].join();
+		} catch (InterruptedException e) {
+		}
 	    }
 	    
 	    System.out.println("Starting colocation!");
@@ -214,6 +247,65 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 		try { wrapper.endTransaction(false); 
 		} catch (Exception e2) { }
 throw new RuntimeException(e);
+	    }
+	}
+    }
+    
+    public class Worker extends Thread {
+	
+	public final int min;
+	public final int max;
+	public final long[] arr;
+	public final CacheWrapper wrapper;
+	public final BPlusTree<Long> tree;
+	public final Random ran;
+	private long timeout;
+	
+	public Worker(BPlusTree<Long> tree, int min, int max, long[] arr, CacheWrapper wrapper) {
+	    this.tree = tree;
+	    this.min = min;
+	    this.max = max;
+	    this.arr = arr;
+	    this.wrapper = wrapper;
+	    this.ran = new Random();
+	}
+	
+	@Override
+	public void run() {
+	    int batch = 1000;
+	    for (int i = min; i < max; i += batch) {
+		populate(i, batch);
+		System.out.println(Thread.currentThread().getId() + "] Coordinator inserted: " + ((int)(max - i)/(max - min) * 100) + " %");
+		timeout = 10;
+	    }
+	}
+	
+	private void populate(int start, int batch) {
+	    boolean successful = false;
+	    while (!successful) {
+		try {
+		    wrapper.startTransaction(false);
+
+		    for (int i = start; i < (start + batch); i++) {
+			long nextVal = arr[i];
+			if (tree.insert(nextVal)) {
+			    wrapper.endTransaction(true);
+			    wrapper.startTransaction(false);
+			}
+		    }
+
+		    wrapper.endTransaction(true);
+		    successful = true;
+		} catch (Exception e) {
+		    try { wrapper.endTransaction(false); 
+		    } catch (Exception e2) { }
+		    try {
+			Thread.sleep(timeout);
+		    } catch (InterruptedException e1) {
+		    }
+		    
+		    timeout = timeout + this.ran.nextInt(100);
+		}
 	    }
 	}
     }
