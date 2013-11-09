@@ -184,7 +184,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
     }
     
     protected AbstractNode applyCutoff(String localRootsUUID, int cutoff, int currentDepth) {
-	cutoff = cutoff + 1;
+	currentDepth = currentDepth + 1;
 	
 	if (cutoff == currentDepth) {
 	    BPlusTree.addLocalRoot(localRootsUUID, this);
