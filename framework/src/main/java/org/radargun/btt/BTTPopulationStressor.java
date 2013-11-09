@@ -192,14 +192,14 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    workers[0].start();
 	    
 	    try {
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 	    } catch (InterruptedException e1) {
 	    }
 	    
-	    for (int i = 1; i < this.keysRange; i++) {
+	    for (int i = 1; i < threads; i++) {
 		workers[i].start();
 	    }
-	    for (int i = 0; i < this.keysRange; i++) {
+	    for (int i = 0; i < threads; i++) {
 		try {
 		    workers[i].join();
 		} catch (InterruptedException e) {
@@ -275,7 +275,7 @@ throw new RuntimeException(e);
 	    int batch = 1000;
 	    for (int i = min; i < max; i += batch) {
 		populate(i, batch);
-		System.out.println(Thread.currentThread().getId() + "] Coordinator inserted: " + ((int)(max - i)/(max - min) * 100) + " %");
+		System.out.println(Thread.currentThread().getId() + "] Coordinator inserted: " + i + " " + max + " -- " + ((int)((max - i)/(max - min) * 100)) + " %");
 		timeout = 10;
 	    }
 	}
