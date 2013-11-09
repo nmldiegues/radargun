@@ -57,6 +57,7 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    log.warn("Received exception during cache population" + e.getMessage());
+System.exit(1);
 	}
 	return null;
     }

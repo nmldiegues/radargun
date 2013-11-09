@@ -56,21 +56,18 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	}
 	
 	setSubNodes(doubleArray.changeReplication(values));
+        this.setParent(old.getParent(true));
     }
     
     InnerNode(boolean applyCutoff, InnerNode old, int newGroup) {
 	super(newGroup);
 	ensureKey();
 	DoubleArray<AbstractNode> doubleArray = old.getSubNodes(false);
-	AbstractNode[] values = new AbstractNode[doubleArray.values.length];
-	
-	int i = 0;
 	for (AbstractNode oldChild : doubleArray.values) {
-	    values[i].setParent(this);
-	    i++;
+	    oldChild.setParent(this);
 	}
 	
-	setSubNodes(doubleArray.changeReplication(values));
+	setSubNodes(doubleArray);
     }
 
     @Override
@@ -203,6 +200,8 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 	
 	if (cutoff == currentDepth) {
 	    BPlusTree.addLocalRoot(localRootsUUID, this);
+ColocationThread.countFull++;
+System.out.println("Created root " + ColocationThread.countFull + " at cutoff " + cutoff + " == " + currentDepth);
 	    return null;
 	} else {
 	    DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
@@ -216,7 +215,7 @@ public class InnerNode<T extends Serializable> extends AbstractNode<T> implement
 		setSubNodes(subNodes.changeReplication(newValues));
 	    }
 	    
-	    InnerNode newMe = new InnerNode(this, 0);
+	    InnerNode newMe = new InnerNode(true, this, 0);
 	    
 	    if (newValues[0] == null) {
 		BPlusTree.wrapper.endTransaction(true);
