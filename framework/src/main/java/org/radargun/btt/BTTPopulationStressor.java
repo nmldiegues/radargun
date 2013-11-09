@@ -184,8 +184,8 @@ public class BTTPopulationStressor extends AbstractCacheWrapperStressor{
 	    int division = this.keysRange / threads;
 	    int batch = 0;
 	    for (int i = 0; i < workers.length; i++) {
-		workers[i] = new Worker(tree, batch, division, arr, wrapper);
-		System.out.println("Setup worker " + i + "th with min " + batch + " and max " + division);
+		workers[i] = new Worker(tree, batch, batch + division, arr, wrapper);
+		System.out.println("Setup worker " + i + "th with min " + batch + " and max " + (batch + division));
 		batch += division;
 	    }
 	    
