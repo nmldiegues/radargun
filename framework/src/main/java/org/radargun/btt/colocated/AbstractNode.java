@@ -1,5 +1,7 @@
 package org.radargun.btt.colocated;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -111,4 +113,6 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
     abstract int shallowSize();
 
     abstract AbstractNode changeGroup(int newGroup);
+
+    abstract int checkDistribution(Map<Integer, List<Integer>> keysDist, boolean sawCutoff);
 }

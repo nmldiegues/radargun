@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -472,6 +473,10 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	}
     }
 
+    public int checkDistribution(Map<Integer, List<Integer>> keysDist, boolean sawCutoff) {
+	return this.getEntries(true).length();
+    }
+    
     @Override
     public boolean containsKey(boolean remote, Comparable key) {
 	if (BPlusTree.INTRA_NODE_CONC) {

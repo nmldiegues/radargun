@@ -1,7 +1,9 @@
 package org.radargun.btt.colocated;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.radargun.LocatedKey;
 
@@ -121,6 +123,17 @@ System.out.println("Division is zero, not co-locating! Had members: " + members 
 //		sleep();
 	    }
 	}
+	
+	Map<Integer, List<Integer>> keysDist = new HashMap<Integer, List<Integer>>();
+	tree.checkDistribution(keysDist);
+	for (Map.Entry<Integer, List<Integer>> entry : keysDist.entrySet()) {
+	    System.out.print(entry.getKey());
+	    for (Integer keysLength : entry.getValue()) {
+		System.out.print(" " + keysLength);
+	    }
+	    System.out.println();
+	}
+	
 	return false;
     }
     
