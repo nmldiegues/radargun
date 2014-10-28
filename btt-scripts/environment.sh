@@ -1,5 +1,5 @@
 # ENVIRONMENT VARIABLES
-MASTER=10.1.2.183 # this was modified!!
+MASTER=gateway-stibt # this was modified!!
 
 #variables to set:
 #CLUSTER=`echo vm{47..86}`

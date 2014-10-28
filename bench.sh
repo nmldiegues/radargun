@@ -70,23 +70,23 @@ keyRange[5]="1000000"
 keyRange[6]="1000000"
 keyRange[7]="1000000"
 
-ro=1
+ro=3
 
     for attempt in 1
     do
         echo "going for attempt $attempt"
-        for nodes in 50 #8 16 24 32 40 48 56 64 80 100
+        for nodes in 4 #10 20 30 40 50 60 #8 16 24 32 40 48 56 64 80 100
         do
         head -$nodes all_machines > /home/$USER/machines
 
                 echo "going for nodes $nodes"
-            for work in 1 2 3 4 5 6 7 8
+            for work in 1 #2 3 #4 5 6
             do
                 echo "going for ro $ro"
                 for opt in 1 #2 6 7 8
                 do
                 echo "going for opt $opt"
-                for sa in 1 2 3 4 5 #6 7
+                for sa in 3 #5 4 3 2 1
                 do
                 echo "going for sa $sa"
                 echo "bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}"
@@ -94,7 +94,7 @@ ro=1
                 mv results-radargun/test-result-results2/infinispan4_ispn_$nodes.csv auto-results/$nodes-${readPerc[$ro]}-${optStr[$opt]}-${emulation[$opt]}-${size[$sa]}-${keyRange[$sa]}-${arity[$sa]}-${workload[$work]}-$attempt.csv
                 rc=$?
                 if [[ $rc != 0 ]] ; then
-                    echo "Error within: bash btt-scripts/run-test.sh ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}" >> auto-results/error.out
+                    echo "Error within: bash btt-scripts/run-test.sh $nodes ${readPerc[$ro]} ${size[$sa]} ${keyRange[$sa]} ${options[$opt]} ${arity[$sa]} ${emulation[$opt]} ${workload[$work]}" >> auto-results/error.out
                 fi
                 done
                 done
