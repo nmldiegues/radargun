@@ -114,5 +114,4 @@ public abstract class AbstractNode<T extends Serializable> implements Iterable<T
 
     abstract AbstractNode changeGroup(int newGroup);
 
-    abstract int checkDistribution(Map<Integer, List<Integer>> keysDist, boolean sawCutoff);
 }

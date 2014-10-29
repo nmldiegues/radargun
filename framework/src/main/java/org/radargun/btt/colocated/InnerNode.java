@@ -816,30 +816,6 @@ System.out.println("Created root " + ColocationThread.countFull + " at cutoff " 
 	}
     }
     
-    public int checkDistribution(Map<Integer, List<Integer>> keysDist, boolean sawCutoff) {
-	DoubleArray<AbstractNode> subNodes = this.getSubNodes(true);
-	boolean nextSawCutoff = false;
-	if (!this.isFullyReplicated() && !sawCutoff) {
-	    nextSawCutoff = true;
-	}
-	
-	int size = 0;
-	for (int i = 0; i < subNodes.length(); i++) {
-	    size += subNodes.values[i].checkDistribution(keysDist, nextSawCutoff);
-	}
-	
-	if (nextSawCutoff) {
-	    List<Integer> list = keysDist.get(this.group);
-	    if (list == null) {
-		list = new ArrayList<Integer>();
-		keysDist.put(this.group, list);
-	    }
-	    list.add(size);
-	}
-	
-	return size;
-    }
-    
     @Override
     public boolean containsKey(boolean remote, Comparable key) {
 	if (!this.isFullyReplicated() && !remote && this.getGroup() != BPlusTree.myGroup()) {

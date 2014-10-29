@@ -473,10 +473,6 @@ public class LeafNode<T extends Serializable> extends AbstractNode<T> implements
 	}
     }
 
-    public int checkDistribution(Map<Integer, List<Integer>> keysDist, boolean sawCutoff) {
-	return this.getEntries(true).length();
-    }
-    
     @Override
     public boolean containsKey(boolean remote, Comparable key) {
 	if (BPlusTree.INTRA_NODE_CONC) {

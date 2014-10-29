@@ -175,13 +175,6 @@ public class BPlusTree<T extends Serializable> implements Serializable, Iterable
 	wrapper.put(treeKey, this);
     }
     
-    public void checkDistribution(Map<Integer, List<Integer>> keysDist) {
-	wrapper.startTransaction(false);
-	AbstractNode root = this.getRoot(true);
-	root.checkDistribution(keysDist);
-	wrapper.endTransaction(true);
-    }
-    
     public static Integer getCutoff(boolean ghost, LocatedKey key) {
 	if (ghost) {
 	    return (Integer) wrapper.getGhost(key);
